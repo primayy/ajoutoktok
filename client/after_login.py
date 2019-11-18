@@ -3,7 +3,6 @@ from PyQt5.QtGui import *
 from PyQt5 import QtCore
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-import chat
 from PyQt5.QtWidgets import QApplication
 import lecture_list as lec
 import alarm

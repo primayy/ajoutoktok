@@ -5,8 +5,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
-import chat
 import chat_test
+import msget
 
 class lecture_list(QWidget):
     def __init__(self,studid,lecid,w):
@@ -228,8 +228,8 @@ class lecture(QWidget):
             self.msg_widget.resize(20, 20)
             self.msg_widget.setStyleSheet('''border:0px''')
             self.msg_widget.setIcon(QIcon('./icon/msg_widget.png'))
-            self.msg_widget.clicked.connect(self.msg_widget_on)
             self.prof = QLabel(course[1])
+            self.msg_widget.clicked.connect(self.msg_widget_on)
             self.layout_bottom.addWidget(self.prof)
             self.layout_bottom.addWidget(self.msg_widget, alignment=(QtCore.Qt.AlignRight))
 
@@ -251,6 +251,8 @@ class lecture(QWidget):
         self.chat.setMinimumSize(QSize(400, 400))
 
     def msg_widget_on(self):
+        self.mwidget = msget.Invisible(self,self.lecture,self.prof)
+        self.mwidget.setMinimumSize(QSize(200, 200))
         print('aaa')
 
 class lecture_group(QWidget):

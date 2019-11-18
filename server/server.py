@@ -279,6 +279,25 @@ class ServerSocket:
                     self.databasent.commit()
                     print('굿?')
 
+                elif commend == 'HowManyChat':
+                    cur = self.databasent.cursor()
+                    print(msg)
+                    print("Finding lecno...")
+                    cur.execute("SELECT no FROM lecture WHERE lecture_name ='" + str(side[0]) + "' AND professor_name = '" + str(side[1]) + "'")
+                    allSQLRows = cur.fetchall()
+                    lecno = allSQLRows[0][0]
+                    print(lecno)
+                    cur.execute("SELECT no FROM category WHERE lecture_id =" + str(lecno) + "")
+                    allSQLRows = cur.fetchall()
+                    catno = allSQLRows[0][0]
+                    print(catno)
+                    cur.execute("SELECT count(*) FROM chatting WHERE category_id =" + str(catno) + "")
+                    allSQLRows = cur.fetchall()
+                    count = allSQLRows[0][0]
+                    print(str(count))
+                    print('클라이언트로 lecture 정보 전송')
+                    client.send(str(count).encode('utf-8'))
+                
                 elif commend == 'exit':
                     self.removeCleint(addr, client)
                     break

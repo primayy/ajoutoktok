@@ -19,6 +19,10 @@
 -- Table structure for table `category`
 --
 
+CREATE DATABASE db_testin;
+use db_testin;
+
+
 DROP TABLE IF EXISTS `category`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -54,7 +58,7 @@ CREATE TABLE `chatting` (
   `comment` varchar(1000) DEFAULT NULL,
   `nickname` varchar(15) NOT NULL,
   `student_id` char(9) NOT NULL,
-  `date_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `likes` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`no`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
@@ -66,7 +70,7 @@ CREATE TABLE `chatting` (
 
 LOCK TABLES `chatting` WRITE;
 /*!40000 ALTER TABLE `chatting` DISABLE KEYS */;
-INSERT INTO `chatting` VALUES (1,1,'테스트','홍길동','201520990','0000-00-00 00:00:00',0),(15,1,'aopdkasopkdopasda','test','201520990','2019-11-18 21:18:14',0),(16,1,'하이 정우야','test','201520990','2019-11-18 21:18:17',0);
+INSERT INTO `chatting` VALUES (1,1,'테스트','홍길동','201520990','0000-00-00 00:00:00',0),(15,1,'aopdkasopkdopasda','test','201520990','2019-11-18 21:18:14',0),(16,1,'하이 정우야','test','201520990',CURRENT_TIMESTAMP,0);
 /*!40000 ALTER TABLE `chatting` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -94,7 +98,7 @@ CREATE TABLE `lecture` (
 
 LOCK TABLES `lecture` WRITE;
 /*!40000 ALTER TABLE `lecture` DISABLE KEYS */;
-INSERT INTO `lecture` VALUES (1,'인공지능','a','김민구','prof1',0),(2,'집중교육2','b','한경식','prof2',0);
+INSERT INTO `lecture` VALUES (1,'인공지능','a','김민구','prof1',0),(2,'IT집중교육2','b','한경식','prof2',0);
 /*!40000 ALTER TABLE `lecture` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -195,7 +199,7 @@ CREATE TABLE `student_id` (
 
 LOCK TABLES `student_id` WRITE;
 /*!40000 ALTER TABLE `student_id` DISABLE KEYS */;
-INSERT INTO `student_id` VALUES (1,'201720713'),(2,'201520990');
+INSERT INTO `student_id` VALUES (1,'201720713'),(2,'201520990'),(3,'201620939');
 /*!40000 ALTER TABLE `student_id` ENABLE KEYS */;
 UNLOCK TABLES;
 

@@ -24,7 +24,7 @@ class App(QWidget):
         self.clientSocket = window.clientSock
         self.studId =studid
         if lecid is 'x':
-            self.lecId = lecid
+            self.lecId = []
         else:
             self.lecId = lecid.split(' ')
 

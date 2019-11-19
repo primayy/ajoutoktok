@@ -8,7 +8,7 @@ import requests
 class ServerSocket:
     def __init__(self):
         try:
-            self.databasent = mdb.connect('localhost', 'root', '0428', 'db_testin')
+            self.databasent = mdb.connect('localhost', 'root', '789521', 'db_testin')
             print("Successfully Connected To DB")
         except mdb.Error as e:
             print('Not Connected Succefully To DB')
@@ -160,6 +160,18 @@ class ServerSocket:
 
                     if len(allSQLRows) == 0: #그룹 0개
                         print('asd')
+                        cur = self.databasent.cursor()
+                        cur.execute("SELECT lecture_code FROM lecture WHERE no ='" + str(side[0]) + "'")
+                        lec_code = cur.fetchall()
+                        lec_code = lec_code[0][0]
+                        cur = self.databasent.cursor()
+                        query = 'INSERT INTO student_course (student_id,lecture_id,lecture_code) Values (%s,%s,%s)'
+                        cur.execute(query, (side[1], side[0], lec_code))
+
+                        self.databasent.commit()
+                        # print(str(side[1]+", "+str(side[0])))
+                        print('저장 완료')
+                        client.send('add_success'.encode('utf-8'))
 
                     else: #속해있는 그룹이 있음
                         # 이미 이 그룹에 속해있는지 확인

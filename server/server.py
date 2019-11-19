@@ -7,6 +7,7 @@ import requests
 
 class ServerSocket:
     def __init__(self):
+        self.numnum = 0
         try:
             self.databasent = mdb.connect('localhost', 'root', '789521', 'db_testin')
             print("Successfully Connected To DB")
@@ -90,7 +91,8 @@ class ServerSocket:
 
                 if commend == 'login':
                     cur = self.databasent.cursor()
-                    cur.execute("SELECT student_id FROM student_id WHERE student_id =" + str(side[0]) + "")
+                    #cur.execute("SELECT student_id FROM student_id WHERE student_id =" + str(side[0]) + "")
+                    cur.execute("SELECT * FROM student_id ")
                     allSQLRows = cur.fetchall()
 
                     #첫 로그인하는 사람인 경우
@@ -98,7 +100,8 @@ class ServerSocket:
                         print('aa')
                     else:
                         cur = self.databasent.cursor()
-                        cur.execute("SELECT lecture_id FROM student_course WHERE student_id =" + str(side[0]) + "")
+                        #cur.execute("SELECT lecture_id FROM student_course WHERE student_id =" + str(side[0]) + "")
+                        cur.execute("SELECT no,professor_name FROM lecture WHERE professor_id ='" + str(side[0]) + "'")
                         allSQLRows = cur.fetchall()
 
                         lectures = allSQLRows
@@ -110,6 +113,8 @@ class ServerSocket:
 
                             for i in range(len(lectures)):
                                 lectureId += str(lectures[i][0]) + " "
+                            if len(lectures[0])>1:
+                                lectureId += str(lectures[0][1]) + " "
                             lectureId = lectureId.rstrip()
                             # print(lectureId)
                             client.send(lectureId.encode('utf-8'))
@@ -150,6 +155,33 @@ class ServerSocket:
                             group_info += str(allSQLRows[0][2]) + ","
                     client.send(group_info.encode('utf-8'))
 
+                
+                elif commend == 'groupInsert':
+                    print('그룹 생성 왔다')
+                    cur = self.databasent.cursor()
+                    group_info = ""
+                    cur.execute("SELECT no,lecture_name,professor_name FROM lecture WHERE professor_id ='" + str(side[1]) + "' AND lecture_name ='"+str(side[0])+"'")
+                    allSQLRows = cur.fetchall()
+                    print(allSQLRows)
+                    print(len(allSQLRows))
+                    
+                    
+                    
+                    result= ""
+                    if len(allSQLRows) == 0:
+                        cur.execute("SELECT professor_name FROM lecture WHERE professor_id ='" + str(side[1]) + "'")
+                        allSQLRows = cur.fetchall()
+                        print(allSQLRows)
+                        cur.execute("INSERT INTO lecture(lecture_name,lecture_code,professor_name,professor_id,student_num) VALUES('"+str(side[0])+"','A"+str(self.numnum%10)+"B"+str(self.numnum%10)+"','"+str(allSQLRows[0][0])+"','"+str(side[1])+"',0)")
+                        self.databasent.commit()
+                        self.numnum += 1
+                        result += "add_success"
+                    else:
+                        result += "already" 
+                    client.send(result.encode('utf-8'))
+
+                
+                
                 elif commend == 'group_insert':
                     cur = self.databasent.cursor()
                     result_to_client = False

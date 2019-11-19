@@ -174,10 +174,12 @@ class login(QWidget):
 
         print('aa')
         # 테스트 코드
+        ProfId = 'Prof1'
         studentId = '201720713'
 
         # 응답 요청
         commend = 'login ' + studentId
+        commend = 'login ' + ProfId
         self.clientSocket.send(commend.encode('utf-8'))
         studentName = '전혜진'
 
@@ -185,11 +187,20 @@ class login(QWidget):
         server_msg = self.clientSocket.recv(1024)
         # print(server_msg.decode('utf-8'))
 
-        lectureId = server_msg.decode('utf-8')
-        print(lectureId)
+        lecturess = server_msg.decode('utf-8')
+        lectures = lecturess.split(" ")
+        print(lectures)
+        lectureId = ""
+        
+        for i in range(len(lectures)-1):
+            lectureId += lectures[i] +" "
+        lectureId = lectureId.rstrip()
+        ProfName = lectures[len(lectures)-1]
+
 
         mainW = QApplication.activeWindow()
-        self.afterLogin = after_login.App(mainW, studentId, studentName, lectureId)
+        #self.afterLogin = after_login.App(mainW, studentId, studentName, lectureId)
+        self.afterLogin = after_login.App(mainW, ProfId, ProfName, lectureId)
         mainW.setCentralWidget(self.afterLogin)
         self.close()
         # DB에서 로그인 정보 확인

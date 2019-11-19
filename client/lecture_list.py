@@ -87,15 +87,25 @@ class group_search_dialog(QDialog):
         self.initUi()
 
     def initUi(self):
-        groupSearchBar = QLineEdit()
-        groupSearchBar.setPlaceholderText('강의 코드')
-        search = QPushButton('조회')
-        cancel = QPushButton('취소')
+        if 'Prof' in str(self.stuid):
+            
+            groupSearchBar = QLineEdit()
+            groupSearchBar.setPlaceholderText('강의명')
+            search = QPushButton('생성')
+            search.clicked.connect(lambda: self.group_insert(groupSearchBar.text()))
+            cancel = QPushButton('취소')
+        
+        else:
+            groupSearchBar = QLineEdit()
+            groupSearchBar.setPlaceholderText('강의 코드')
+            search = QPushButton('조회')
+            search.clicked.connect(lambda: self.group_search(groupSearchBar.text()))
+            cancel = QPushButton('취소')
 
         cancel.clicked.connect(self.close)
         self.btnLayout.addWidget(search)
         self.btnLayout.addWidget(cancel)
-        search.clicked.connect(lambda: self.group_search(groupSearchBar.text()))
+
 
         self.mainLayout.addWidget(groupSearchBar)
         self.mainLayout.addLayout(self.btnLayout)
@@ -112,6 +122,34 @@ class group_search_dialog(QDialog):
         self.group_add(result_parse)
 
         # else 그룹 없음
+
+
+    def group_insert(self,group_title):
+        commend = 'groupInsert ' + group_title +' '+ str(self.stuid)
+        self.clientSocket.send(commend.encode('utf-8'))
+        # if 그룹이 존재
+        recv = self.clientSocket.recv(1024)
+
+        result_parse = recv.decode('utf-8')
+        
+        if result_parse == "add_success":
+            lecture_list = self.getLectureList()
+            for i in range(len(lecture_list)):
+                lecture(lecture_list[i],self.stuid,self.w,self.viewer,self.lecId)
+            print("??")
+            
+        else:
+            msg = QMessageBox()
+            msg.setStyleSheet("background-color:#FFFFFF")
+            msg.setText("이미 존재하는 강의입니다.")
+            group_cancel = msg.addButton('확인', QMessageBox.NoRole)
+            msg.setWindowTitle("강의 생성")
+            msg.exec_()
+                
+
+        # else 그룹 없음
+
+
 
     def group_add(self, result_parse):
         if len(result_parse) == 3:

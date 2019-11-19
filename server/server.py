@@ -368,6 +368,16 @@ class ServerSocket:
 
                     print(str(side[3])+'등록 완료')
 
+                elif commend == 'like_update':
+                    studid = str(side[0])
+                    msg = str(" ".join(side[1:]))
+
+                    cur = self.databasent.cursor()
+                    cur.execute("UPDATE chatting SET likes = likes+1 WHERE student_id ='" + studid + "' AND comment = '" + msg + "'")
+                    self.databasent.commit()
+                    print('좋아요 업데이트')
+                    client.send('like_updated'.encode('utf-8'))
+
                 elif commend == 'exit':
                     self.removeCleint(addr, client)
                     break

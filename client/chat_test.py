@@ -299,8 +299,10 @@ class category_create(QDialog):
 class chatWidget(QWidget):
     def __init__(self,parent,comments):
         super().__init__()
+        self.parent = parent
         self.mainLayout = QHBoxLayout()
         self.setLayout(self.mainLayout)
+        self.clientSocket = parent.clientSocket
 
         #comments 참조 순서 studid,name,comment,like,category_id,time
         self.comments = comments
@@ -314,6 +316,8 @@ class chatWidget(QWidget):
             QPushButton{border:0px}''')
             BtnLike.setIconSize(QSize(20,20))
             BtnLike.setMaximumWidth(35)
+            BtnLike.clicked.connect(self.likeClicked)
+
             question = QLabel()
             question.setText(self.comments[2])
         else:
@@ -323,11 +327,25 @@ class chatWidget(QWidget):
                         QPushButton{border:0px}''')
             BtnLike.setIconSize(QSize(20, 20))
             BtnLike.setMaximumWidth(35)
+            BtnLike.clicked.connect(self.likeClicked)
+
             question = QLabel()
             question.setText(self.comments[0])
 
         self.mainLayout.addWidget(question)
         self.mainLayout.addWidget(BtnLike)
+
+    def likeClicked(self):
+        print(self.comments)
+        commend = 'like_update '+ self.comments[0] + " " + self.comments[2] #학번 + msg
+        self.clientSocket.send(commend.encode('utf-8'))
+        print(commend)
+        result = self.clientSocket.recv(1024)
+        result = result.decode('utf-8')
+        print(result)
+        self.parent.category_changed()
+
+
 
     def mousePressEvent(self, QMouseEvent):
         if QMouseEvent.button() == Qt.LeftButton:

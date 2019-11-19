@@ -8,7 +8,7 @@ import requests
 class ServerSocket:
     def __init__(self):
         try:
-            self.databasent = mdb.connect('localhost', 'root', '789521', 'db_testin')
+            self.databasent = mdb.connect('localhost', 'root', '0428', 'db_testin')
             print("Successfully Connected To DB")
         except mdb.Error as e:
             print('Not Connected Succefully To DB')
@@ -78,7 +78,7 @@ class ServerSocket:
 
                 msg = msg.split(' ')
 
-                if len(msg) is not 1:
+                if len(msg) != 1:
                     commend = msg[0]
                     side = []
                     for i in range(1,len(msg)):
@@ -105,7 +105,7 @@ class ServerSocket:
                         print("강의수: "+ str(len(allSQLRows)))
                         # print(lectures)
 
-                        if len(lectures) is not 0:
+                        if len(lectures) != 0:
                             lectureId = ""
 
                             for i in range(len(lectures)):

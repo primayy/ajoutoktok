@@ -23,7 +23,9 @@ class login(QWidget):
 
         self.main = QVBoxLayout()
         self.mainWidget = QWidget()
-        self.mainWidget.setStyleSheet("background-color:#5218FA ")
+        self.mainWidget.setObjectName("myParentWidget");
+        #self.mainWidget.setStyleSheet("background-color:#5218FA ")
+        self.mainWidget.setStyleSheet('QWidget#myParentWidget { border-image:url(./ui/점선2.png) 0 0 0 0 stretch stretch}')
         self.mainLayer = QVBoxLayout()
         self.mainWidget.setLayout(self.mainLayer)
 
@@ -42,6 +44,14 @@ class login(QWidget):
         self.setWindowTitle('로그인')
 
         logo = QLabel()
+        ajoutoktok = QPixmap('./ui/toktok_logo.png')
+        ajoutoktok= ajoutoktok.scaled(200,400,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+        logo.setPixmap(ajoutoktok)
+
+        # logo2 = QLabel()
+        # ajoutoktok2 = QPixmap('./ui/Ajoutoktok.png')
+        # ajoutoktok2= ajoutoktok2.scaled(100,200,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+        # logo2.setPixmap(ajoutoktok2)
 
         # titlebar 대신할 놈들
         btExit = QPushButton()
@@ -50,39 +60,55 @@ class login(QWidget):
         btExit.setIconSize(QSize(15,15))
         btExit.clicked.connect(self.quitClicked)
 
-        logo.setPixmap(QPixmap('./icon/gnb_ajoulogo.png'))
-
+        #logo.setPixmap(QPixmap('./ui/아주똑똑_최종.png'))
+        #logo.scaledToWidth(130)
+        #logo.scaledToHeight(130)
+        #logo.setIcon(QIcon('./ui/아주똑똑_최종.png'))
+        #logo.setIconSize(QSize(50,200))
+        #logo.resize(50,200)
+        #logo.setStyleSheet('QLabel{image:url(./ui/아주똑똑_최종.png); height:300px}')
+        
         self.id_input = QLineEdit()
         self.id_input.setPlaceholderText('Account')
         self.id_input.setMaximumWidth(240)
-        self.id_input.setStyleSheet('background:white; height:37; font-family: Arial')
+        self.id_input.setStyleSheet('background:white; height:32; font-family: Arial')
 
         self.pw_input = QLineEdit()
         self.pw_input.setPlaceholderText('Password')
         self.pw_input.setMaximumWidth(240)
-        self.pw_input.setStyleSheet('background:white; height:37; font-family: Arial')
+        self.pw_input.setStyleSheet('background:white; height:32; font-family: Arial')
         self.pw_input.setEchoMode(QLineEdit.Password)
         self.pw_input.returnPressed.connect(self.btn_login_clicked)  # 엔터 처리
 
-        self.subLayer.addStretch(2)
-        self.subLayer.addWidget(logo)
-        self.subLayer.addStretch(1)
+        self.subLayer.addStretch(3)
+
+        #로고1,2
+        self.subLayer.addWidget(logo, alignment=(QtCore.Qt.AlignCenter|QtCore.Qt.AlignTop))
+        #self.subLayer.addWidget(logo2, alignment=QtCore.Qt.AlignCenter|QtCore.Qt.AlignTop)
+
+        #로그인인풋
         self.subLayer.addWidget(self.id_input)
         self.subLayer.addWidget(self.pw_input)
 
-        BtLogin = QPushButton('Login')
+        #로그인버튼
+        BtLogin = QPushButton()
         BtLogin.setMaximumWidth(240)
-        BtLogin.setMaximumHeight(37)
-        BtLogin.setStyleSheet('background:#F6F6F3; height:33; font-size:12px; font-family: Arial')
-
+        BtLogin.setMaximumHeight(80)
+        #BtLogin.setStyleSheet('background:#F6F6F3; height:33; font-size:12px; font-family: Arial')
+        #BtLogin.setIcon(QIcon('C:/Users/hyejin/1119/client/ui/로그인버튼.png'))
+        #BtLogin.setStyleSheet('background-image:C:/Users/hyejin/ajoutoktok/ajoutoktok/client/ui/로그인버튼.png; height:33; font-size:12px; font-family: Arial')
+        BtLogin.setStyleSheet('''
+                        QPushButton{image:url(./ui/login_button.png); border:0px; width:100px; height:50px}        
+                        
+                        ''')
         self.subLayer.addWidget(BtLogin)
 
         checkgoToBB = QCheckBox('black board 이동하기')
         checkgoToBB.stateChanged.connect(self.checkGoToBB)
 
         self.subLayer.addWidget(checkgoToBB)
-
-        self.subLayer.addStretch(3)
+        #self.subLayer.setAlignment(AlignTop)
+        self.subLayer.addStretch(4.5)
 
         BtLogin.clicked.connect(self.btn_login_clicked)
 
@@ -146,14 +172,14 @@ class login(QWidget):
         #     msg.setWindowTitle("Login Error")
         #     msg.exec_()
 
-
+        print('aa')
         # 테스트 코드
-        studentId = '201520990'
+        studentId = '201720713'
 
         # 응답 요청
         commend = 'login ' + studentId
         self.clientSocket.send(commend.encode('utf-8'))
-        studentName = '김용표'
+        studentName = '전혜진'
 
         # 결과 도착
         server_msg = self.clientSocket.recv(1024)

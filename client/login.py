@@ -7,6 +7,7 @@ import sys
 import after_login
 import webbrowser
 import requests
+import register
 
 class login(QWidget):
     def __init__(self,window):
@@ -172,37 +173,38 @@ class login(QWidget):
         #     msg.setWindowTitle("Login Error")
         #     msg.exec_()
 
-        print('aa')
+
         # 테스트 코드
-        ProfId = 'Prof1'
-        studentId = '201720713'
+        studentId = '201520991'
+        studentName = '김용표'
 
-        # 응답 요청
-        commend = 'login ' + studentId
-        commend = 'login ' + ProfId
+        #첫 로그인인지 확인
+        commend = "firstLogin "+ studentId
         self.clientSocket.send(commend.encode('utf-8'))
-        studentName = '전혜진'
 
-        # 결과 도착
-        server_msg = self.clientSocket.recv(1024)
-        # print(server_msg.decode('utf-8'))
+        result = self.clientSocket.recv(1024)
+        result = result.decode('utf-8')
 
-        lecturess = server_msg.decode('utf-8')
-        lectures = lecturess.split(" ")
-        print(lectures)
-        lectureId = ""
-        
-        for i in range(len(lectures)-1):
-            lectureId += lectures[i] +" "
-        lectureId = lectureId.rstrip()
-        ProfName = lectures[len(lectures)-1]
+        if result == 'first':
+            mainW = QApplication.activeWindow()
+            self.register = register.Register(mainW,studentName,studentId)
+            mainW.setCentralWidget(self.register)
+            self.close()
 
+        else:#already_resgisterd
+            # 응답 요청
+            commend = 'login ' + studentId
+            self.clientSocket.send(commend.encode('utf-8'))
 
-        mainW = QApplication.activeWindow()
-        #self.afterLogin = after_login.App(mainW, studentId, studentName, lectureId)
-        self.afterLogin = after_login.App(mainW, ProfId, ProfName, lectureId)
-        mainW.setCentralWidget(self.afterLogin)
-        self.close()
+            # 결과 도착
+            server_msg = self.clientSocket.recv(1024)
+
+            lectureId  = server_msg.decode('utf-8')
+
+            mainW = QApplication.activeWindow()
+            self.afterLogin = after_login.App(mainW, studentId, studentName, lectureId)
+            mainW.setCentralWidget(self.afterLogin)
+            self.close()
         # DB에서 로그인 정보 확인
 
     def quitClicked(self):

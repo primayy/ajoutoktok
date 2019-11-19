@@ -12,7 +12,6 @@ class lecture_list(QWidget):
     def __init__(self,studid,lecid,w):
         super().__init__()
         self.studid = studid
-        print(type(lecid))
         self.lecId = lecid
         self.w = w
         self.clientSocket = w.clientSock

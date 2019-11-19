@@ -100,8 +100,8 @@ class ServerSocket:
                         print('aa')
                     else:
                         cur = self.databasent.cursor()
-                        #cur.execute("SELECT lecture_id FROM student_course WHERE student_id =" + str(side[0]) + "")
-                        cur.execute("SELECT no,professor_name FROM lecture WHERE professor_id ='" + str(side[0]) + "'")
+                        cur.execute("SELECT lecture_id FROM student_course WHERE student_id =" + str(side[0]) + "")
+                        # cur.execute("SELECT no,professor_name FROM lecture WHERE professor_id ='" + str(side[0]) + "'")
                         allSQLRows = cur.fetchall()
 
                         lectures = allSQLRows
@@ -127,10 +127,11 @@ class ServerSocket:
                 elif commend == 'lecture':
                     cur = self.databasent.cursor()
                     lecture_info = ""
-
+                    print(side)
                     for i in range(len(side)):
                         cur.execute("SELECT lecture_name,professor_name,lecture_code FROM lecture WHERE no =" + str(side[i]) + "")
                         allSQLRows = cur.fetchall()
+                        print(allSQLRows)
                         lecture_info += allSQLRows[0][0] + ","
                         lecture_info += allSQLRows[0][1] + ","
                         lecture_info += allSQLRows[0][2] + "/"
@@ -180,8 +181,6 @@ class ServerSocket:
                         result += "already" 
                     client.send(result.encode('utf-8'))
 
-                
-                
                 elif commend == 'group_insert':
                     cur = self.databasent.cursor()
                     result_to_client = False
@@ -240,11 +239,15 @@ class ServerSocket:
                     msg = str(" ".join(side[2:-1]))
                     stuid = str(side[-1])
 
+                    cur.execute("SELECT nickname FROM user WHERE student_id ='" + str(stuid) + "'")
+                    nick = cur.fetchall()
+                    nick = nick[0][0]
+
                     #카테고리 정보 가져오기
                     cur.execute("SELECT no FROM category WHERE chatroom_name ='" + str(category_name) + "'"+ "AND lecture_id = '"+ str(lecid)+"'")
                     category_id = cur.fetchall()
                     # print(category_id)
-                    cur.execute(query, (category_id, msg, 'test',stuid))
+                    cur.execute(query, (category_id, msg, nick,stuid))
                     self.databasent.commit()
 
                 elif commend == 'chat_history':
@@ -341,7 +344,30 @@ class ServerSocket:
                     print(str(count))
                     print('클라이언트로 lecture 정보 전송')
                     client.send(str(count).encode('utf-8'))
-                
+
+                elif commend == 'firstLogin':
+                    print(side)
+                    cur = self.databasent.cursor()
+                    cur.execute("SELECT * FROM student_id WHERE student_id =" + str(side[0]) + "")
+                    result = cur.fetchall()
+                    if len(result) != 1:
+                        client.send('first'.encode('utf-8'))
+                    else:
+                        client.send('already_registerd'.encode('utf-8'))
+
+                elif commend == 'register':
+                    print(side)
+                    cur = self.databasent.cursor()
+                    query = 'INSERT INTO user (student_id,name,nickname,department) Values (%s,%s,%s,%s)'
+                    cur.execute(query, (str(side[3]), str(side[2]), str(side[0]), str(side[1])))
+                    self.databasent.commit()
+
+                    query = 'INSERT INTO student_id (student_id) Values (%s)'
+                    cur.execute(query, str(side[3]))
+                    self.databasent.commit()
+
+                    print(str(side[3])+'등록 완료')
+
                 elif commend == 'exit':
                     self.removeCleint(addr, client)
                     break

@@ -175,8 +175,8 @@ class login(QWidget):
 
 
         # 테스트 코드
-        studentId = '201520991'
-        studentName = '곽명섭'
+        studentId = '201421123'
+        studentName = '김용표'
 
         #첫 로그인인지 확인
         commend = "firstLogin "+ studentId

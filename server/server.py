@@ -3,7 +3,7 @@ from threading import *
 from socket import *
 import pymysql as mdb
 import requests
-
+import os
 
 class ServerSocket:
     def __init__(self):
@@ -16,17 +16,28 @@ class ServerSocket:
 
         self.bListen = False
         self.clients = []
+        self.chat_clients = []
         self.ip = []
+        self.chat_ip = []
         self.threads = []
 
-        # self.start('10.128.0.5',int(3333))
-        self.start('',int(3333))
+        self.serverThreads = []
+
+        self.t = Thread(target=self.start, args=('',int(3333),))#main server
+        self.t.start()
+        self.serverThreads.append(self.t)
+
+        self.t = Thread(target=self.start, args=('',int(3334),))#chat server
+        self.t.start()
+        self.serverThreads.append(self.t)
+
 
     def __del__(self):
         self.stop()
 
     def start(self, ip, port):
         self.server = socket(AF_INET, SOCK_STREAM)
+        self.server.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 
         try:
             self.server.bind((ip, port))
@@ -35,7 +46,7 @@ class ServerSocket:
             return False
         else:
             self.bListen = True
-            self.t = Thread(target=self.listen, args=(self.server,))
+            self.t = Thread(target=self.listen, args=(self.server,port,))
             self.t.start()
             print('Server Listening...')
             self.resourceInfo()
@@ -47,7 +58,7 @@ class ServerSocket:
             self.server.close()
             print('Server Stop')
 
-    def listen(self, server):
+    def listen(self, server, port):
         while self.bListen:
             server.listen(5)
             try:
@@ -56,18 +67,29 @@ class ServerSocket:
                 print('Accept() Error : ', e)
                 break
             else:
-                self.clients.append(client)
-                self.ip.append(addr)
-                print('클라이언트 접속')
-                print(client)
-                t = Thread(target=self.receive, args=(addr, client))
-                self.threads.append(t)
-                t.start()
+
+
+                print(str(port)+"(server): "+str(client)+' 클라이언트 접속')
+
+                if port == int(3333): #main server receive
+                    self.clients.append(client)
+                    self.ip.append(addr)
+
+                    t = Thread(target=self.receive, args=(addr, client))
+                    self.threads.append(t)
+                    t.start()
+                else:# chat server receive
+                    self.chat_clients.append(client)
+                    self.chat_ip.append(addr)
+
+                    t = Thread(target=self.chat_receive, args=(addr, client))
+                    self.threads.append(t)
+                    t.start()
 
         self.removeAllClients()
         self.server.close()
 
-    def receive(self, addr, client):
+    def chat_receive(self, addr, client):
         while True:
             try:
                 recv = client.recv(1024)
@@ -75,7 +97,50 @@ class ServerSocket:
                 print('Recv() Error :', e)
                 break
             else:
+                com = str(recv, encoding='utf-8')
+
+                print('3334 msg:'+ com)
+                com = com.split(' ')
+
+                if len(com) != 1:
+                    commend = com[0]
+                    side = []
+                    for i in range(1,len(com)):
+                        side.append(com[i])
+                else:
+                    commend = com[0]
+
+                print('3334: '+ commend)
+
+                if commend == 'exit':
+                    self.chat_ip.remove(addr)
+                    self.chat_clients.remove(client)
+
+                    client.send('stop'.encode('utf-8'))
+                    break
+
+                elif commend == 'chat_update':
+                    data = 'update'
+                    #채팅방에 들어와 있는 애들만 어떻게 선정?
+                    # print(self.clients)
+                    for c in self.chat_clients:
+                        print(c)
+                        print(data)
+                        c.send(data.encode('utf-8'))
+
+
+    def receive(self, addr, client):
+        while True:
+            try:
+                recv = client.recv(1024)
+                print('recv:'+str(len(recv)))
+            except Exception as e:
+                print('Recv() Error :', e)
+                break
+            else:
                 msg = str(recv, encoding='utf-8')
+
+                print('3333 msg: '+msg)
 
                 msg = msg.split(' ')
 
@@ -87,7 +152,7 @@ class ServerSocket:
                 else:
                     commend = msg[0]
 
-                print(commend)
+                print('3333: '+ commend)
 
                 if commend == 'login':
                     cur = self.databasent.cursor()
@@ -250,8 +315,11 @@ class ServerSocket:
                     cur.execute(query, (category_id, msg, nick,stuid))
                     self.databasent.commit()
 
+                    client.send('o'.encode('utf-8'))
+                    print('sendmsg끝')
+
                 elif commend == 'chat_history':
-                    # print(side)
+                    print(side)
                     cur = self.databasent.cursor()
                     cur.execute("SELECT no FROM category WHERE lecture_id ='" + str(side[0]) + "'AND chatroom_name = '"+str(side[1])+"'")
                     category_id = cur.fetchall()
@@ -264,7 +332,6 @@ class ServerSocket:
                         if len(chat_log) == 0:
                             result = 'x'
                             client.send(result.encode('utf-8'))
-
                         else:
                             result = ""
                             for i in range(len(chat_log)):
@@ -274,9 +341,11 @@ class ServerSocket:
                                 result += str(chat_log[i][6]) + "," #likes
                                 result += str(chat_log[i][1]) + "," #category_id
                                 result += str(chat_log[i][5]) + "/" #time
-                            # print(result)
-                            client.send(result.encode('utf-8'))
+
+                            client.sendall(result.encode('utf-8'))
+                            print('chat_history 끝')
                     else:
+                        print('history읽기 오류')
                         result = 'x'
                         client.send(result.encode('utf-8'))
 
@@ -367,6 +436,7 @@ class ServerSocket:
                     self.databasent.commit()
 
                     print(str(side[3])+'등록 완료')
+                    client.send('등록 완료'.encode('utf-8'))
 
                 elif commend == 'like_update':
                     studid = str(side[0])
@@ -379,9 +449,9 @@ class ServerSocket:
                     client.send('like_updated'.encode('utf-8'))
 
                 elif commend == 'exit':
-                    self.removeCleint(addr, client)
+                    self.removeClient(addr, client)
                     break
-        # self.removeCleint(addr, client)
+
 
     def send(self, msg):
         try:
@@ -390,7 +460,7 @@ class ServerSocket:
         except Exception as e:
             print('Send() Error : ', e)
 
-    def removeCleint(self, addr, client):
+    def removeClient(self, addr, client):
         client.close()
         self.ip.remove(addr)
         self.clients.remove(client)

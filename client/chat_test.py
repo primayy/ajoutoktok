@@ -7,6 +7,32 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
 import smtplib
 from email.mime.text import MIMEText
+from socket import *
+import time
+
+class update_listener(QThread):
+    chatUpdate = pyqtSignal()
+
+    def __init__(self,parent = None):
+        super().__init__()
+        self.parent = parent
+        self.chatSocket = parent.chatSocket
+        self.go = True
+    def run(self):
+        while self.go:
+            time.sleep(1)  # 클라이언트 처리 과부하 방지
+
+            update_commend = self.chatSocket.recv(1024)
+            update_commend = update_commend.decode('utf-8')
+
+            if update_commend == 'update':
+                self.chatUpdate.emit()
+                # print('업데이트 시그널 emit')
+            elif update_commend =='stop':
+                self.go = False
+                print('멈춤')
+                # break
+
 
 class chatRoom(QWidget):
     def __init__(self,parent):
@@ -24,6 +50,10 @@ class chatRoom(QWidget):
         self.tab = QTabWidget()
         self.getCategory()
 
+        #chat server와 연결
+        self.chatSocket= socket(AF_INET, SOCK_STREAM)
+        self.chatSocket.connect(('192.168.0.13', 3334))
+        # self.chatSocket.connect(('34.84.112.149', 3334))
 
         self.history = self.getChatHistory()
         if len(self.history) != 0:
@@ -84,6 +114,11 @@ class chatRoom(QWidget):
         self.initUI()
 
     def initUI(self):
+        # 쓰레드
+        self.t = update_listener(parent=self)
+        self.t.chatUpdate.connect(self.chat_Update)
+        self.t.start()
+
         #타이틀
         # 최소화
         btMini = QPushButton()
@@ -97,7 +132,7 @@ class chatRoom(QWidget):
         btExit.setStyleSheet('''border:0px''')
         btExit.setIcon(QIcon('./icon/icons8-close-window-16.png'))
         btExit.setIconSize(QSize(15, 15))
-        btExit.clicked.connect(self.close)
+        btExit.clicked.connect(self.quitClicked)
 
 
         self.titleLayoutTop.addStretch(1)
@@ -151,6 +186,17 @@ class chatRoom(QWidget):
 
         self.show()
 
+    def chat_Update(self):
+        # print('ㅇㅇㅇ')
+        self.category_changed()
+
+    def quitClicked(self):
+        commend = 'exit'
+        self.chatSocket.send(commend.encode('utf-8'))
+        #쓰레드 삭제
+        self.t.quit()
+        self.close()
+
     def category_changed(self):
         self.tab.currentWidget().clear()
         self.history = self.getChatHistory()
@@ -164,7 +210,7 @@ class chatRoom(QWidget):
 
         category = self.clientSocket.recv(1024)
         category = category.decode('utf-8')
-        print(category)
+        # print(category)
 
         category = category.split(',')
         category.pop()
@@ -224,30 +270,17 @@ class chatRoom(QWidget):
         self.move(self.x() + delta.x(), self.y() + delta.y())
         self.oldPos = event.globalPos()
 
-    def likingthis(self, id):
-        print(id.text())
-        numb = id.text().split("btnLike")[1]
-        print(self.liked)
-        cur = self.databasent.cursor()
-        cur.execute("SELECT * FROM chatting WHERE id = " + str(self.ids[int(numb)]) + "")
-        allSQLRows1 = cur.fetchall()
-        print(allSQLRows1)
-        id.setStyleSheet('''
-                        QPushButton{image:url(./icon/liked_now.png); border:0px; width:32px; height:24px; color:rgba(0,0,0,0)}        
-                        QPushButton:hover{background:#e9e9e2; border:0px}
-                        ''')
-        print(self.studentsID)
-
     def sendMsg(self,msg):
         self.chat_input.setPlainText('')
         commend = 'sendMsg ' + self.tab.tabText(self.tab.currentIndex()) + " "+ self.lecId + " " + msg + " " + self.parent.stuid
         # print(commend)
+
+        #main server에 알림
         self.clientSocket.send(commend.encode('utf-8'))
 
-        self.tab.currentWidget().clear()
-        self.history = self.getChatHistory()
-        self.history.pop()
-        self.showQuestions()
+        tmp = self.clientSocket.recv(1024)
+        #chat server에 전송 -> 모두에게 뿌리기 위해
+        self.chatSocket.send('chat_update'.encode('utf-8'))
 
 class category_create(QDialog):
     def __init__(self,window,parent):
@@ -344,7 +377,6 @@ class chatWidget(QWidget):
         result = result.decode('utf-8')
         print(result)
         self.parent.category_changed()
-
 
 
     def mousePressEvent(self, QMouseEvent):

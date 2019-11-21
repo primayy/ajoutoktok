@@ -13,40 +13,36 @@ class update_listener(QThread):
 
     def __init__(self,parent = None):
         super().__init__()
-        self.parent = parent
+        parent.countStop.connect(self.count_stop)
+
         self.go = True
+
     def run(self):
         while self.go:
             time.sleep(1)  # 클라이언트 처리 과부하 방지
 
             self.countUpdate.emit()
-            print('업데이트 시그널 emit')
 
-            # if update_commend == 'count_update':
-            #
-            # elif update_commend =='stop':
-            #     self.go = False
-            #     print('멈춤')
-            #     # break
-
+    def count_stop(self):
+        self.go = False
 
 class Invisible(QWidget):
+    countStop = pyqtSignal()
+
     def __init__(self,parent,lecture,prof):
         super().__init__()
         self.__press_pos = QPoint()
         self.mainLayout = QHBoxLayout()
+
         self.lecture = lecture.text()
         self.prof = prof.text()
+
         self.clientSocket = parent.w.clientSock
         self.origin_num = int(self.howManyChat())
+
         self.parent = parent
         self.setLayout(self.mainLayout)
         self.initUI()
-
-        #self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
-        #self.setAttribute(Qt.WA_TranslucentBackground)
-        #self.setWindowFlags(Qt.FramelessWindowHint)
-        #self.setWindowFlags(Qt.WindowStaysOnTopHint)
 
     def initUI(self):
         print(self.origin_num)
@@ -72,10 +68,9 @@ class Invisible(QWidget):
         self.show()
 
     def count_update(self):
-        print('ttt')
         num_new_msg = int(self.howManyChat())
-        print(num_new_msg)
         self.l.setText(str(num_new_msg-self.origin_num))
+
 
     def howManyChat(self):
         commend = "HowManyChat " + self.lecture + " " + self.prof
@@ -89,7 +84,8 @@ class Invisible(QWidget):
         if event.button() == Qt.LeftButton:
             self.__press_pos = event.pos()
         elif event.button() == Qt.RightButton:
-            print("LELELELEL")
+            self.countStop.emit()
+            self.t.quit()
             self.close()
               
 
@@ -105,12 +101,13 @@ class Invisible(QWidget):
             self.move(self.pos() + (event.pos() - self.__press_pos))
 
     def mouseDoubleClickEvent(self, QMouseEvent):
-        print("ELELELELE")
         title = self.parent.course
-        # self.chat = chat.chatRoom(title,self.stuid,self.w)
         self.parent.chat = chat_test.chatRoom(self.parent)
         self.parent.chat.setWindowTitle(title[0])
         self.parent.chat.setMinimumSize(QSize(400, 400))
+
+        self.countStop.emit()
+        self.t.quit()
         self.close()
         
 

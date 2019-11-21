@@ -156,7 +156,6 @@ class ServerSocket:
 
                 if commend == 'login':
                     cur = self.databasent.cursor()
-                    #cur.execute("SELECT student_id FROM student_id WHERE student_id =" + str(side[0]) + "")
                     cur.execute("SELECT * FROM student_id ")
                     allSQLRows = cur.fetchall()
 
@@ -194,12 +193,11 @@ class ServerSocket:
                     lecture_info = ""
                     print(side)
                     for i in range(len(side)):
-                        cur.execute("SELECT lecture_name,professor_name,lecture_code FROM lecture WHERE no =" + str(side[i]) + "")
+                        cur.execute("SELECT lecture_name,lecture_code FROM lecture WHERE no =" + str(side[i]) + "")
                         allSQLRows = cur.fetchall()
                         print(allSQLRows)
                         lecture_info += allSQLRows[0][0] + ","
-                        lecture_info += allSQLRows[0][1] + ","
-                        lecture_info += allSQLRows[0][2] + "/"
+                        lecture_info += allSQLRows[0][1] + "/"
 
                     print('클라이언트로 lecture 정보 전송')
                     client.send(lecture_info.encode('utf-8'))
@@ -209,7 +207,7 @@ class ServerSocket:
                     cur = self.databasent.cursor()
                     group_info = ""
                     for i in range(len(side)):
-                        cur.execute("SELECT no,lecture_name,professor_name FROM lecture WHERE lecture_code ='" + str(side[i]) + "'")
+                        cur.execute("SELECT no,lecture_name FROM lecture WHERE lecture_code ='" + str(side[i]) + "'")
                         allSQLRows = cur.fetchall()
 
                         if len(allSQLRows) == 0:
@@ -218,7 +216,6 @@ class ServerSocket:
                         else:
                             group_info += str(allSQLRows[0][0]) + ","
                             group_info += str(allSQLRows[0][1]) + ","
-                            group_info += str(allSQLRows[0][2]) + ","
                     client.send(group_info.encode('utf-8'))
 
                 
@@ -226,7 +223,7 @@ class ServerSocket:
                     print('그룹 생성 왔다')
                     cur = self.databasent.cursor()
                     group_info = ""
-                    cur.execute("SELECT no,lecture_name,professor_name FROM lecture WHERE professor_id ='" + str(side[1]) + "' AND lecture_name ='"+str(side[0])+"'")
+                    cur.execute("SELECT no,lecture_name FROM lecture WHERE professor_id ='" + str(side[1]) + "' AND lecture_name ='"+str(side[0])+"'")
                     allSQLRows = cur.fetchall()
                     print(allSQLRows)
                     print(len(allSQLRows))
@@ -350,7 +347,7 @@ class ServerSocket:
                         client.send(result.encode('utf-8'))
 
                 elif commend == 'get_lecture_id':
-                    # print(side)
+                    print(side)
                     cur = self.databasent.cursor()
                     cur.execute("SELECT no FROM lecture WHERE lecture_code ='" + str(side[0]) + "'")
                     allSQLRows = cur.fetchall()
@@ -359,72 +356,19 @@ class ServerSocket:
                     lecid = str(lecid)
                     client.send(lecid.encode('utf-8'))
 
-                elif commend == 'getRank': #LeaderBoard 순위 가져오기
-                    print(side)
-                    cur = self.databasent.cursor()
-                    #cur.execute("SELECT Depart,points FROM points WHERE Student_id ='" + str(side[1]) + "'")
-                    cur.execute("SELECT department,point FROM user WHERE student_id ='" + str(side[1]) + "'")
-                    allSQLRows = cur.fetchall()
-                    Department = ""                    
-                    if len(allSQLRows) > 0 :
-                        Department += str(allSQLRows[0][0])
-                    #Lecture_Id = ""
-                    points = 0
-
-
-
-                    for i in range(len(allSQLRows)):
-                        #Lecture_Id += str(allSQLRows[i][2]) +" "
-                        points += allSQLRows[i][1]
-                    wholepoint = str(points)
+                elif commend == 'getRank':
                     if side[0] == '1':
-                        UnivRank = ""
-                        #cur.execute("SELECT sum(points) FROM points GROUP BY Student_id ORDER BY sum(points) DESC")
-                        cur.execute("SELECT sum(point) FROM user GROUP BY student_id ORDER BY sum(point) DESC")
-                        allSQLRows = cur.fetchall()
                         #전체 랭킹 서치
-                        if len(allSQLRows) > 0 :
-                            for i in range(len(allSQLRows)):
-                                UnivRank += str(allSQLRows[0][0]) +" "
-                    
                         print('asd')
-                        print(str(UnivRank)+ "a")
-                        client.send(str(UnivRank).encode('utf-8'))
+                        client.send('1'.encode('utf-8'))
                     elif side[0] == '2':
-                        inDeptRank = ""
-                        #cur.execute("SELECT sum(points) FROM points WHERE Depart = '"+Department+"' GROUP BY Student_id ORDER BY sum(points) DESC")
-                        cur.execute("SELECT sum(point) FROM user WHERE department = '"+Department+"' GROUP BY student_id ORDER BY sum(point) DESC")
-                        allSQLRows = cur.fetchall()
                         #과내 랭킹 서치
-                        if len(allSQLRows) > 0 :
-                            for i in range(len(allSQLRows)):
-                                inDeptRank += str(allSQLRows[0][0]) +" "
-                    
                         print('bcd')
-                        print(str(inDeptRank) + "a")
-                        client.send(str(inDeptRank).encode('utf-8'))
+                        client.send('2'.encode('utf-8'))
                     elif side[0] == '3':
-                        DeptRank = ""
-                        #cur.execute("SELECT sum(points) FROM points GROUP BY Depart ORDER BY sum(points) DESC")
-                        cur.execute("SELECT sum(point) FROM user GROUP BY department ORDER BY sum(point) DESC")
-                        allSQLRows = cur.fetchall()
                         #과별 랭킹 서치
-                        if len(allSQLRows) > 0 :
-                            for i in range(len(allSQLRows)):
-                                DeptRank += str(allSQLRows[0][0]) +" "
-                    
                         print('efg')
-                        print(str(DeptRank)+ "a")
-                        client.send(str(DeptRank).encode('utf-8'))
-
-                    #elif side[0] == '4':
-                    #    cur.execute("SELECT Depart,Lec_id,points FROM lecture WHERE Student_id ='" + str(side[1]) + "' AND Lec_id =")
-                    #    allSQLRows = cur.fetchall()
-                    #    #강의별 랭킹 서치
-                    #    print('efg')
-                    #    client.send('4'.encode('utf-8'))
-                  
-                
+                        client.send('3'.encode('utf-8'))
                 elif commend == 'getCategory':
                     cur = self.databasent.cursor()
                     cur.execute("SELECT chatroom_name FROM category WHERE lecture_id ='" + str(side[0]) + "'")
@@ -452,7 +396,7 @@ class ServerSocket:
                     cur = self.databasent.cursor()
                     print(msg)
                     print("Finding lecno...")
-                    cur.execute("SELECT no FROM lecture WHERE lecture_name ='" + str(side[0]) + "' AND professor_name = '" + str(side[1]) + "'")
+                    cur.execute("SELECT no FROM lecture WHERE lecture_code ='" + str(side[0]) +"'")
                     allSQLRows = cur.fetchall()
                     lecno = allSQLRows[0][0]
                     # print(lecno)
@@ -489,7 +433,63 @@ class ServerSocket:
                     self.databasent.commit()
 
                     print(str(side[3])+'등록 완료')
+
                     client.send('registered'.encode('utf-8'))
+
+                elif commend == 'courses_create':
+                    cur = self.databasent.cursor()
+                    print(side)
+                    stuid = str(side[0])
+                    tmp = ' '.join(side[1:])
+                    print(tmp)
+                    tmp = tmp.split('/')
+                    print(tmp)
+                    tmp.pop()
+                    for t in tmp:
+                        course_name = t.split(',')[0]
+                        course_code = t.split(',')[1]
+                        print(course_name)
+                        print(course_code)
+
+                        #강의 있는지 조회
+                        cur.execute("SELECT no FROM lecture WHERE lecture_code ='" + str(course_code) + "'")
+                        lec_id = cur.fetchall()
+
+                        #있으면
+                        if len(lec_id) != 0:
+                            print('a')
+                            #바로추가
+                            query = 'INSERT INTO student_course (student_id,lecture_code,lecture_id) Values (%s,%s,%s)'
+                            cur.execute(query, (stuid, str(course_code),str(lec_id[0][0])))
+                            self.databasent.commit()
+
+                        #없으면
+                        else:
+                            print('b')
+                            #강의를 디비에 추가
+                            query = 'INSERT INTO lecture (lecture_name,lecture_code) Values (%s,%s)'
+                            cur.execute(query, (str(course_name), str(course_code)))
+                            self.databasent.commit()
+
+                            print('c')
+                            #추가한 강의의 lecid를 가져옴
+                            cur.execute("SELECT no FROM lecture WHERE lecture_code ='" + str(course_code) + "'")
+                            lec_id = cur.fetchall()
+                            lec_id = str(lec_id[0][0])
+
+                            query = 'INSERT INTO category (lecture_code,lecture_id,chatroom_name) Values (%s,%s,%s)'
+                            cur.execute(query, (str(course_code), lec_id, str('강의')))
+                            self.databasent.commit()
+
+                            print('d')
+                            print(str(lec_id))
+                            #학생 정보에 강의 추가
+                            query = 'INSERT INTO student_course (student_id,lecture_code,lecture_id) Values (%s,%s,%s)'
+                            cur.execute(query, (stuid, str(course_code), str(lec_id)))
+                            self.databasent.commit()
+
+                    print('3333: 추가완료')
+                    client.send('complete'.encode('utf-8'))
 
                 elif commend == 'like_update':
                     studid = str(side[0])

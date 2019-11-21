@@ -6,8 +6,8 @@ from PyQt5.QtWidgets import *
 import sys
 import after_login
 import webbrowser
-import requests
 import register
+import requests
 
 class login(QWidget):
     def __init__(self,window):
@@ -16,6 +16,7 @@ class login(QWidget):
         shadow.setBlurRadius(5)
         shadow.setOffset(3)
         self.setGraphicsEffect(shadow)
+        self.session = requests.session()
 
         QApplication.setActiveWindow(window)
         #소켓 가져옴
@@ -129,82 +130,93 @@ class login(QWidget):
         # print(self.goToBB)
 
     def btn_login_clicked(self):
+        res = self.session.post('https://eclass2.ajou.ac.kr/webapps/bbgs-autosignon-BBLEARN/ajouLogin.jsp',
+                          data={'userId': self.id_input.text(), 'userPw': self.pw_input.text()}).text
 
-        # res = requests.post('https://eclass2.ajou.ac.kr/webapps/bbgs-autosignon-BBLEARN/ajouLogin.jsp',
-        #                   data={'userId': self.id_input.text(), 'userPw': self.pw_input.text()}).text
-        #
-        # res_split = res.split('^')
+        res_split = res.split('^')
 
-        # #로그인 성공
-        # if len(res_split) is not 1:
-        #     cookie = res_split[2]
+        #로그인 성공
+        if len(res_split) is not 1:
+            cookie = res_split[2]
+
+            r1 = self.session.get('https://eclass2.ajou.ac.kr' + cookie)
+            if self.goToBB is True:
+                url = 'https://eclass2.ajou.ac.kr' + cookie
+                webbrowser.open(url)
+
+            studentName = r1.text.split('title')[1].split('.')[1].split(' ')[0]
+            studentId = res_split[0]
+
+            # 첫 로그인인지 확인
+            commend = "firstLogin " + studentId
+            self.clientSocket.send(commend.encode('utf-8'))
+
+            result = self.clientSocket.recv(1024)
+            result = result.decode('utf-8')
+
+            if result == 'first':
+                print('aaaa')
+                mainW = QApplication.activeWindow()
+                self.register = register.Register(self,mainW, studentName, studentId)
+                mainW.setCentralWidget(self.register)
+                self.close()
+
+            else:  # already_resgisterd
+                # 응답 요청
+                commend = 'login ' + studentId
+                self.clientSocket.send(commend.encode('utf-8'))
+
+                # 결과 도착
+                server_msg = self.clientSocket.recv(1024)
+
+                lectureId = server_msg.decode('utf-8')
+
+                mainW = QApplication.activeWindow()
+                self.afterLogin = after_login.App(mainW, studentId, studentName, lectureId)
+                mainW.setCentralWidget(self.afterLogin)
+                self.close()
+
+        #로그인 실패
+        else:
+            print("Error")
+            msg = QMessageBox()
+            msg.setStyleSheet("background-color:#FFFFFF")
+            msg.setText("Error: Login Error")
+            msg.setWindowTitle("Login Error")
+            msg.exec_()
+
+
+        # # 테스트 코드
+        # studentId = '201421123'
+        # studentName = '김용표'
+
+        # #첫 로그인인지 확인
+        # commend = "firstLogin "+ studentId
+        # self.clientSocket.send(commend.encode('utf-8'))
         #
-        #     r1 = requests.get('https://eclass2.ajou.ac.kr' + cookie)
-        #     if self.goToBB is True:
-        #         url = 'https://eclass2.ajou.ac.kr' + cookie
-        #         webbrowser.open(url)
+        # result = self.clientSocket.recv(1024)
+        # result = result.decode('utf-8')
         #
-        #     studentName = r1.text.split('title')[1].split('.')[1].split(' ')[0]
-        #     studentId = res_split[0]
+        # if result == 'first':
+        #     mainW = QApplication.activeWindow()
+        #     self.register = register.Register(mainW,studentName,studentId)
+        #     mainW.setCentralWidget(self.register)
+        #     self.close()
         #
-        #     #응답 요청
-        #     commend = 'login '+studentId
+        # else:#already_resgisterd
+        #     # 응답 요청
+        #     commend = 'login ' + studentId
         #     self.clientSocket.send(commend.encode('utf-8'))
         #
-        #     print("LOG IN")
-        #
-        #     #결과 도착
+        #     # 결과 도착
         #     server_msg = self.clientSocket.recv(1024)
-        #     print(server_msg.decode('utf-8'))
         #
-        #     lectureId = server_msg.decode('utf-8')
+        #     lectureId  = server_msg.decode('utf-8')
         #
         #     mainW = QApplication.activeWindow()
         #     self.afterLogin = after_login.App(mainW, studentId, studentName, lectureId)
         #     mainW.setCentralWidget(self.afterLogin)
         #     self.close()
-        #
-        # #로그인 실패
-        # else:
-        #     print("Error")
-        #     msg = QMessageBox()
-        #     msg.setStyleSheet("background-color:#FFFFFF")
-        #     msg.setText("Error: Login Error")
-        #     msg.setWindowTitle("Login Error")
-        #     msg.exec_()
-
-
-        # 테스트 코드
-        studentId = '201421123'
-        studentName = '김용표'
-
-        #첫 로그인인지 확인
-        commend = "firstLogin "+ studentId
-        self.clientSocket.send(commend.encode('utf-8'))
-
-        result = self.clientSocket.recv(1024)
-        result = result.decode('utf-8')
-
-        if result == 'first':
-            mainW = QApplication.activeWindow()
-            self.register = register.Register(mainW,studentName,studentId)
-            mainW.setCentralWidget(self.register)
-            self.close()
-
-        else:#already_resgisterd
-            # 응답 요청
-            commend = 'login ' + studentId
-            self.clientSocket.send(commend.encode('utf-8'))
-
-            # 결과 도착
-            server_msg = self.clientSocket.recv(1024)
-
-            lectureId  = server_msg.decode('utf-8')
-
-            mainW = QApplication.activeWindow()
-            self.afterLogin = after_login.App(mainW, studentId, studentName, lectureId)
-            mainW.setCentralWidget(self.afterLogin)
-            self.close()
         # DB에서 로그인 정보 확인
 
     def quitClicked(self):

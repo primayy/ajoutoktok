@@ -52,8 +52,8 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.13', 3334))
-        #self.chatSocket.connect(('34.84.112.149', 3334))
+        self.chatSocket.connect(('192.168.0.14', 3334))
+        # self.chatSocket.connect(('34.84.112.149', 3334))
 
         self.history = self.getChatHistory()
         if len(self.history) != 0:
@@ -232,7 +232,7 @@ class chatRoom(QWidget):
             self.tab.currentWidget().addItem(item)
 
     def getLecId(self):
-        commend = "get_lecture_id "+self.parent.course[2]
+        commend = "get_lecture_id "+self.parent.course[1]
 
         self.clientSocket.send(commend.encode('utf-8'))
         result = self.clientSocket.recv(1024)

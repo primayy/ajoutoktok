@@ -6,14 +6,18 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
 import after_login
+from bs4 import BeautifulSoup
 
 class Register(QWidget):
-    def __init__(self,window,name,studId):
+    def __init__(self,parent,window,name,studId):
         super().__init__()
         self.w = window
         self.clientSocket = window.clientSock
         self.studName = name
         self.studId = studId
+        self.session = parent.session
+
+        self.courses = self.getCourses()
 
         self.mainWidget = QWidget()
         self.widgetLayout = QVBoxLayout()
@@ -100,6 +104,47 @@ class Register(QWidget):
 
         self.setFixedSize(358,600)
 
+    def getCourses(self):
+        res = ""
+
+        session = self.session
+        u = 'https://eclass2.ajou.ac.kr/webapps/portal/execute/tabs/tabAction'
+
+        custom_header = {
+            'referer': 'https://eclass2.ajou.ac.kr:8443/webapps/portal/execute/tabs/tabAction?tab_tab_group_id=_1_1',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36'}
+
+        course_get = session.get(u, headers=custom_header,
+                                 params="action=refreshAjaxModule&modId=_3_1&tabId=_1_1&tab_tab_group_id=_1_1")
+        soup = BeautifulSoup(course_get.text, 'lxml')
+
+        courses = soup.select(''
+                              '#_3_1termCourses__15_1 > ul > li > a'
+                              '')
+
+        if len(courses) == 0:
+            courses = soup.select(''
+                                  '#_3_1termCourses_noterm > ul > li > a'
+                                  '')
+
+            for i in range(1, len(courses)):
+                temp = ' '.join(courses[i].text.split(' ')[1:])
+                course_name = temp.split('(')[0]
+                course_code = temp.split('(')[1].split(')')[0]
+                res += course_name + ',' + course_code + '/'
+
+            # print(res)
+            return res
+        else:
+            for course in courses:
+                temp = ' '.join(course.text.split(' ')[1:])
+                course_name = temp.split('(')[0]
+                course_code = temp.split('(')[1].split(')')[0]
+                res += course_name+','+course_code+'/'
+
+            # print(res)
+            return res
+
     def nickname_overlap_check(self):
         print("중복확인")
 
@@ -110,6 +155,12 @@ class Register(QWidget):
         print("등록완료")
         res = self.clientSocket.recv(1024)
         if res.decode('utf-8') == 'registered':
+            commend = 'courses_create '+self.studId + " " + self.courses
+            self.clientSocket.send(commend.encode('utf-8'))
+
+            course_res = self.clientSocket.recv(1024).decode('utf-8')
+            # print(course_res)
+
             commend = 'login ' + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
 
@@ -120,15 +171,8 @@ class Register(QWidget):
 
             mainW = QApplication.activeWindow()
             self.afterLogin = after_login.App(mainW, self.studId, self.studName, lectureId)
-            # self.afterLogin = after_login.App(mainW, ProfId, ProfName, lectureId)
             mainW.setCentralWidget(self.afterLogin)
             self.close()
-    #움직이지 못하게 만듬
-    def mousePressEvent(self, event):
-        self.oldPos = event.globalPos()
-
-    def mouseMoveEvent(self, event):
-        self.oldPos = event.globalPos()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

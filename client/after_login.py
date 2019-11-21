@@ -182,7 +182,7 @@ class App(QWidget):
 
     def showLeader(self):
         self.rightSideInfo.close()
-        self.rightSideInfo = leader.LeaderBoard(self,self.studId)
+        self.rightSideInfo = leader.LeaderBoard(self)
         self.rightSideInfo.setMinimumSize(300,500)
         self.rightSideLayout.addWidget(self.rightSideInfo)
 

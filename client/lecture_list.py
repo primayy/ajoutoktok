@@ -135,7 +135,7 @@ class group_search_dialog(QDialog):
             lecture_list = self.getLectureList()
             for i in range(len(lecture_list)):
                 lecture(lecture_list[i],self.stuid,self.w,self.viewer,self.lecId)
-            print("??")
+            # print("??")
             
         else:
             msg = QMessageBox()
@@ -256,6 +256,7 @@ class lecture(QWidget):
 
             # middle
             self.lecture = QLabel(course[0])
+            # print(course)
             self.layout_middle.addWidget(self.lecture)
             self.layout_middle.addWidget(self.btExit, alignment=(QtCore.Qt.AlignTop | QtCore.Qt.AlignRight))
 
@@ -296,8 +297,9 @@ class lecture(QWidget):
 class lecture_group(QWidget):
     def __init__(self, courses,stuid,w,viewer,lecid):
         super().__init__()
+        # print(courses)
         course = courses.split(',')
-
+        # print(course)
         self.mainLayout = QVBoxLayout()
         self.mainLayout.setContentsMargins(1,3,1,3)
         #그룹 그리기

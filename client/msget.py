@@ -29,13 +29,13 @@ class update_listener(QThread):
 class Invisible(QWidget):
     countStop = pyqtSignal()
 
-    def __init__(self,parent,lecture,prof):
+    def __init__(self,parent,lecture,code):
         super().__init__()
         self.__press_pos = QPoint()
         self.mainLayout = QHBoxLayout()
 
-        self.lecture = lecture.text()
-        self.prof = prof.text()
+        self.lecture = parent.course[0]
+        self.lecture_code = parent.course[1]
 
         self.clientSocket = parent.w.clientSock
         self.origin_num = int(self.howManyChat())
@@ -45,14 +45,14 @@ class Invisible(QWidget):
         self.initUI()
 
     def initUI(self):
-        print(self.origin_num)
+        # print(self.origin_num)
 
         self.t = update_listener(parent=self)
         self.t.countUpdate.connect(self.count_update)
         self.t.start()
 
-        print(self.lecture)
-        print(self.prof)
+        # print(self.lecture)
+        # print(self.lecture_code)
 
         self.l = QLabel()
         self.chatcount = 0
@@ -73,7 +73,7 @@ class Invisible(QWidget):
 
 
     def howManyChat(self):
-        commend = "HowManyChat " + self.lecture + " " + self.prof
+        commend = "HowManyChat " + self.lecture_code
         self.clientSocket.send(commend.encode('utf-8'))
         chatcount = self.clientSocket.recv(1024)
         chatcount = chatcount.decode('utf-8')

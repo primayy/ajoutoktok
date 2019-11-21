@@ -52,8 +52,8 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.14', 3334))
-        # self.chatSocket.connect(('34.84.112.149', 3334))
+        self.chatSocket.connect(('192.168.0.13', 3334))
+        #self.chatSocket.connect(('34.84.112.149', 3334))
 
         self.history = self.getChatHistory()
         if len(self.history) != 0:
@@ -226,7 +226,7 @@ class chatRoom(QWidget):
         for i in range(len(self.history)):
             item = QListWidgetItem(self.tab.currentWidget())
 
-            custom_widget = chatWidget(self,self.history[i])
+            custom_widget = chatWidget(self,self.history[i],self.parent)
             item.setSizeHint(custom_widget.sizeHint())
             self.tab.currentWidget().setItemWidget(item, custom_widget)
             self.tab.currentWidget().addItem(item)
@@ -330,9 +330,11 @@ class category_create(QDialog):
         self.close()
 
 class chatWidget(QWidget):
-    def __init__(self,parent,comments):
+    def __init__(self,parent,comments,grandparent):
         super().__init__()
         self.parent = parent
+        self.grandparent = grandparent
+
         self.mainLayout = QHBoxLayout()
         self.setLayout(self.mainLayout)
         self.clientSocket = parent.clientSocket
@@ -370,7 +372,7 @@ class chatWidget(QWidget):
 
     def likeClicked(self):
         print(self.comments)
-        commend = 'like_update '+ self.comments[0] + " " + self.comments[2] #학번 + msg
+        commend = 'like_update '+ self.comments[6] + " " + self.grandparent.stuid#학번 + msg
         self.clientSocket.send(commend.encode('utf-8'))
         print(commend)
         result = self.clientSocket.recv(1024)

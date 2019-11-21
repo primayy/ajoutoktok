@@ -320,7 +320,7 @@ class ServerSocket:
                     cur = self.databasent.cursor()
                     cur.execute("SELECT no FROM category WHERE lecture_id ='" + str(side[0]) + "'AND chatroom_name = '"+str(side[1])+"'")
                     category_id = cur.fetchall()
-
+                    print(category_id)
                     if len(category_id) != 0:
                         cur = self.databasent.cursor()
                         cur.execute("SELECT * FROM chatting WHERE category_id ='" + str(category_id[0][0]) + "'")
@@ -360,63 +360,64 @@ class ServerSocket:
                 elif commend == 'getRank': #LeaderBoard 순위 가져오기
                     print(side)
                     cur = self.databasent.cursor()
-                    #cur.execute("SELECT Depart,points FROM points WHERE Student_id ='" + str(side[1]) + "'")
-                    cur.execute("SELECT department,point FROM user WHERE student_id ='" + str(side[1]) + "'")
+                    
+                    cur.execute("SELECT department FROM user WHERE student_id ='" + str(side[1]) + "'")  #해당 유저의 학과 ==> '학과내'에 사용
                     allSQLRows = cur.fetchall()
-                    Department = ""                    
+                    Department = ""
                     if len(allSQLRows) > 0 :
-                        Department += str(allSQLRows[0][0])
-                    #Lecture_Id = ""
-                    points = 0
+                        Department = str(allSQLRows[0][0])
 
-
-
-                    for i in range(len(allSQLRows)):
+                    #for i in range(len(allSQLRows)):
                         #Lecture_Id += str(allSQLRows[i][2]) +" "
-                        points += allSQLRows[i][1]
-                    wholepoint = str(points)
+                        #points += allSQLRows[i][1]
+                    #wholepoint = str(points)
                     if side[0] == '1':
                         UnivRank = ""
-                        #cur.execute("SELECT sum(points) FROM points GROUP BY Student_id ORDER BY sum(points) DESC")
-                        cur.execute("SELECT sum(point) FROM user GROUP BY student_id ORDER BY sum(point) DESC")
+                        #학번으로 묶어서 포인트의 합과 학번을 얻는다(내림차순)
+                        cur.execute("SELECT sum(points),Student_id FROM points GROUP BY Student_id ORDER BY sum(points) DESC")
+                        #cur.execute("SELECT sum(point),student_id FROM user GROUP BY student_id ORDER BY sum(point) DESC")
                         allSQLRows = cur.fetchall()
                         #전체 랭킹 서치
                         if len(allSQLRows) > 0 :
                             for i in range(len(allSQLRows)):
-                                UnivRank += str(allSQLRows[0][0]) +" "
-                    
-                        print('asd')
-                        print(str(UnivRank)+ "a")
+                                cur.execute("SELECT nickname FROM user WHERE student_id ='" + str(allSQLRows[i][1]) + "'") #해당 학번의 닉네임 호출
+                                allSQLRows2 = cur.fetchall()
+                                UnivRank += str(allSQLRows[i][0]) + "," + str(allSQLRows2[0][0]) + " " # "포인트,닉네임"
+                        UnivRank.rstrip()
+                        print(UnivRank)
                         client.send(str(UnivRank).encode('utf-8'))
-                    elif side[0] == '2':
+                    elif side[0] == '2': #학과내
+                        print(Department)
                         inDeptRank = ""
-                        #cur.execute("SELECT sum(points) FROM points WHERE Depart = '"+Department+"' GROUP BY Student_id ORDER BY sum(points) DESC")
-                        cur.execute("SELECT sum(point) FROM user WHERE department = '"+Department+"' GROUP BY student_id ORDER BY sum(point) DESC")
+                        #학번으로 묶어서 포인트의 합과 학번을 얻는다(조건[같은학과], 내림차순)
+                        cur.execute("SELECT sum(points),Student_id FROM points WHERE Depart = '"+Department+"' GROUP BY Student_id ORDER BY sum(points) DESC")
+                        #cur.execute("SELECT sum(point) FROM user WHERE department = '"+Department+"' GROUP BY student_id ORDER BY sum(point) DESC") 리더보드는 유저 테이블로도 가능하지만 일단 points 테이블로 사용하였다.
                         allSQLRows = cur.fetchall()
                         #과내 랭킹 서치
                         if len(allSQLRows) > 0 :
                             for i in range(len(allSQLRows)):
-                                inDeptRank += str(allSQLRows[0][0]) +" "
-                    
-                        print('bcd')
-                        print(str(inDeptRank) + "a")
+                                cur.execute("SELECT nickname FROM user WHERE student_id ='" + str(allSQLRows[i][1]) + "'") #해당 학번의 닉네임 호출
+                                allSQLRows2 = cur.fetchall()
+                                inDeptRank += str(allSQLRows[i][0]) + "," + str(allSQLRows2[0][0]) + " "  # "포인트,닉네임"
+                        inDeptRank.rstrip()
+                        print(inDeptRank)
                         client.send(str(inDeptRank).encode('utf-8'))
                     elif side[0] == '3':
                         DeptRank = ""
-                        #cur.execute("SELECT sum(points) FROM points GROUP BY Depart ORDER BY sum(points) DESC")
-                        cur.execute("SELECT sum(point) FROM user GROUP BY department ORDER BY sum(point) DESC")
+                        #학과로 묶어서 포인트의 합과 학과을 얻는다(내림차순)
+                        cur.execute("SELECT sum(points),Depart FROM points GROUP BY Depart ORDER BY sum(points) DESC")
+                        #cur.execute("SELECT sum(point) FROM user GROUP BY department ORDER BY sum(point) DESC") 리더보드는 유저 테이블로도 가능하지만 일단 points 테이블로 사용하였다.
                         allSQLRows = cur.fetchall()
                         #과별 랭킹 서치
                         if len(allSQLRows) > 0 :
                             for i in range(len(allSQLRows)):
-                                DeptRank += str(allSQLRows[0][0]) +" "
-                    
-                        print('efg')
-                        print(str(DeptRank)+ "a")
+                                DeptRank += str(allSQLRows[i][0]) + "," + str(allSQLRows[i][1]) + " " # "포인트,학과"
+                        DeptRank.rstrip()
+                        print(DeptRank)
                         client.send(str(DeptRank).encode('utf-8'))
 
-                    #elif side[0] == '4':
-                    #    cur.execute("SELECT Depart,Lec_id,points FROM lecture WHERE Student_id ='" + str(side[1]) + "' AND Lec_id =")
+                    #elif side[0] == '4': 강의실 내 포인트 비교... 적용여부미정, 보류
+                    #    cur.execute("SELECT Depart,Lec_id,points FROM lecture WHERE Student_id ='" + str(side[1]) + "' AND Lec_id =") 리더보드는 유저 테이블로도 가능하지만 일단 points 테이블로 사용하였다.
                     #    allSQLRows = cur.fetchall()
                     #    #강의별 랭킹 서치
                     #    print('efg')
@@ -550,31 +551,55 @@ class ServerSocket:
                     print(side)
                     print("<><><><>")
                     cur = self.databasent.cursor()
+                    #왜 하는지 모르지만 안전상 유지시킴
                     cur.execute("SELECT no FROM chatting WHERE no = " + str(chat_id) + "")
                     allSQLRows = cur.fetchall()
                     chat_id = allSQLRows[0][0]
-                    print(side)
+                    #포인트 조절용>>>
+                    cur.execute("SELECT category_id FROM chatting WHERE no = " + str(chat_id) + "")
+                    allSQLRows1 = cur.fetchall()
+                    cat_id = allSQLRows1[0][0]
+                    cur.execute("SELECT lecture_code FROM category WHERE no = " + str(cat_id) + "")
+                    allSQLRows1 = cur.fetchall()
+                    lec_id = allSQLRows1[0][0]
+                    print(lec_id)
+                    #<<<포인트 조절용
                     cur.execute("SELECT likes_num FROM likes WHERE student_id = '"+str(side[1])+"' AND chat_id = " + str(chat_id) + "")
                     allSQLRows = cur.fetchall()
                     print(allSQLRows)
                     if len(allSQLRows)>0:
                         likes_num = allSQLRows[0][0]
                         if likes_num == 0:
+                            #좋아요를 할때
                             cur.execute("UPDATE chatting SET likes = likes+1 WHERE no =" + str(chat_id) + "")
                             self.databasent.commit()
                             cur.execute("UPDATE likes SET likes_num = 1 WHERE student_id='"+str(side[1])+"' AND chat_id = " + str(chat_id) + "")
                             self.databasent.commit()
+                            #점수 +
+                            cur.execute("UPDATE points SET points = points + 1 WHERE Student_id='"+str(side[1])+"' AND Lec_id = '" + str(lec_id) + "'")
+                            self.databasent.commit()
+                            
+                            
+                            
                         elif likes_num == 1:
+                            #이미 좋아요를 했을때
                             cur.execute("UPDATE chatting SET likes = likes-1  WHERE no = " + str(chat_id) + "")
                             self.databasent.commit()
                             cur.execute("UPDATE likes SET likes_num = 0 WHERE student_id='"+str(side[1])+"' AND chat_id = " + str(chat_id) + "")
                             self.databasent.commit()
+                            #점수 -
+                            cur.execute("UPDATE points SET points = points - 1 WHERE Student_id='"+str(side[1])+"' AND Lec_id = '" + str(lec_id) + "'")
+                            self.databasent.commit()
+                    
                     else:
+                        #likes가 생성되지 않았을때
                         cur.execute("INSERT INTO likes(chat_id,student_id,likes_num) VALUES ("+str(chat_id)+",'"+str(side[1])+"',1)")
                         self.databasent.commit()
                         cur.execute("UPDATE chatting SET likes = likes+1 WHERE no =" + str(chat_id) + "")
                         self.databasent.commit()
-
+                        #점수+
+                        cur.execute("UPDATE points SET points = points + 1 WHERE Student_id='"+str(side[1])+"' AND Lec_id = '" + str(lec_id) + "'")
+                        self.databasent.commit()
                         
                     
                     print('좋아요 업데이트')

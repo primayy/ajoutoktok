@@ -128,11 +128,11 @@ DROP TABLE IF EXISTS `points`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `points` (
-  `Student_id` int(11) NOT NULL,
+  `Student_id` char(9) NOT NULL,
   `Depart` varchar(1000) NOT NULL,
-  `Lec_id` varchar(1000) NOT NULL,
+  `Lec_id` varchar(100) NOT NULL,
   `points` int(100) NOT NULL,
-  PRIMARY KEY (`Student_id`)
+  PRIMARY KEY (`Student_id`,`Lec_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -142,6 +142,7 @@ CREATE TABLE `points` (
 
 LOCK TABLES `points` WRITE;
 /*!40000 ALTER TABLE `points` DISABLE KEYS */;
+INSERT INTO `points` VALUES (201620939,'소프트웨어학과','F066-1',5),(201620939,'소프트웨어학과','F013-1',2),(201620939,'소프트웨어학과','F043-1',1),(201423510,'소프트웨어학과','H501',7),(201856370,'미디어학과','F066-1',9),(201620949,'사이버보안학과','F043-1',1),(201620949,'사이버보안학과','F066-1',5),(201736985,'미디어학과','F013-1',6),(201135421,'미디어학과','F043-1',5);
 /*!40000 ALTER TABLE `points` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -203,7 +204,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `student_id`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `student_id` (
+CREATE TABLE `student_id`(
   `no` int(11) NOT NULL AUTO_INCREMENT,
   `student_id` char(9) DEFAULT NULL,
   PRIMARY KEY (`no`)
@@ -248,6 +249,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user`(student_id,name,nickname,department) VALUES (201856370,"한해가","NewY",'미디어학과'),(201620939,"전민건","JRTHP",'소프트웨어학과'),(201423510,"다갔네","훋",'소프트웨어학과'),(201620949,"하루도","DAy",'사이버보안학과'),(201736985,"지났고","핻",'미디어학과'),(201135421,"졸립다","Zzz",'미디어학과');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

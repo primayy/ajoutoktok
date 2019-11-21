@@ -18,6 +18,9 @@ class LeaderBoard(QWidget):
         self.tab = QTabWidget()
         self.tab.setStyleSheet('''
         QTabBar:tab{width:100px}''')
+        self.show_all = QListWidget(self)
+        self.show_inDepart = QListWidget(self)
+        self.show_compDepart = QListWidget(self)
         self.initUi()
 
     def initUi(self):
@@ -27,16 +30,28 @@ class LeaderBoard(QWidget):
         group.setStyleSheet('''
                         font-weight:bold;
                         font-size:16pt''')
-        show_all = QListWidget(self)
-        show_inDepart = QListWidget(self)
-        show_compDepart = QListWidget(self)
+        ##### 첫화면에서 바로 전체 순위 확인할 수 있도록
+        commend = "getRank "
+        commend += "1 " + self.studId
+        self.clientSocket.send(commend.encode('utf-8'))
+        result = self.clientSocket.recv(1024).decode('utf-8')
+        print(str(result))
+        UnivRank = str(result).split(" ")
+        for i in range(len(UnivRank)):
+            if len(UnivRank[i])>0:
+                allRank = UnivRank[i].split(",")
+                if len(allRank)>0:
+                    self.show_all.addItem(str("Points: "+allRank[0]+" / 아이디: "+allRank[1]))
+            #########여기까지가 그 코드
 
-        self.tab.addTab(show_all, "전체")
-        self.tab.addTab(show_inDepart, "학과내")
-        self.tab.addTab(show_compDepart, "학과별")
 
+
+        self.tab.addTab(self.show_all, "전체")
+        self.tab.addTab(self.show_inDepart, "학과내")
+        self.tab.addTab(self.show_compDepart, "학과별")
+
+        self.tab.currentChanged.connect(self.tab.tabText)
         self.tab.currentChanged.connect(self.getRank)
-
         self.title.addWidget(group)
         self.mainLayout.addLayout(self.title)
         self.mainLayout.addWidget(horizon_line)
@@ -49,20 +64,52 @@ class LeaderBoard(QWidget):
     def getRank(self):
         commend = "getRank "
         if self.tab.tabText(self.tab.currentIndex()) == '전체':
+            self.show_all.clear()
             commend += "1 " + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
             result = self.clientSocket.recv(1024).decode('utf-8')
             print(str(result))
+            UnivRank = str(result).split(" ")
+            for i in range(len(UnivRank)):
+                if len(UnivRank[i])>0:#있을 때만, index out of range 오류 피하기
+                    allRank = UnivRank[i].split(",")
+                    if len(allRank)>0:#있을 때만, index out of range 오류 피하기
+                        self.show_all.addItem(str("Points: "+allRank[0]+" / 아이디: "+allRank[1]))
+
+            
 
         elif self.tab.tabText(self.tab.currentIndex()) == '학과내':
+            self.show_inDepart.clear()
             commend += "2 " + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
-            result = self.clientSocket.recv(1024)
+            result = self.clientSocket.recv(1024).decode('utf-8')
+            print(str(result))
+            inDeptRank = result.split(" ")
+            print(inDeptRank)
+            for i in range(len(inDeptRank)):
+                if len(inDeptRank[i])>0:#있을 때만, index out of range 오류 피하기
+                    inDepartRank = inDeptRank[i].split(",")
+                    print(inDepartRank)
+                    if len(inDepartRank)>0:#있을 때만, index out of range 오류 피하기
+                        self.show_inDepart.addItem(str("Points: "+inDepartRank[0]+" / 아이디: "+inDepartRank[1]))
+
 
         elif self.tab.tabText(self.tab.currentIndex()) == '학과별':
+            self.show_compDepart.clear()
             commend += "3 " + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
-            result = self.clientSocket.recv(1024)
+            result = self.clientSocket.recv(1024).decode('utf-8')
+            print(str(result))
+            DeptRank = result.split(" ")
+            print(DeptRank)
+            for i in range(len(DeptRank)):
+                if len(DeptRank[i])>0:#있을 때만, index out of range 오류 피하기
+                    compDepartRank = DeptRank[i].split(",")
+                    if len(compDepartRank)>0:#있을 때만, index out of range 오류 피하기
+                        self.show_compDepart.addItem(str("Points: "+compDepartRank[0]+" / 학과: "+compDepartRank[1]))
+        
+        
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

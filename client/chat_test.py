@@ -9,6 +9,7 @@ import smtplib
 from email.mime.text import MIMEText
 from socket import *
 import time
+import reply_test # 대댓글창용
 
 class update_listener(QThread):
     chatUpdate = pyqtSignal()
@@ -52,7 +53,8 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.13', 3334))
+        #self.chatSocket.connect(('192.168.0.13', 3334))
+        self.chatSocket.connect(('192.168.25.28', 3334))
         #self.chatSocket.connect(('34.84.112.149', 3334))
 
         self.history = self.getChatHistory()
@@ -385,6 +387,11 @@ class chatWidget(QWidget):
         if QMouseEvent.button() == Qt.LeftButton:
             print(self.comments)
             print("Left Button Clicked")
+            #self.chat = reply_test.replyRoom(self,self.grandparent)기능 안되서 주석처리
+
+            #self.chat.setWindowTitle(self.comments[6])
+            #self.chat.setMinimumSize(QSize(400, 400))
+        
         elif QMouseEvent.button() == Qt.RightButton:
             print("Right Button Clicked")
 

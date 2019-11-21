@@ -7,9 +7,10 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
 
 class LeaderBoard(QWidget):
-    def __init__(self,parent):
+    def __init__(self,parent,studId):
         super().__init__()
         self.parent = parent
+        self.studId = studId
         self.clientSocket = parent.clientSocket
         self.mainLayout=QVBoxLayout()
         self.rankWidget = QWidget()
@@ -48,19 +49,22 @@ class LeaderBoard(QWidget):
     def getRank(self):
         commend = "getRank "
         if self.tab.tabText(self.tab.currentIndex()) == '전체':
-            commend += "1"
+            commend += "1 "  + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
-            result = self.clientSocket.recv(1024)
+            result = self.clientSocket.recv(1024).decode('utf-8')
+            print(str(result))
 
         elif self.tab.tabText(self.tab.currentIndex()) == '학과내':
-            commend += "2"
+            commend += "2 "  + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
-            result = self.clientSocket.recv(1024)
+            result = self.clientSocket.recv(1024).decode('utf-8')
+            print(str(result))
 
         elif self.tab.tabText(self.tab.currentIndex()) == '학과별':
-            commend += "3"
+            commend += "3 "  + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
-            result = self.clientSocket.recv(1024)
+            result = self.clientSocket.recv(1024).decode('utf-8')
+            print(str(result))
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

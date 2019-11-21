@@ -359,19 +359,72 @@ class ServerSocket:
                     lecid = str(lecid)
                     client.send(lecid.encode('utf-8'))
 
-                elif commend == 'getRank':
+                elif commend == 'getRank': #LeaderBoard 순위 가져오기
+                    print(side)
+                    cur = self.databasent.cursor()
+                    #cur.execute("SELECT Depart,points FROM points WHERE Student_id ='" + str(side[1]) + "'")
+                    cur.execute("SELECT department,point FROM user WHERE student_id ='" + str(side[1]) + "'")
+                    allSQLRows = cur.fetchall()
+                    Department = ""                    
+                    if len(allSQLRows) > 0 :
+                        Department += str(allSQLRows[0][0])
+                    #Lecture_Id = ""
+                    points = 0
+
+
+
+                    for i in range(len(allSQLRows)):
+                        #Lecture_Id += str(allSQLRows[i][2]) +" "
+                        points += allSQLRows[i][1]
+                    wholepoint = str(points)
                     if side[0] == '1':
+                        UnivRank = ""
+                        #cur.execute("SELECT sum(points) FROM points GROUP BY Student_id ORDER BY sum(points) DESC")
+                        cur.execute("SELECT sum(point) FROM user GROUP BY student_id ORDER BY sum(point) DESC")
+                        allSQLRows = cur.fetchall()
                         #전체 랭킹 서치
+                        if len(allSQLRows) > 0 :
+                            for i in range(len(allSQLRows)):
+                                UnivRank += str(allSQLRows[0][0]) +" "
+                    
                         print('asd')
-                        client.send('1'.encode('utf-8'))
+                        print(str(UnivRank)+ "a")
+                        client.send(str(UnivRank).encode('utf-8'))
                     elif side[0] == '2':
+                        inDeptRank = ""
+                        #cur.execute("SELECT sum(points) FROM points WHERE Depart = '"+Department+"' GROUP BY Student_id ORDER BY sum(points) DESC")
+                        cur.execute("SELECT sum(point) FROM user WHERE department = '"+Department+"' GROUP BY student_id ORDER BY sum(point) DESC")
+                        allSQLRows = cur.fetchall()
                         #과내 랭킹 서치
+                        if len(allSQLRows) > 0 :
+                            for i in range(len(allSQLRows)):
+                                inDeptRank += str(allSQLRows[0][0]) +" "
+                    
                         print('bcd')
-                        client.send('2'.encode('utf-8'))
+                        print(str(inDeptRank) + "a")
+                        client.send(str(inDeptRank).encode('utf-8'))
                     elif side[0] == '3':
+                        DeptRank = ""
+                        #cur.execute("SELECT sum(points) FROM points GROUP BY Depart ORDER BY sum(points) DESC")
+                        cur.execute("SELECT sum(point) FROM user GROUP BY department ORDER BY sum(point) DESC")
+                        allSQLRows = cur.fetchall()
                         #과별 랭킹 서치
+                        if len(allSQLRows) > 0 :
+                            for i in range(len(allSQLRows)):
+                                DeptRank += str(allSQLRows[0][0]) +" "
+                    
                         print('efg')
-                        client.send('3'.encode('utf-8'))
+                        print(str(DeptRank)+ "a")
+                        client.send(str(DeptRank).encode('utf-8'))
+
+                    #elif side[0] == '4':
+                    #    cur.execute("SELECT Depart,Lec_id,points FROM lecture WHERE Student_id ='" + str(side[1]) + "' AND Lec_id =")
+                    #    allSQLRows = cur.fetchall()
+                    #    #강의별 랭킹 서치
+                    #    print('efg')
+                    #    client.send('4'.encode('utf-8'))
+                  
+                
                 elif commend == 'getCategory':
                     cur = self.databasent.cursor()
                     cur.execute("SELECT chatroom_name FROM category WHERE lecture_id ='" + str(side[0]) + "'")

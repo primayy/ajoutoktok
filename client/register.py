@@ -123,6 +123,12 @@ class Register(QWidget):
             # self.afterLogin = after_login.App(mainW, ProfId, ProfName, lectureId)
             mainW.setCentralWidget(self.afterLogin)
             self.close()
+    #움직이지 못하게 만듬
+    def mousePressEvent(self, event):
+        self.oldPos = event.globalPos()
+
+    def mouseMoveEvent(self, event):
+        self.oldPos = event.globalPos()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

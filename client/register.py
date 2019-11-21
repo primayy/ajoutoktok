@@ -108,19 +108,21 @@ class Register(QWidget):
         self.clientSocket.send(commend.encode('utf-8'))
 
         print("등록완료")
-        commend = 'login ' + self.studId
-        self.clientSocket.send(commend.encode('utf-8'))
+        res = self.clientSocket.recv(1024)
+        if res.decode('utf-8') == 'registered':
+            commend = 'login ' + self.studId
+            self.clientSocket.send(commend.encode('utf-8'))
 
-        # 결과 도착
-        server_msg = self.clientSocket.recv(1024)
+            # 결과 도착
+            server_msg = self.clientSocket.recv(1024)
 
-        lectureId = server_msg.decode('utf-8')
+            lectureId = server_msg.decode('utf-8')
 
-        mainW = QApplication.activeWindow()
-        self.afterLogin = after_login.App(mainW, self.studId, self.studName, lectureId)
-        # self.afterLogin = after_login.App(mainW, ProfId, ProfName, lectureId)
-        mainW.setCentralWidget(self.afterLogin)
-        self.close()
+            mainW = QApplication.activeWindow()
+            self.afterLogin = after_login.App(mainW, self.studId, self.studName, lectureId)
+            # self.afterLogin = after_login.App(mainW, ProfId, ProfName, lectureId)
+            mainW.setCentralWidget(self.afterLogin)
+            self.close()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

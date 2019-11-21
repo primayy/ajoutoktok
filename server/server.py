@@ -436,7 +436,7 @@ class ServerSocket:
                     self.databasent.commit()
 
                     print(str(side[3])+'등록 완료')
-                    client.send('등록 완료'.encode('utf-8'))
+                    client.send('registered'.encode('utf-8'))
 
                 elif commend == 'like_update':
                     studid = str(side[0])

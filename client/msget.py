@@ -6,7 +6,28 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
 import chat_test
+import time
 
+class update_listener(QThread):
+    countUpdate = pyqtSignal()
+
+    def __init__(self,parent = None):
+        super().__init__()
+        self.parent = parent
+        self.go = True
+    def run(self):
+        while self.go:
+            time.sleep(1)  # 클라이언트 처리 과부하 방지
+
+            self.countUpdate.emit()
+            print('업데이트 시그널 emit')
+
+            # if update_commend == 'count_update':
+            #
+            # elif update_commend =='stop':
+            #     self.go = False
+            #     print('멈춤')
+            #     # break
 
 
 class Invisible(QWidget):
@@ -17,42 +38,52 @@ class Invisible(QWidget):
         self.lecture = lecture.text()
         self.prof = prof.text()
         self.clientSocket = parent.w.clientSock
+        self.origin_num = int(self.howManyChat())
         self.parent = parent
         self.setLayout(self.mainLayout)
         self.initUI()
+
         #self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         #self.setAttribute(Qt.WA_TranslucentBackground)
         #self.setWindowFlags(Qt.FramelessWindowHint)
         #self.setWindowFlags(Qt.WindowStaysOnTopHint)
 
     def initUI(self):
+        print(self.origin_num)
+
+        self.t = update_listener(parent=self)
+        self.t.countUpdate.connect(self.count_update)
+        self.t.start()
+
         print(self.lecture)
         print(self.prof)
+
+        self.l = QLabel()
+        self.chatcount = 0
+        self.l.setStyleSheet('QLabel{image:url(./icon/msgWid.png)}')
+        self.l.setText(str(self.chatcount))
+        self.l.setFont(QFont("Times", 50, QFont.Bold))
+
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        self.l.setAlignment(Qt.AlignCenter)
+        self.mainLayout.addWidget(self.l)
+
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.show()
+
+    def count_update(self):
+        print('ttt')
+        num_new_msg = int(self.howManyChat())
+        print(num_new_msg)
+        self.l.setText(str(num_new_msg-self.origin_num))
+
+    def howManyChat(self):
         commend = "HowManyChat " + self.lecture + " " + self.prof
         self.clientSocket.send(commend.encode('utf-8'))
         chatcount = self.clientSocket.recv(1024)
         chatcount = chatcount.decode('utf-8')
-        l = QLabel()
 
-        l.setStyleSheet('QLabel{image:url(./icon/msgWid.png)}')
-        l.setText(str(chatcount))
-        l.setFont(QFont("Times", 50, QFont.Bold))
-        # self.adjustSize()
-        # self.setGeometry(
-        #     QStyle.alignedRect(
-        #         Qt.LeftToRight,
-        #         Qt.AlignCenter,
-        #         self.size(),
-        #         QApplication.instance().desktop().availableGeometry()
-        #         )
-        #     )
-        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
-        l.setAlignment(Qt.AlignCenter)
-        self.mainLayout.addWidget(l)
-        #self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        #self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.show()
+        return chatcount
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:

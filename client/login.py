@@ -27,7 +27,7 @@ class login(QWidget):
         self.mainWidget = QWidget()
         self.mainWidget.setObjectName("myParentWidget");
         #self.mainWidget.setStyleSheet("background-color:#5218FA ")
-        self.mainWidget.setStyleSheet('QWidget#myParentWidget { border-image:url(./ui/점선2.png) 0 0 0 0 stretch stretch}')
+        self.mainWidget.setStyleSheet('QWidget#myParentWidget { border-image:url(./ui/login_ui/점선2.png) 0 0 0 0 stretch stretch}')
         self.mainLayer = QVBoxLayout()
         self.mainWidget.setLayout(self.mainLayer)
 
@@ -46,7 +46,7 @@ class login(QWidget):
         self.setWindowTitle('로그인')
 
         logo = QLabel()
-        ajoutoktok = QPixmap('./ui/toktok_logo.png')
+        ajoutoktok = QPixmap('./ui/login_ui/toktok_logo.png')
         ajoutoktok= ajoutoktok.scaled(200,400,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
         logo.setPixmap(ajoutoktok)
 
@@ -100,7 +100,7 @@ class login(QWidget):
         #BtLogin.setIcon(QIcon('C:/Users/hyejin/1119/client/ui/로그인버튼.png'))
         #BtLogin.setStyleSheet('background-image:C:/Users/hyejin/ajoutoktok/ajoutoktok/client/ui/로그인버튼.png; height:33; font-size:12px; font-family: Arial')
         BtLogin.setStyleSheet('''
-                        QPushButton{image:url(./ui/login_button.png); border:0px; width:100px; height:50px}        
+                        QPushButton{image:url(./ui/login_ui/login_button.png); border:0px; width:100px; height:50px}        
                         
                         ''')
         self.subLayer.addWidget(BtLogin)
@@ -136,7 +136,7 @@ class login(QWidget):
         res_split = res.split('^')
 
         #로그인 성공
-        if len(res_split) is not 1:
+        if len(res_split) != 1:
             cookie = res_split[2]
 
             r1 = self.session.get('https://eclass2.ajou.ac.kr' + cookie)

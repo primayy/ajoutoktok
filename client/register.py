@@ -1,12 +1,12 @@
 import sys
 from PyQt5.QtGui import *
+from PyQt5 import QtGui
 from PyQt5 import QtCore
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
 import after_login
-from bs4 import BeautifulSoup
 
 class Register(QWidget):
     def __init__(self,parent,window,name,studId):
@@ -15,14 +15,11 @@ class Register(QWidget):
         self.clientSocket = window.clientSock
         self.studName = name
         self.studId = studId
-        self.session = parent.session
-
-        self.courses = self.getCourses()
 
         self.mainWidget = QWidget()
         self.widgetLayout = QVBoxLayout()
         self.mainWidget.setLayout(self.widgetLayout)
-        self.mainWidget.setStyleSheet('background-color:white')
+        self.mainWidget.setStyleSheet('background-color:#f2f2f2;')
 
 
         self.mainLayout = QVBoxLayout()
@@ -43,25 +40,60 @@ class Register(QWidget):
 
     def initUi(self):
         self.setWindowTitle('초기등록')
-        self.regi_qual = 0 #가입가능한지아닌지
 
-        init_register_label = QLabel('초기 등록')
-        init_register_label.setAlignment(Qt.AlignTop)
-        init_register_label.setStyleSheet('''font-weight: Bold; font-size: 16pt''')
+        init_register_label = QLabel()
+        #init_register_label.setAlignment(Qt.AlignTop)
+        #init_register_label.setStyleSheet('''font-weight: Bold; font-size: 16pt''')
+        init_register_word = QPixmap('./ui/register_ui/초기등록2.png')
+        init_register_word = init_register_word.scaled(122,53,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+        init_register_label.setPixmap(init_register_word)
 
-        horizon_line = QLabel('─────────────────────')
+        # logo = QLabel()
+        # ajoutoktok = QPixmap('./ui/register_ui/toktok_logo.png')
+        # ajoutoktok= ajoutoktok.scaled(200,400,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+        # logo.setPixmap(ajoutoktok)
+
+        #구분선
+        horizon_line = QLabel()
+        horizon_img = QPixmap('./ui/register_ui/구분선5.png')
+        horizon_img = horizon_img.scaled(290,12,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+        horizon_line.setPixmap(horizon_img)
         horizon_line.setAlignment(Qt.AlignTop)
+
+        #안내
+        explanation_label = QLabel()
+        explanation_img = QPixmap('./ui/register_ui/안내문4.png')
+        explanation_img = explanation_img.scaled(320,112,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+        explanation_label.setPixmap(explanation_img)
 
         #이름
         student_name_label = QLabel('이름')
+        #student_name_label.setStyleSheet('''font-size: 10pt; font-family:NanumSquareRoundB''')
+        # student_name_img = QPixmap('./ui/register_ui/이름.png')
+        # student_name_img = student_name_img.scaled(60,40,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+        # student_name_label.setPixmap(student_name_img)
+        student_name_label.setStyleSheet("font: 9pt 나눔바른펜")
         student_name = QLabel(self.studName)
-
-        #학과
+        
+        #student_name_label.setFont(QtGui.QFont("궁서",20))
+        
+        #student_name_label.setStyleSheet('QLabel{font-family:NanumSquareRoundB}')
+        
+        #학번
         student_id_label = QLabel('학번')
+        student_id_label.setStyleSheet("font: 9pt 나눔바른펜")
+        # student_id_img = QPixmap('./ui/register_ui/학번.png')
+        # student_id_img = student_id_img.scaled(75,47,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+        # student_id_label.setPixmap(student_id_img)
         sutdent_id =  QLabel(self.studId)
 
         #학과
         department_label = QLabel('학과')
+        department_label.setStyleSheet("font: 9pt 나눔바른펜")
+        # department_img = QPixmap('./ui/register_ui/학과.png')
+        # department_img = department_img.scaled(75,47,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+        # department_label.setPixmap(department_img)
+        
         department_comboBox = QComboBox(self)
         #디비에 있는 department 목록 불러오기 추가필요
         department_comboBox.addItem('소프트웨어학과')
@@ -70,18 +102,28 @@ class Register(QWidget):
 
         #닉네임
         nickname_label = QLabel('닉네임')
-        self.nickname_textbox = QLineEdit()
-        nickname_overlap = QPushButton('중복확인')
+        nickname_label.setStyleSheet("font: 9pt 나눔바른펜")
+        nickname_textbox = QLineEdit()
+        nickname_overlap = QPushButton()
+        nickname_overlap.setStyleSheet('''
+                        QPushButton{image:url(./ui/register_ui/중복확인.png); border:0px; width:100px; height:50px}
+                        ''')
         nickname_overlap.clicked.connect(self.nickname_overlap_check)
 
         #등록
-        register_button = QPushButton('등록')
-        register_button.clicked.connect(lambda: self.register(self.nickname_textbox.text(),department_comboBox.currentText() ))
-
-        self.title.addWidget(init_register_label)
+        register_button = QPushButton()
+        register_button.setStyleSheet('''
+                        QPushButton{image:url(./ui/register_ui/등록.png); border:0px; width:100px; height:50px}        
+                        
+                        ''')
+        register_button.clicked.connect(lambda: self.register(nickname_textbox.text(),department_comboBox.currentText() ))
+        #self.subLayer.addWidget(logo, alignment=(QtCore.Qt.AlignCenter|QtCore.Qt.AlignTop))
+        #self.title.addWidget(init_register_label, alignment=(QtCore.Qt.AlignCenter|QtCore.Qt.AlignTop))
+        self.title.addWidget(init_register_label, alignment=(QtCore.Qt.AlignCenter|QtCore.Qt.AlignTop))
 
         self.id.addWidget(student_id_label, alignment=(QtCore.Qt.AlignTop))
         self.id.addWidget(sutdent_id)
+        
 
         self.name.addWidget(student_name_label)
         self.name.addWidget(student_name)
@@ -90,115 +132,52 @@ class Register(QWidget):
         self.department.addWidget(department_comboBox)
 
         self.nickname.addWidget(nickname_label)
-        self.nickname.addWidget(self.nickname_textbox)
+        self.nickname.addWidget(nickname_textbox)
         self.nickname.addWidget(nickname_overlap)
 
         self.widgetLayout.addLayout(self.title)
-        self.widgetLayout.addWidget(horizon_line,alignment=Qt.AlignTop)
+        self.widgetLayout.addWidget(horizon_line,alignment=Qt.AlignTop|Qt.AlignCenter)
+        self.widgetLayout.addWidget(explanation_label,alignment=Qt.AlignTop)
         self.widgetLayout.addStretch(1)
         self.widgetLayout.addLayout(self.name)
         self.widgetLayout.addLayout(self.id)
         self.widgetLayout.addLayout(self.department)
         self.widgetLayout.addLayout(self.nickname)
         self.widgetLayout.addWidget(register_button)
-        self.widgetLayout.addStretch(1)
+        self.widgetLayout.addStretch(3)
 
         self.setFixedSize(358,600)
-        self.show
-
-    def getCourses(self):
-        res = ""
-
-        session = self.session
-        u = 'https://eclass2.ajou.ac.kr/webapps/portal/execute/tabs/tabAction'
-
-        custom_header = {
-            'referer': 'https://eclass2.ajou.ac.kr:8443/webapps/portal/execute/tabs/tabAction?tab_tab_group_id=_1_1',
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36'}
-
-        course_get = session.get(u, headers=custom_header,
-                                 params="action=refreshAjaxModule&modId=_3_1&tabId=_1_1&tab_tab_group_id=_1_1")
-        soup = BeautifulSoup(course_get.text, 'lxml')
-
-        courses = soup.select(''
-                              '#_3_1termCourses__15_1 > ul > li > a'
-                              '')
-
-        #블랙보드에서 학기별 분류 안해놨을 경우
-        if len(courses) == 0:
-            courses = soup.select(''
-                                  '#_3_1termCourses_noterm > ul > li > a'
-                                  '')
-
-            for course in courses:
-                print(course.text)
-                if course.text == "Blackboard Learn 소개하기 (학습자용)":
-                    continue
-                else:
-                    temp = ' '.join(course.text.split(' ')[1:])
-                    course_name = temp.split('(')[0]
-                    course_code = temp.split('(')[1].split(')')[0]
-                    res += course_name + ',' + course_code + '/'
-
-            return res
-        else:
-            for course in courses:
-                temp = ' '.join(course.text.split(' ')[1:])
-                course_name = temp.split('(')[0]
-                course_code = temp.split('(')[1].split(')')[0]
-                res += course_name+','+course_code+'/'
-
-            # print(res)
-            return res
 
     def nickname_overlap_check(self):
-        commend = "OvelapCheck "
-        commend += self.nickname_textbox.text()
-        self.clientSocket.send(commend.encode('utf-8'))
         print("중복확인")
-        answer = self.clientSocket.recv(1024).decode('utf-8')
-        if answer == "newone":
-            self.regi_qual=1
-        elif answer == "overlap":
-            self.regi_qual=2
+        #user 테이블 닉네임 항목 보고
+
+        #중복이면
+        
+            
+        #아니면
 
     def register(self,nick,department):
-        if self.regi_qual == 1 :#새로운 아이디일때 (밑으로는 모두 한단계 indendation이 되었다.)
-            commend = 'register '+nick+" "+department+" "+self.studName+" "+self.studId
+        commend = 'register '+nick+" "+department+" "+self.studName+" "+self.studId
+        self.clientSocket.send(commend.encode('utf-8'))
+
+        print("등록완료")
+        res = self.clientSocket.recv(1024)
+        if res.decode('utf-8') == 'registered':
+            commend = 'login ' + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
 
-            print("등록완료")
-            res = self.clientSocket.recv(1024)
-            if res.decode('utf-8') == 'registered':
-                commend = 'courses_create '+self.studId + " " + self.courses
-                self.clientSocket.send(commend.encode('utf-8'))
+            # 결과 도착
+            server_msg = self.clientSocket.recv(1024)
 
-                course_res = self.clientSocket.recv(1024).decode('utf-8')
-                # print(course_res)
+            lectureId = server_msg.decode('utf-8')
 
-                commend = 'login ' + self.studId
-                self.clientSocket.send(commend.encode('utf-8'))
+            mainW = QApplication.activeWindow()
+            self.afterLogin = after_login.App(mainW, self.studId, self.studName, lectureId)
+            # self.afterLogin = after_login.App(mainW, ProfId, ProfName, lectureId)
+            mainW.setCentralWidget(self.afterLogin)
+            self.close()
 
-                # 결과 도착
-                server_msg = self.clientSocket.recv(1024)
-
-                lectureId = server_msg.decode('utf-8')
-
-                mainW = QApplication.activeWindow()
-                self.afterLogin = after_login.App(mainW, self.studId, self.studName, lectureId)
-                mainW.setCentralWidget(self.afterLogin)
-                self.close()
-        elif self.regi_qual == 0 :
-            print("중복검사 하세요")
-        elif self.regi_qual == 2 :
-            print("아이디 중복")
-            
-    #움직이지 못하게 만듬
-    def mousePressEvent(self, event):
-        self.oldPos = event.globalPos()
-
-    def mouseMoveEvent(self, event):
-        self.oldPos = event.globalPos()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

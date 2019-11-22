@@ -514,6 +514,12 @@ class ServerSocket:
                     cur = self.databasent.cursor()
                     print(side)
                     stuid = str(side[0])
+
+                    # 강의 있는지 조회
+                    cur.execute("SELECT department FROM user WHERE student_id ='" + str(stuid) + "'")
+                    depart = cur.fetchall()
+                    depart = depart[0][0]
+
                     tmp = ' '.join(side[1:])
                     print(tmp)
                     tmp = tmp.split('/')
@@ -536,6 +542,12 @@ class ServerSocket:
                             query = 'INSERT INTO student_course (student_id,lecture_code,lecture_id) Values (%s,%s,%s)'
                             cur.execute(query, (stuid, str(course_code),str(lec_id[0][0])))
                             self.databasent.commit()
+
+                            # 학생, 강의 정보를 포인트 테이블에 추가
+                            query = 'INSERT INTO points (Student_id,Depart,points) Values (%s,%s,%s)'
+                            cur.execute(query, (stuid, str(depart), str(0)))
+                            self.databasent.commit()
+
 
                         #없으면
                         else:
@@ -561,6 +573,12 @@ class ServerSocket:
                             query = 'INSERT INTO student_course (student_id,lecture_code,lecture_id) Values (%s,%s,%s)'
                             cur.execute(query, (stuid, str(course_code), str(lec_id)))
                             self.databasent.commit()
+
+                            # 학생, 강의 정보를 포인트 테이블에 추가
+                            query = 'INSERT INTO points (Student_id,Depart,Lec_id,points) Values (%s,%s,%s,%s)'
+                            cur.execute(query, (stuid, str(depart),str(course_code), str(0)))
+                            self.databasent.commit()
+
 
                     print('3333: 추가완료')
                     client.send('complete'.encode('utf-8'))

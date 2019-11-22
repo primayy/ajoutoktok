@@ -366,16 +366,55 @@ class ServerSocket:
 
                 #아이디 중복 확인
                 elif commend == 'OvelapCheck':
-                    print(side)
+                    print(str(side[0]))
+                    Answer = ""
+
+                    #특수문자 ㄴㄴ해
+                    for i in range(len(str(side[0]))):
+                        print("ord(str(side[0])[i])" + str(ord(str(side[0])[i])))
+                        if 122 < ord(str(side[0])[i]):
+                            Answer = "noMark"
+                            print(Answer+"4")
+                            client.send(Answer.encode('utf-8'))
+                            
+                        elif 90 < ord(str(side[0])[i]):
+                            if 97 > ord(str(side[0])[i]):
+                                Answer = "noMark"
+                                print(Answer+"3")
+                                client.send(Answer.encode('utf-8'))
+
+                        elif 57 < ord(str(side[0])[i]):
+                            if 65 > ord(str(side[0])[i]):
+                                Answer = "noMark"
+                                print(Answer+"2")
+                                client.send(Answer.encode('utf-8'))
+
+                        elif 48 > ord(str(side[0])[i]):
+                            Answer = "noMark"
+                            print(Answer+"1")
+                            client.send(Answer.encode('utf-8'))
+
+                    print(len(str(side[0])))
+                    if len(Answer)==0:
+                        if (len(str(side[0]))<4 or len(str(side[0]))>8):
+                            Answer = "length" #짧은거 ㄴㄴ해 긴 것도 ㄴㄴ해
+                            print(Answer)
+                            client.send(Answer.encode('utf-8'))
+                    # elif len(str(side[0]))>8:
+                    #     Answer = "long" #긴 것도 ㄴㄴ해
+                    #     client.send(Answer.encode('utf-8'))
+
                     cur = self.databasent.cursor()
-                    cur.execute("SELECT no FROM student_id WHERE student_id ='" + str(side[0]) + "'")
+                    cur.execute("SELECT nickname FROM user WHERE student_id ='" + str(side[0]) + "'")
                     allSQLRows = cur.fetchall()
-                    if len(allSQLRows) > 0:
-                        Answer = "overlap" #있으면
-                    else:
-                        Answer = "newone" #없으면
-                    
-                    client.send(Answer.encode('utf-8'))
+                    if len(Answer)==0:
+                        if len(allSQLRows) > 0:
+                            Answer = "overlap" #있는 것도 ㄴㄴ해
+                            client.send(Answer.encode('utf-8'))
+                        else:
+                            Answer = "newone" #없으면 괜찮음
+                            client.send(Answer.encode('utf-8'))
+                        print(Answer)
 
                 elif commend == 'getRank': #LeaderBoard 순위 가져오기
                     print(side)

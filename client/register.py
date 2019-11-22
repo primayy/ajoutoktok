@@ -104,6 +104,7 @@ class Register(QWidget):
         self.widgetLayout.addStretch(1)
 
         self.setFixedSize(358,600)
+        self.show
 
     def getCourses(self):
         res = ""

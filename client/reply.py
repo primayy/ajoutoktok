@@ -125,7 +125,7 @@ class Reply(QWidget):
         self.widgetLayout.addWidget(self.question_reply)
 
 
-        # self.show()
+        self.show()
 
 
     def mousePressEvent(self, event):

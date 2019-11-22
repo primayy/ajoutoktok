@@ -544,8 +544,8 @@ class ServerSocket:
                             self.databasent.commit()
 
                             # 학생, 강의 정보를 포인트 테이블에 추가
-                            query = 'INSERT INTO points (Student_id,Depart,points) Values (%s,%s,%s)'
-                            cur.execute(query, (stuid, str(depart), str(0)))
+                            query = 'INSERT INTO points (Student_id,Depart,Lec_id,points) Values (%s,%s,%s,%s)'
+                            cur.execute(query, (stuid, str(depart), str(course_code), str(0)))
                             self.databasent.commit()
 
 

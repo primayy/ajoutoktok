@@ -123,18 +123,22 @@ class Register(QWidget):
                               '#_3_1termCourses__15_1 > ul > li > a'
                               '')
 
+        #블랙보드에서 학기별 분류 안해놨을 경우
         if len(courses) == 0:
             courses = soup.select(''
                                   '#_3_1termCourses_noterm > ul > li > a'
                                   '')
 
-            for i in range(1, len(courses)):
-                temp = ' '.join(courses[i].text.split(' ')[1:])
-                course_name = temp.split('(')[0]
-                course_code = temp.split('(')[1].split(')')[0]
-                res += course_name + ',' + course_code + '/'
+            for course in courses:
+                print(course.text)
+                if course.text == "Blackboard Learn 소개하기 (학습자용)":
+                    continue
+                else:
+                    temp = ' '.join(course.text.split(' ')[1:])
+                    course_name = temp.split('(')[0]
+                    course_code = temp.split('(')[1].split(')')[0]
+                    res += course_name + ',' + course_code + '/'
 
-            # print(res)
             return res
         else:
             for course in courses:

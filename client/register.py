@@ -43,6 +43,7 @@ class Register(QWidget):
 
     def initUi(self):
         self.setWindowTitle('초기등록')
+        self.regi_qual = 0 #가입가능한지아닌지
 
         init_register_label = QLabel('초기 등록')
         init_register_label.setAlignment(Qt.AlignTop)
@@ -69,13 +70,13 @@ class Register(QWidget):
 
         #닉네임
         nickname_label = QLabel('닉네임')
-        nickname_textbox = QLineEdit()
+        self.nickname_textbox = QLineEdit()
         nickname_overlap = QPushButton('중복확인')
         nickname_overlap.clicked.connect(self.nickname_overlap_check)
 
         #등록
         register_button = QPushButton('등록')
-        register_button.clicked.connect(lambda: self.register(nickname_textbox.text(),department_comboBox.currentText() ))
+        register_button.clicked.connect(lambda: self.register(self.nickname_textbox.text(),department_comboBox.currentText() ))
 
         self.title.addWidget(init_register_label)
 
@@ -89,7 +90,7 @@ class Register(QWidget):
         self.department.addWidget(department_comboBox)
 
         self.nickname.addWidget(nickname_label)
-        self.nickname.addWidget(nickname_textbox)
+        self.nickname.addWidget(self.nickname_textbox)
         self.nickname.addWidget(nickname_overlap)
 
         self.widgetLayout.addLayout(self.title)
@@ -146,33 +147,46 @@ class Register(QWidget):
             return res
 
     def nickname_overlap_check(self):
+        commend = "OvelapCheck "
+        commend += self.nickname_textbox.text()
+        self.clientSocket.send(commend.encode('utf-8'))
         print("중복확인")
+        answer = self.clientSocket.recv(1024).decode('utf-8')
+        if answer == "newone":
+            self.regi_qual=1
+        elif answer == "overlap":
+            self.regi_qual=2
 
     def register(self,nick,department):
-        commend = 'register '+nick+" "+department+" "+self.studName+" "+self.studId
-        self.clientSocket.send(commend.encode('utf-8'))
-
-        print("등록완료")
-        res = self.clientSocket.recv(1024)
-        if res.decode('utf-8') == 'registered':
-            commend = 'courses_create '+self.studId + " " + self.courses
+        if self.regi_qual == 1 :#새로운 아이디일때 (밑으로는 모두 한단계 indendation이 되었다.)
+            commend = 'register '+nick+" "+department+" "+self.studName+" "+self.studId
             self.clientSocket.send(commend.encode('utf-8'))
 
-            course_res = self.clientSocket.recv(1024).decode('utf-8')
-            # print(course_res)
+            print("등록완료")
+            res = self.clientSocket.recv(1024)
+            if res.decode('utf-8') == 'registered':
+                commend = 'courses_create '+self.studId + " " + self.courses
+                self.clientSocket.send(commend.encode('utf-8'))
 
-            commend = 'login ' + self.studId
-            self.clientSocket.send(commend.encode('utf-8'))
+                course_res = self.clientSocket.recv(1024).decode('utf-8')
+                # print(course_res)
 
-            # 결과 도착
-            server_msg = self.clientSocket.recv(1024)
+                commend = 'login ' + self.studId
+                self.clientSocket.send(commend.encode('utf-8'))
 
-            lectureId = server_msg.decode('utf-8')
+                # 결과 도착
+                server_msg = self.clientSocket.recv(1024)
 
-            mainW = QApplication.activeWindow()
-            self.afterLogin = after_login.App(mainW, self.studId, self.studName, lectureId)
-            mainW.setCentralWidget(self.afterLogin)
-            self.close()
+                lectureId = server_msg.decode('utf-8')
+
+                mainW = QApplication.activeWindow()
+                self.afterLogin = after_login.App(mainW, self.studId, self.studName, lectureId)
+                mainW.setCentralWidget(self.afterLogin)
+                self.close()
+        elif self.regi_qual == 0 :
+            print("중복검사 하세요")
+        elif self.regi_qual == 2 :
+            print("아이디 중복")
             
     #움직이지 못하게 만듬
     def mousePressEvent(self, event):

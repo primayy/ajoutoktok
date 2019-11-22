@@ -142,7 +142,7 @@ CREATE TABLE `points` (
 
 LOCK TABLES `points` WRITE;
 /*!40000 ALTER TABLE `points` DISABLE KEYS */;
-INSERT INTO `points` VALUES (201620939,'소프트웨어학과','F066-1',5),(201620939,'소프트웨어학과','F013-1',2),(201620939,'소프트웨어학과','F043-1',1),(201423510,'소프트웨어학과','H501',7),(201856370,'미디어학과','F066-1',9),(201620949,'사이버보안학과','F043-1',1),(201620949,'사이버보안학과','F066-1',5),(201736985,'미디어학과','F013-1',6),(201135421,'미디어학과','F043-1',5);
+INSERT INTO `points` VALUES ('201620939','소프트웨어학과','F066-1',5),('201620939','소프트웨어학과','F013-1',2),('201620939','소프트웨어학과','F043-1',1),('201423510','소프트웨어학과','H501',7),('201856370','미디어학과','F066-1',9),('201620949','사이버보안학과','F043-1',1),('201620949','사이버보안학과','F066-1',5),('201736985','미디어학과','F013-1',6),('201135421','미디어학과','F043-1',5);
 /*!40000 ALTER TABLE `points` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -217,6 +217,7 @@ CREATE TABLE `student_id`(
 
 LOCK TABLES `student_id` WRITE;
 /*!40000 ALTER TABLE `student_id` DISABLE KEYS */;
+INSERT INTO `student_id` VALUES (0,"NewY");
 /*!40000 ALTER TABLE `student_id` ENABLE KEYS */;
 UNLOCK TABLES;
 

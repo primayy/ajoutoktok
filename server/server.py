@@ -311,6 +311,13 @@ class ServerSocket:
                     # print(category_id)
                     cur.execute(query, (category_id, msg, nick,stuid))
                     self.databasent.commit()
+                    
+                    #강의코드 가져오기
+                    cur.execute("SELECT lecture_code FROM category WHERE chatroom_name ='" + str(category_name) + "'"+ "AND lecture_id = '"+ str(lecid)+"'")
+                    lecture_code = cur.fetchall()
+                    #점수 +
+                    cur.execute("UPDATE points SET points = points + 5 WHERE Student_id='"+str(stuid)+"' AND Lec_id = '" + str(lecture_code[0][0]) + "'")
+                    self.databasent.commit()
 
                     client.send('o'.encode('utf-8'))
                     print('sendmsg끝')
@@ -356,6 +363,19 @@ class ServerSocket:
                     lecid = allSQLRows[0][0]
                     lecid = str(lecid)
                     client.send(lecid.encode('utf-8'))
+
+                #아이디 중복 확인
+                elif commend == 'OvelapCheck':
+                    print(side)
+                    cur = self.databasent.cursor()
+                    cur.execute("SELECT no FROM student_id WHERE student_id ='" + str(side[0]) + "'")
+                    allSQLRows = cur.fetchall()
+                    if len(allSQLRows) > 0:
+                        Answer = "overlap" #있으면
+                    else:
+                        Answer = "newone" #없으면
+                    
+                    client.send(Answer.encode('utf-8'))
 
                 elif commend == 'getRank': #LeaderBoard 순위 가져오기
                     print(side)

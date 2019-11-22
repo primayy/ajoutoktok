@@ -81,7 +81,7 @@ class Reply(QWidget):
         self.setLayout(self.mainLayout)
         self.setMinimumSize(500, 400)
         self.setStyleSheet('background-color:white')
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        # self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.initUI()
 
     def initUI(self):
@@ -135,6 +135,8 @@ class Reply(QWidget):
     def returnToChat(self):
         self.close()
         self.parent.chatWidget = self.widgetTmp
+        print(self.parent.sendType)
+        self.parent.sendType = True
         self.widgetTmp.show()
 
 

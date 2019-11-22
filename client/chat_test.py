@@ -47,8 +47,9 @@ class chatRoom(QWidget):
         self.parent = parent
         self.clientSocket = parent.w.clientSock
         self.lecId = self.getLecId()
-
-        # self.reply = reply.Reply()
+        self.sendType = True
+        # self.reply = reply.Reply(self)
+        self.comment_info = 0
         # self.reply.clientSocket = self.clientSocket
         self.tab = QTabWidget()
         self.getCategory()
@@ -281,8 +282,8 @@ class chatRoom(QWidget):
 
     def sendMsg(self,msg):
         self.chat_input.setPlainText('')
-        if self.chatWidget == self.reply:
-            commend = 'sendReplyMsg ' + self.reply.comment_info[6] + " " + self.parent.stuid + " " + msg
+        if self.sendType == False:
+            commend = 'sendReplyMsg ' + self.comment_info[6] + " " + self.parent.stuid + " " + msg
             print(commend)
 
             # main server에 알림
@@ -404,8 +405,10 @@ class chatWidget(QWidget):
     def mousePressEvent(self, QMouseEvent):
         if QMouseEvent.button() == Qt.LeftButton:
             self.parent.chatWidget.close()
-
+            self.parent.sendType = False
             replyWidget = reply.Reply(self.parent)
+            self.parent.comment_info = self.comments
+            # replyWidget = self.parent.reply
             replyWidget.widgetTmp = self.parent.chatWidget
             replyWidget.clientSocket = self.clientSocket
 

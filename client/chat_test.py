@@ -48,12 +48,14 @@ class chatRoom(QWidget):
         self.clientSocket = parent.w.clientSock
         self.lecId = self.getLecId()
 
+        # self.reply = reply.Reply()
+        # self.reply.clientSocket = self.clientSocket
         self.tab = QTabWidget()
         self.getCategory()
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.41', 3334))
+        self.chatSocket.connect(('192.168.0.14', 3334))
         #self.chatSocket.connect(('192.168.25.28', 3334))
         #self.chatSocket.connect(('34.84.112.149', 3334))
 
@@ -112,10 +114,10 @@ class chatRoom(QWidget):
         self.mainWidget.setLayout(self.mainLayout)
 
         self.showLayout.addWidget(self.mainWidget)
-        self.showLayout.setContentsMargins(0,0,5,5)
+        self.showLayout.setContentsMargins(0,0,0,0)
         self.setLayout(self.showLayout)
         self.setMinimumSize(500,700)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        # self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 
         self.initUI()
@@ -279,15 +281,26 @@ class chatRoom(QWidget):
 
     def sendMsg(self,msg):
         self.chat_input.setPlainText('')
-        commend = 'sendMsg ' + self.tab.tabText(self.tab.currentIndex()) + " "+ self.lecId + " " + msg + " " + self.parent.stuid
-        # print(commend)
+        if self.chatWidget == self.reply:
+            commend = 'sendReplyMsg ' + self.reply.comment_info[6] + " " + self.parent.stuid + " " + msg
+            print(commend)
 
-        #main server에 알림
-        self.clientSocket.send(commend.encode('utf-8'))
+            # main server에 알림
+            self.clientSocket.send(commend.encode('utf-8'))
 
-        tmp = self.clientSocket.recv(1024)
-        #chat server에 전송 -> 모두에게 뿌리기 위해
-        self.chatSocket.send('chat_update'.encode('utf-8'))
+            tmp = self.clientSocket.recv(1024)
+            print(tmp)
+            # chat server에 전송 -> 모두에게 뿌리기 위해
+            # self.chatSocket.send('chat_update'.encode('utf-8'))
+        else:
+            commend = 'sendMsg ' + self.tab.tabText(self.tab.currentIndex()) + " "+ self.lecId + " " + msg + " " + self.parent.stuid
+
+            #main server에 알림
+            self.clientSocket.send(commend.encode('utf-8'))
+
+            tmp = self.clientSocket.recv(1024)
+            #chat server에 전송 -> 모두에게 뿌리기 위해
+            self.chatSocket.send('chat_update'.encode('utf-8'))
 
 class category_create(QDialog):
     def __init__(self,window,parent):
@@ -346,7 +359,7 @@ class chatWidget(QWidget):
         self.setLayout(self.mainLayout)
         self.clientSocket = parent.clientSocket
 
-        #comments 참조 순서 studid,name,comment,like,category_id,time
+        #comments 참조 순서 studid,name,comment,like,category_id,time,chat_id
         self.comments = comments
         self.initUI()
 
@@ -390,19 +403,18 @@ class chatWidget(QWidget):
 
     def mousePressEvent(self, QMouseEvent):
         if QMouseEvent.button() == Qt.LeftButton:
-            print(self.comments)
-            print("Left Button Clicked")
-            #self.chat = reply_test.replyRoom(self,self.grandparent)기능 안되서 주석처리
-
             self.parent.chatWidget.close()
-            self.parent.chatWidget = reply.Reply()
+
+            replyWidget = reply.Reply(self.parent)
+            replyWidget.widgetTmp = self.parent.chatWidget
+            replyWidget.clientSocket = self.clientSocket
+
+            self.parent.chatWidget = replyWidget
+
+            self.parent.chatWidget.comment_info = self.comments
+            self.parent.chatWidget.replyList = self.parent.chatWidget.getReply()
+            self.parent.chatWidget.showQuestions()
             self.parent.chatContentLayout.addWidget(self.parent.chatWidget)
-
-            # self.rightSideLayout.addWidget(self.rightSideInfo)
-
-
-            #self.chat.setWindowTitle(self.comments[6])
-            #self.chat.setMinimumSize(QSize(400, 400))
         
         elif QMouseEvent.button() == Qt.RightButton:
             print("Right Button Clicked")

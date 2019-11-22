@@ -4,12 +4,12 @@ from socket import *
 import pymysql as mdb
 import requests
 import os
-
+import datetime
 class ServerSocket:
     def __init__(self):
         self.numnum = 0
         try:
-            self.databasent = mdb.connect('localhost', 'root', '0428', 'db_testin')
+            self.databasent = mdb.connect('localhost', 'root', '789521', 'db_testin')
             print("Successfully Connected To DB")
         except mdb.Error as e:
             print('Not Connected Succefully To DB')
@@ -322,6 +322,29 @@ class ServerSocket:
                     client.send('o'.encode('utf-8'))
                     print('sendmsg끝')
 
+                elif commend == 'sendReplyMsg':
+                    print(side)
+                    cur = self.databasent.cursor()
+
+                    #답글 디비에 저장
+                    query = 'INSERT INTO reply (chat_id,student_id,reply_comment) Values (%s,%s,%s)'
+                    chat_id = str(side[0])
+                    stuid = str(side[1])
+                    msg = str(" ".join(side[2:]))
+                    print(msg)
+
+                    cur.execute(query, (chat_id, stuid, msg))
+                    self.databasent.commit()
+
+                    #답글 달았을 때 포인트 정리
+
+
+                    client.send('o'.encode('utf-8'))
+
+                    print('답글 저장완료')
+
+
+
                 elif commend == 'chat_history':
                     print(side)
                     cur = self.databasent.cursor()
@@ -353,6 +376,27 @@ class ServerSocket:
                         print('history읽기 오류')
                         result = 'x'
                         client.send(result.encode('utf-8'))
+
+                elif commend == 'replyHistory':
+                    print(side)
+                    cur = self.databasent.cursor()
+                    cur.execute("SELECT * FROM reply WHERE chat_id ='" + str(side[0]) + "'")
+                    reply = cur.fetchall()
+                    # print(reply[0][4].strftime('%Y,%m,%d,%H,%M'))
+                    if len(reply) != 0:
+                        result = ""
+                        for i in range(len(reply)):
+                            print(reply[i][2])
+                            result += str(reply[i][2]) +"," #msg
+                            result += str(reply[i][3]) +"," #stuId
+                            result += str(reply[i][4].strftime('%Y.%m.%d.%H.%M')) +"/" #time
+
+                        client.sendall(result.encode('utf-8'))
+                        print('reply 끝')
+                    else:
+                        client.send('x'.encode('utf-8'))
+                        print('답글 없음')
+
 
                 elif commend == 'get_lecture_id':
                     print(side)

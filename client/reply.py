@@ -34,9 +34,15 @@ class update_listener(QThread):
                 # break
 
 class Reply(QWidget):
-    def __init__(self):
+    def __init__(self,parent):
         super().__init__()
-        # self.parent = parent
+        #변수 설정
+        self.parent = parent
+        self.clientSocket = 0
+        self.comment_info = 0
+        self.replyList = 0
+        self.widgetTmp = QWidget()
+        #효과 설정
         shadow = QGraphicsDropShadowEffect()
         shadow.setBlurRadius(5)
         shadow.setOffset(3)
@@ -60,7 +66,7 @@ class Reply(QWidget):
         self.questionLayout = QVBoxLayout()
         self.questionWidget.setLayout(self.questionLayout)
         self.questionWidget.setMaximumSize(500,200)
-        self.questionLayout.setContentsMargins(0,0,0,0)
+        # self.questionLayout.setContentsMargins(0,0,0,0)
 
 
         #위젯에 다른 위젯 추가하기 위한 레이아웃 선언
@@ -74,23 +80,34 @@ class Reply(QWidget):
 
         self.setLayout(self.mainLayout)
         self.setMinimumSize(500, 400)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-
+        self.setStyleSheet('background-color:white')
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.initUI()
 
     def initUI(self):
         #화면 구성요소
         #위젯은 widgetLayout에 추가하면 됨
-        btnBack =QPushButton('뒤로')
+        btnBack =QPushButton()
+        btnBack.setIconSize(QSize(30, 30))
+        btnBack.setMaximumWidth(30)
+        btnBack.setStyleSheet('width:30px; border:0px')
+        btnBack.setIcon(QIcon('./icon/return.png'))
+        btnBack.clicked.connect(self.returnToChat)
 
         #질문 타이틀
-        question_title = QLabel('에에에에에')
-        self.questionLayout.addWidget(question_title)
+        self.question_title = QLabel()
+        self.questionLayout.addWidget(self.question_title)
 
         #질문 타이틀 bottom
-        self.dateLabel = QLabel('시간')
-        self.btnLike = QPushButton('좋아요')
+        self.dateLabel = QLabel()
+        self.btnLike = QPushButton()
+        # self.btnLike.setText(str(self.comment_info[3]))
+        self.btnLike.setIcon(QIcon('./icon/heart_unchecked.png'))
+        self.btnLike.setStyleSheet('''
+                                QPushButton{border:0px}''')
+        self.btnLike.setIconSize(QSize(20, 20))
+        self.btnLike.setMaximumWidth(35)
+        # self.btnLike.clicked.connect(self.likeClicked)
 
         self.question_title_bottom.addWidget(self.dateLabel)
         self.question_title_bottom.addWidget(self.btnLike)
@@ -107,77 +124,83 @@ class Reply(QWidget):
                         # QListWidget:item:hover{background:white};
                         # QListWidget:item{padding:0px}
                         ''')
-        item = QListWidgetItem(self.question_reply)
-
-        custom_widget = replyWidget(self,['a','b'])
-        item.setSizeHint(custom_widget.sizeHint())
-        self.question_reply.setItemWidget(item, custom_widget)
-        self.question_reply.addItem(item)
-
-
 
         #widgetLayout에 추가
         self.widgetLayout.addWidget(btnBack)
         self.widgetLayout.addWidget(self.questionWidget)
-
-        # self.widgetLayout.addWidget(question_title)
-
         self.widgetLayout.addWidget(self.question_reply)
 
+        # self.show()
 
-        self.show()
+    def returnToChat(self):
+        self.close()
+        self.parent.chatWidget = self.widgetTmp
+        self.widgetTmp.show()
 
 
-    def mousePressEvent(self, event):
-        self.oldPos = event.globalPos()
+    def getReply(self):
+        commend = 'replyHistory ' + self.comment_info[6]
+        print(commend)
+        self.clientSocket.send(commend.encode('utf-8'))
 
-    def mouseMoveEvent(self, event):
-        delta = QPoint(event.globalPos() - self.oldPos)
-        # print(delta)
-        self.move(self.x() + delta.x(), self.y() + delta.y())
-        self.oldPos = event.globalPos()
+        res = self.clientSocket.recv(1024)
+        res = res.decode('utf-8')
+
+        if res == 'x':
+            return []
+
+        else:
+            res = res.split('/')
+            print(res)
+            res.pop()
+            reply = []
+
+            for i in range(len(res)):
+                reply.append(res[i].split(','))
+
+            return reply
+
+    def showQuestions(self):
+        self.question_title.setText(str(self.comment_info[2]))
+        self.btnLike.setText(str(self.comment_info[3]))
+        self.dateLabel.setText(str(self.comment_info[5]))
+
+        for i in range(len(self.replyList)):
+            item = QListWidgetItem(self.question_reply)
+
+            custom_widget = replyWidget(self.replyList[i],self.parent)
+            item.setSizeHint(custom_widget.sizeHint())
+            self.question_reply.setItemWidget(item, custom_widget)
+            self.question_reply.addItem(item)
 
 
 class replyWidget(QWidget):
-    def __init__(self, parent, comments):
+    def __init__(self,comments, parent):
         super().__init__()
         self.parent = parent
+        self.comments = comments
 
         self.replyLayout = QVBoxLayout()
         self.mainLayout = QHBoxLayout()
         self.setLayout(self.mainLayout)
 
-        # comments 참조 순서 studid,name,comment,like,category_id,time
-        self.comments = comments
         self.initUI()
 
     def initUI(self):
-        if len(self.comments) != 2:
-            BtnLike = QPushButton(self.comments[3])
-            BtnLike.setIcon(QIcon('./icon/heart_unchecked.png'))
-            BtnLike.setStyleSheet('''
-            QPushButton{border:0px}''')
-            BtnLike.setIconSize(QSize(20, 20))
-            BtnLike.setMaximumWidth(35)
-            BtnLike.clicked.connect(self.likeClicked)
+        BtnLike = QPushButton()
+        BtnLike.setIcon(QIcon('./icon/heart_unchecked.png'))
+        BtnLike.setStyleSheet('''
+                                QPushButton{border:0px}''')
+        BtnLike.setIconSize(QSize(20, 20))
+        BtnLike.setMaximumWidth(35)
+        BtnLike.clicked.connect(self.likeClicked)
 
-            question = QLabel()
-            question.setText(self.comments[2])
-            date = QLabel('시간')
+        question = QLabel()
+        question.setText(self.comments[0])
 
-        else:
-            BtnLike = QPushButton('0')
-            BtnLike.setIcon(QIcon('./icon/heart_unchecked.png'))
-            BtnLike.setStyleSheet('''
-                        QPushButton{border:0px}''')
-            BtnLike.setIconSize(QSize(20, 20))
-            BtnLike.setMaximumWidth(35)
-            BtnLike.clicked.connect(self.likeClicked)
+        date = QLabel()
+        date.setText(self.comments[2])
 
-            question = QLabel()
-            question.setText(self.comments[0])
-
-            date = QLabel('시간')
 
         self.replyLayout.addWidget(question)
         self.replyLayout.addWidget(date)
@@ -198,10 +221,6 @@ class replyWidget(QWidget):
         if QMouseEvent.button() == Qt.LeftButton:
             print(self.comments)
             print("Left Button Clicked")
-            # self.chat = reply_test.replyRoom(self,self.grandparent)기능 안되서 주석처리
-
-            # self.chat.setWindowTitle(self.comments[6])
-            # self.chat.setMinimumSize(QSize(400, 400))
 
         elif QMouseEvent.button() == Qt.RightButton:
             print("Right Button Clicked")

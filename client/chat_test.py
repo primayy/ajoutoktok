@@ -9,7 +9,7 @@ import smtplib
 from email.mime.text import MIMEText
 from socket import *
 import time
-import reply_test # 대댓글창용
+import reply
 
 class update_listener(QThread):
     chatUpdate = pyqtSignal()
@@ -82,11 +82,14 @@ class chatRoom(QWidget):
         self.titleLayout.addLayout(self.titleLayoutMid)
         self.titleLayout.addLayout(self.titleLayoutBot)
         self.titleWidget.setLayout(self.titleLayout)
+
         #채팅 내용
+        self.chatContentLayout = QVBoxLayout()
         self.chatWidget = QWidget()
         self.chatWidget.setStyleSheet('background-color:white')
         self.chatLayout = QVBoxLayout()
         self.chatWidget.setLayout(self.chatLayout)
+        self.chatContentLayout.addWidget(self.chatWidget)
 
         #입력창
         self.chat_input = QTextEdit()
@@ -101,7 +104,9 @@ class chatRoom(QWidget):
         #메인 레이아웃 설정
         self.mainLayout.setContentsMargins(0,0,0,0)
         self.mainLayout.addWidget(self.titleWidget)
-        self.mainLayout.addWidget(self.chatWidget)
+        # self.mainLayout.addWidget(self.chatWidget)
+        self.mainLayout.addLayout(self.chatContentLayout)
+
         self.mainLayout.addWidget(self.chatLayoutWidget)
 
         self.mainWidget.setLayout(self.mainLayout)
@@ -388,6 +393,13 @@ class chatWidget(QWidget):
             print(self.comments)
             print("Left Button Clicked")
             #self.chat = reply_test.replyRoom(self,self.grandparent)기능 안되서 주석처리
+
+            self.parent.chatWidget.close()
+            self.parent.chatWidget = reply.Reply()
+            self.parent.chatContentLayout.addWidget(self.parent.chatWidget)
+
+            # self.rightSideLayout.addWidget(self.rightSideInfo)
+
 
             #self.chat.setWindowTitle(self.comments[6])
             #self.chat.setMinimumSize(QSize(400, 400))

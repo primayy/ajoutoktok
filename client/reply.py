@@ -94,6 +94,10 @@ class Reply(QWidget):
         btnBack.setIcon(QIcon('./icon/return.png'))
         btnBack.clicked.connect(self.returnToChat)
 
+        btnRefresh = QPushButton('새로고침')
+        btnRefresh.clicked.connect(self.refresh)
+
+
         #질문 타이틀
         self.question_title = QLabel()
         self.questionLayout.addWidget(self.question_title)
@@ -117,6 +121,7 @@ class Reply(QWidget):
 
         #질문 목록
         self.question_reply = QListWidget()
+        self.question_reply.scrollToBottom()
         self.question_reply.setBaseSize(500, 200)
         self.question_reply.setMaximumSize(500,200)
 
@@ -127,11 +132,28 @@ class Reply(QWidget):
 
         #widgetLayout에 추가
         self.widgetLayout.addWidget(btnBack)
+        self.widgetLayout.addWidget(btnRefresh)
         self.widgetLayout.addWidget(self.questionWidget)
         self.widgetLayout.addWidget(self.question_reply)
 
         # self.show()
 
+    def refresh(self):
+        print('aaaa')
+        self.question_reply.clear()
+        self.replyList = self.getReply()
+        for i in range(len(self.replyList)):
+            item = QListWidgetItem(self.question_reply)
+
+            custom_widget = replyWidget(self.replyList[i],self.parent)
+            item.setSizeHint(custom_widget.sizeHint())
+            self.question_reply.setItemWidget(item, custom_widget)
+            self.question_reply.addItem(item)
+        self.question_reply.scrollToBottom()
+
+        # self.question_reply.update()
+
+    #뒤로가기 버튼 눌렀을시
     def returnToChat(self):
         self.close()
         self.parent.chatWidget = self.widgetTmp
@@ -139,7 +161,7 @@ class Reply(QWidget):
         self.parent.sendType = True
         self.widgetTmp.show()
 
-
+    #질문에 대한 답글 읽어옴
     def getReply(self):
         commend = 'replyHistory ' + self.comment_info[6]
         print(commend)
@@ -162,7 +184,8 @@ class Reply(QWidget):
 
             return reply
 
-    def showQuestions(self):
+    #리스트 위젯에 답글 추가
+    def showReply(self):
         self.question_title.setText(str(self.comment_info[2]))
         self.btnLike.setText(str(self.comment_info[3]))
         self.dateLabel.setText(str(self.comment_info[5]))

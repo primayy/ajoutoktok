@@ -48,15 +48,13 @@ class chatRoom(QWidget):
         self.clientSocket = parent.w.clientSock
         self.lecId = self.getLecId()
         self.sendType = True
-        # self.reply = reply.Reply(self)
         self.comment_info = 0
-        # self.reply.clientSocket = self.clientSocket
         self.tab = QTabWidget()
         self.getCategory()
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.14', 3334))
+        self.chatSocket.connect(('192.168.0.13', 3334))
         # self.chatSocket.connect(('192.168.25.28', 3334))
         #self.chatSocket.connect(('34.84.112.149', 3334))
 
@@ -240,6 +238,8 @@ class chatRoom(QWidget):
             item.setSizeHint(custom_widget.sizeHint())
             self.tab.currentWidget().setItemWidget(item, custom_widget)
             self.tab.currentWidget().addItem(item)
+        self.tab.currentWidget().scrollToBottom()
+
 
     def getLecId(self):
         commend = "get_lecture_id "+self.parent.course[1]
@@ -291,6 +291,7 @@ class chatRoom(QWidget):
 
             tmp = self.clientSocket.recv(1024)
             print(tmp)
+            self.chatWidget.refresh()
             # chat server에 전송 -> 모두에게 뿌리기 위해
             # self.chatSocket.send('chat_update'.encode('utf-8'))
         else:
@@ -404,8 +405,13 @@ class chatWidget(QWidget):
 
     def mousePressEvent(self, QMouseEvent):
         if QMouseEvent.button() == Qt.LeftButton:
+            #질문 목록 위젯 닫음
             self.parent.chatWidget.close()
+
+            #메시지 전송 타입 답글로 변경
             self.parent.sendType = False
+
+            #리플 위젯 생성 및 변수값 대입
             replyWidget = reply.Reply(self.parent)
             self.parent.comment_info = self.comments
             # replyWidget = self.parent.reply
@@ -414,9 +420,10 @@ class chatWidget(QWidget):
 
             self.parent.chatWidget = replyWidget
 
+            #리플 위젯 화면 뿌려주기
             self.parent.chatWidget.comment_info = self.comments
             self.parent.chatWidget.replyList = self.parent.chatWidget.getReply()
-            self.parent.chatWidget.showQuestions()
+            self.parent.chatWidget.showReply()
             self.parent.chatContentLayout.addWidget(self.parent.chatWidget)
         
         elif QMouseEvent.button() == Qt.RightButton:

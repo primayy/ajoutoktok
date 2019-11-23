@@ -123,6 +123,7 @@ class ServerSocket:
                     data = 'update'
                     #채팅방에 들어와 있는 애들만 어떻게 선정?
                     # print(self.clients)
+                    #여기서 가끔 문제발생
                     for c in self.chat_clients:
                         print(c)
                         print(data)
@@ -323,7 +324,6 @@ class ServerSocket:
                     print('sendmsg끝')
 
                 elif commend == 'sendReplyMsg':
-                    print(side)
                     cur = self.databasent.cursor()
 
                     #답글 디비에 저장
@@ -340,15 +340,24 @@ class ServerSocket:
                     cur.execute("SELECT count(*) FROM reply")
                     reply = cur.fetchall()
                     reply_id = reply[0][0]-1
-                    #게시글 학생 학번 찾기
-                    cur.execute("SELECT student_id FROM chatting WHERE no ="+str(chat_id) )
-                    chatstuId = cur.fetchall()
-                    chat_stuId = chatstuId[0][0]
-                    #알림 테이브렝 입력
+                    #게시글 학생 학번,카테고리 id 찾기
+                    cur.execute("SELECT student_id,category_id FROM chatting WHERE no ="+str(chat_id) )
+                    chatResult = cur.fetchall()
+                    chat_stuId = chatResult[0][0]
+                    category_id = chatResult[0][1]
+
+                    #카테고리 아이디로 강의코드 얻어오기
+                    cur.execute("SELECT lecture_code FROM category WHERE no ="+str(category_id) )
+                    lecCode = cur.fetchall()
+                    lec_code = lecCode[0][0]
+
+                    #알림 테이블에 입력
                     cur.execute("INSERT INTO alarm(chat_id,chat_student_id,reply_id,reply_student_id,reply_selected) Values ("+str(chat_id)+",'"+chat_stuId+"',"+str(reply_id)+",'"+stuid+"',0)")
                     self.databasent.commit()
-                    #답글 달았을 때 포인트 정리
 
+                    #답글 달았을 때 포인트 정리 (5점 증가)
+                    cur.execute("UPDATE points SET points = points + 5 WHERE Student_id='"+str(stuid)+"' AND Lec_id = '" + str(lec_code) + "'")
+                    self.databasent.commit()
 
                     client.send('o'.encode('utf-8'))
 

@@ -33,19 +33,20 @@ class lecture_list(QWidget):
                 # QListWidget:item:hover{background:white};
                 # QListWidget:item{padding:0px}
                 ''')
-        lecture_list = self.getLectureList()
-        for i in range(len(lecture_list)):
-            item = QListWidgetItem(self.viewer)
-            custom_widget = lecture_group(lecture_list[i], studid, QApplication.activeWindow(),self.viewer,self.lecId)
-            item.setSizeHint(custom_widget.sizeHint())
-            self.viewer.setItemWidget(item, custom_widget)
-            self.viewer.addItem(item)
-
-        item = QListWidgetItem(self.viewer)
-        custom_widget = lecture_group('add', studid, QApplication.activeWindow(),self.viewer,self.lecId)
-        item.setSizeHint(custom_widget.sizeHint())
-        self.viewer.setItemWidget(item, custom_widget)
-        self.viewer.addItem(item)
+        self.lecture_list = self.getLectureList()
+        self.showLectures()
+        # for i in range(len(lecture_list)):
+        #     item = QListWidgetItem(self.viewer)
+        #     custom_widget = lecture_group(lecture_list[i], QApplication.activeWindow(),self)
+        #     item.setSizeHint(custom_widget.sizeHint())
+        #     self.viewer.setItemWidget(item, custom_widget)
+        #     self.viewer.addItem(item)
+        #
+        # item = QListWidgetItem(self.viewer)
+        # custom_widget = lecture_group('add', QApplication.activeWindow(),self)
+        # item.setSizeHint(custom_widget.sizeHint())
+        # self.viewer.setItemWidget(item, custom_widget)
+        # self.viewer.addItem(item)
 
         # 메인 레이아웃 그리기
         self.title.addWidget(group)
@@ -56,6 +57,20 @@ class lecture_list(QWidget):
         self.setWindowTitle('test')
         self.setStyleSheet("background-color:white")
         # self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+
+    def showLectures(self):
+        for i in range(len(self.lecture_list)):
+            item = QListWidgetItem(self.viewer)
+            custom_widget = lecture_group(self.lecture_list[i], QApplication.activeWindow(),self)
+            item.setSizeHint(custom_widget.sizeHint())
+            self.viewer.setItemWidget(item, custom_widget)
+            self.viewer.addItem(item)
+
+        item = QListWidgetItem(self.viewer)
+        custom_widget = lecture_group('add', QApplication.activeWindow(),self)
+        item.setSizeHint(custom_widget.sizeHint())
+        self.viewer.setItemWidget(item, custom_widget)
+        self.viewer.addItem(item)
 
     def getLectureList(self):
         if len(self.lecId) == 0:
@@ -74,20 +89,23 @@ class lecture_list(QWidget):
             return list_parse
 
 class group_search_dialog(QDialog):
-    def __init__(self,w,stuid,viewer,lecid):
+    # def __init__(self,w,stuid,viewer,lecid):
+    def __init__(self, w,lecture_list_widget):
+
         super().__init__()
         self.w = w
         self.clientSocket= w.clientSock
-        self.stuid = stuid
-        self.lecId = lecid
-        self.viewer = viewer
+        self.lecture_list_widget = lecture_list_widget
+        self.stuid = lecture_list_widget.studid
+        self.lecId = lecture_list_widget.lecId
+        self.viewer = lecture_list_widget.viewer
+
         self.mainLayout = QVBoxLayout()
         self.btnLayout = QHBoxLayout()
         self.initUi()
 
     def initUi(self):
         if 'Prof' in str(self.stuid):
-            
             groupSearchBar = QLineEdit()
             groupSearchBar.setPlaceholderText('강의명')
             search = QPushButton('생성')
@@ -110,14 +128,15 @@ class group_search_dialog(QDialog):
         self.mainLayout.addLayout(self.btnLayout)
         self.setLayout(self.mainLayout)
 
-    def group_search(self,group_title):
-        commend = 'groupSearch ' + group_title
+    def group_search(self,lecture_code):
+        commend = 'groupSearch ' + lecture_code
         self.clientSocket.send(commend.encode('utf-8'))
         # if 그룹이 존재
         recv = self.clientSocket.recv(1024)
 
         result_parse = recv.decode('utf-8').split(',')
-        result_parse.pop()
+        # result_parse.pop()
+        print(result_parse)
         self.group_add(result_parse)
 
         # else 그룹 없음
@@ -134,9 +153,8 @@ class group_search_dialog(QDialog):
         if result_parse == "add_success":
             lecture_list = self.getLectureList()
             for i in range(len(lecture_list)):
-                lecture(lecture_list[i],self.stuid,self.w,self.viewer,self.lecId)
-            # print("??")
-            
+                lecture(self.lecture_list_widget,lecture_list[i])
+
         else:
             msg = QMessageBox()
             msg.setStyleSheet("background-color:#FFFFFF")
@@ -144,10 +162,8 @@ class group_search_dialog(QDialog):
             group_cancel = msg.addButton('확인', QMessageBox.NoRole)
             msg.setWindowTitle("강의 생성")
             msg.exec_()
-                
 
         # else 그룹 없음
-
 
 
     def group_add(self, result_parse):
@@ -163,7 +179,7 @@ class group_search_dialog(QDialog):
             # 그룹 추가
             if msg.clickedButton() == group_add:
                 # 그룹 추가 서버로 요청
-                commend = "group_insert " + result_parse[0] + " " + str(self.stuid)
+                commend = "group_add " + result_parse[0] + " " + str(self.stuid)
                 self.clientSocket.send(commend.encode('utf-8'))
                 # 반환 결과
                 result = self.clientSocket.recv(1024)
@@ -176,14 +192,13 @@ class group_search_dialog(QDialog):
                     lecture_list = self.getLectureList()
                     for i in range(len(lecture_list)):
                         item = QListWidgetItem(self.viewer)
-                        custom_widget = lecture_group(lecture_list[i], self.stuid, QApplication.activeWindow(), self.viewer,
-                                                      self.lecId)
+                        custom_widget = lecture_group(lecture_list[i], QApplication.activeWindow(),self.lecture_list_widget)
                         item.setSizeHint(custom_widget.sizeHint())
                         self.viewer.setItemWidget(item, custom_widget)
                         self.viewer.addItem(item)
 
                     item = QListWidgetItem(self.viewer)
-                    custom_widget = lecture_group('add', self.stuid, QApplication.activeWindow(), self.viewer, self.lecId)
+                    custom_widget = lecture_group('add', QApplication.activeWindow(), self.lecture_list_widget)
                     item.setSizeHint(custom_widget.sizeHint())
                     self.viewer.setItemWidget(item, custom_widget)
                     self.viewer.addItem(item)
@@ -212,19 +227,23 @@ class group_search_dialog(QDialog):
             return list_parse
 
 class lecture(QWidget):
-    def __init__(self, course,stuid,window,viewer,lecid):
+    def __init__(self, lecture_list_Widget, course,window):
         super().__init__()
-        self.stuid = stuid
-        self.lecid = lecid
+        self.lecture_list_Widget = lecture_list_Widget
+        self.stuid = lecture_list_Widget.studid
+        self.lecid = lecture_list_Widget.lecId
+
         self.w = window
-        self.viewer = viewer
+        self.clientSocket = self.w.clientSock
+        self.viewer = lecture_list_Widget.viewer
+        self.course = course
+
         self.mainLayout = QVBoxLayout()
         self.mainWidget = QWidget()
         self.mainWidget.setStyleSheet('background-color:grey')
         self.mainWidget.setMinimumSize(200,80)
         self.mainLayout.setContentsMargins(0,0,0,0)
         self.mainLayout.addWidget(self.mainWidget)
-        self.course = course
 
         if course[0] is 'add':
             self.layout = QVBoxLayout()
@@ -253,6 +272,7 @@ class lecture(QWidget):
             self.btExit.setIconSize(QSize(13,13))
             self.btExit.setStyleSheet('''border:0px''')
             self.btExit.setIcon(QIcon('./icon/x.png'))
+            self.btExit.clicked.connect(self.exitLecture)
 
             # middle
             self.lecture = QLabel(course[0])
@@ -277,8 +297,25 @@ class lecture(QWidget):
             self.mainWidget.setLayout(self.layout)
             self.setLayout(self.mainLayout)
 
+    def exitLecture(self):
+        commend = "exitLecture " +self.stuid + " " + self.course[1]
+
+        self.clientSocket.send(commend.encode('utf-8'))
+
+        res = self.clientSocket.recv(1024)
+        res = res.decode('utf-8')
+
+        #삭제한 강의id를 강의id 리스트에서 삭제
+        self.lecture_list_Widget.lecId.remove(res)
+
+        #다시 읽어오는거 필요함
+        self.lecture_list_Widget.viewer.clear()
+        self.lecture_list_Widget.lecture_list = self.lecture_list_Widget.getLectureList()
+        self.lecture_list_Widget.showLectures()
+
     def group_search_popup(self,w):
-        dlg = group_search_dialog(w,self.stuid,self.viewer,self.lecid)
+        # dlg = group_search_dialog(w,self.stuid,self.viewer,self.lecid)
+        dlg = group_search_dialog(w,self.lecture_list_Widget)
         dlg.exec_()
 
     def mousePressEvent(self, QMouseEvent):
@@ -292,25 +329,21 @@ class lecture(QWidget):
     def msg_widget_on(self):
         self.mwidget = msget.Invisible(self,self.lecture,self.prof)
         self.mwidget.setMinimumSize(QSize(200, 200))
-        print('aaa')
 
 class lecture_group(QWidget):
-    def __init__(self, courses,stuid,w,viewer,lecid):
+    def __init__(self, courses,w,parent):
         super().__init__()
-        # print(courses)
+        self.parent = parent
         course = courses.split(',')
         # print(course)
         self.mainLayout = QVBoxLayout()
         self.mainLayout.setContentsMargins(1,3,1,3)
         #그룹 그리기
-        self.mainWidget = lecture(course,stuid,w,viewer,lecid)
+        # self.mainWidget = lecture(course, parent.studid, w, parent.viewer, parent.lecId)
+        self.mainWidget = lecture(self.parent, course, w)
+
         self.mainLayout.addWidget(self.mainWidget)
         self.setLayout(self.mainLayout)
-
-    # def chatStart(self, title):
-    #     self.chat = chat.chatRoom(title)
-    #     self.chat.setWindowTitle(title)
-    #     self.chat.setMinimumSize(QSize(400, 400))
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

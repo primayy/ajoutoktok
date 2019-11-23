@@ -205,23 +205,41 @@ class ServerSocket:
 
                 elif commend == 'groupSearch':
                     print('그룹 조회 왔다')
+                    print(side)
                     cur = self.databasent.cursor()
                     group_info = ""
-                    for i in range(len(side)):
-                        cur.execute("SELECT no,lecture_name FROM lecture WHERE lecture_code ='" + str(side[i]) + "'")
-                        allSQLRows = cur.fetchall()
 
-                        if len(allSQLRows) == 0:
-                            group_info += 'x'
+                    cur.execute("SELECT no,lecture_name,lecture_code FROM lecture WHERE lecture_code ='" + str(side[0]) + "'")
+                    allSQLRows = cur.fetchall()
 
-                        else:
-                            group_info += str(allSQLRows[0][0]) + ","
-                            group_info += str(allSQLRows[0][1]) + ","
+                    if len(allSQLRows) == 0:
+                        group_info += 'x'
+
+                    else:
+                        group_info += str(allSQLRows[0][0]) + ","
+                        group_info += str(allSQLRows[0][1]) + ","
+                        group_info += str(allSQLRows[0][2])
+
                     client.send(group_info.encode('utf-8'))
 
-                
+                elif commend == 'exitLecture':
+                    print('그룹 나가기 들어옴')
+                    print(side)
+
+                    cur = self.databasent.cursor()
+                    cur.execute("SELECT lecture_id FROM student_course WHERE student_id ='" + str(side[0]) + "' AND lecture_code ='"+str(side[1])+"'")
+                    del_lecId = cur.fetchall()
+                    del_lecId = str(del_lecId[0][0])
+                    print(del_lecId)
+
+                    cur.execute("delete FROM student_course WHERE student_id ='" + str(side[0]) + "' AND lecture_code ='"+str(side[1])+"'")
+                    self.databasent.commit()
+
+                    client.send(del_lecId.encode('utf-8'))
+
+
                 elif commend == 'groupInsert':
-                    print('그룹 생성 왔다')
+                    # print('그룹 생성 왔다')
                     cur = self.databasent.cursor()
                     group_info = ""
                     cur.execute("SELECT no,lecture_name FROM lecture WHERE professor_id ='" + str(side[1]) + "' AND lecture_name ='"+str(side[0])+"'")
@@ -244,7 +262,9 @@ class ServerSocket:
                         result += "already" 
                     client.send(result.encode('utf-8'))
 
-                elif commend == 'group_insert':
+                elif commend == 'group_add':
+                    print(side)
+
                     cur = self.databasent.cursor()
                     result_to_client = False
 

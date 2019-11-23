@@ -142,7 +142,7 @@ CREATE TABLE `points` (
 
 LOCK TABLES `points` WRITE;
 /*!40000 ALTER TABLE `points` DISABLE KEYS */;
-INSERT INTO `points` VALUES ('201620939','소프트웨어학과','F066-1',5),('201620939','소프트웨어학과','F013-1',2),('201620939','소프트웨어학과','F043-1',1),('201423510','소프트웨어학과','H501',7),('201856370','미디어학과','F066-1',9),('201620949','사이버보안학과','F043-1',1),('201620949','사이버보안학과','F066-1',5),('201736985','미디어학과','F013-1',6),('201135421','미디어학과','F043-1',5);
+INSERT INTO `points` VALUES ('201620139','소프트웨어학과','F066-1',5),('201620139','소프트웨어학과','F013-1',2),('201620139','소프트웨어학과','F043-1',1),('201423510','소프트웨어학과','H501',7),('201856370','미디어학과','F066-1',9),('201620949','사이버보안학과','F043-1',1),('201620949','사이버보안학과','F066-1',5),('201736985','미디어학과','F013-1',6),('201135421','미디어학과','F043-1',5);
 /*!40000 ALTER TABLE `points` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -171,6 +171,31 @@ LOCK TABLES `reply` WRITE;
 /*!40000 ALTER TABLE `reply` DISABLE KEYS */;
 /*!40000 ALTER TABLE `reply` ENABLE KEYS */;
 UNLOCK TABLES;
+
+
+DROP TABLE IF EXISTS `alarm`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `alarm` (
+  `no` int(11) NOT NULL AUTO_INCREMENT,
+  `chat_id` int(11) NOT NULL,
+  `chat_student_id` char(9) NOT NULL,
+  `reply_id` int(11) NOT NULL,
+  `reply_student_id` char(9) NOT NULL,
+  `reply_selected` int(1) NOT NULL,
+  PRIMARY KEY (`no`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `alarm`
+--
+
+LOCK TABLES `alarm` WRITE;
+/*!40000 ALTER TABLE `alarm` DISABLE KEYS */;
+/*!40000 ALTER TABLE `alarm` ENABLE KEYS */;
+UNLOCK TABLES;
+
 
 --
 -- Table structure for table `student_course`
@@ -250,7 +275,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user`(student_id,name,nickname,department) VALUES (201856370,"한해가","NewY",'미디어학과'),(201620939,"전민건","JRTHP",'소프트웨어학과'),(201423510,"다갔네","훋",'소프트웨어학과'),(201620949,"하루도","DAy",'사이버보안학과'),(201736985,"지났고","핻",'미디어학과'),(201135421,"졸립다","Zzz",'미디어학과');
+INSERT INTO `user`(student_id,name,nickname,department) VALUES (201856370,"한해가","NewY",'미디어학과'),(201620139,"전일건","JRTHP",'소프트웨어학과'),(201423510,"다갔네","훋",'소프트웨어학과'),(201620949,"하루도","DAy",'사이버보안학과'),(201736985,"지났고","핻",'미디어학과'),(201135421,"졸립다","Zzz",'미디어학과');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

@@ -328,6 +328,7 @@ class ServerSocket:
 
                     #답글 디비에 저장
                     query = 'INSERT INTO reply (chat_id,student_id,reply_comment) Values (%s,%s,%s)'
+
                     chat_id = str(side[0])
                     stuid = str(side[1])
                     msg = str(" ".join(side[2:]))
@@ -335,7 +336,17 @@ class ServerSocket:
 
                     cur.execute(query, (chat_id, stuid, msg))
                     self.databasent.commit()
-
+                    #방금 넣은 reply_id 찾기
+                    cur.execute("SELECT count(*) FROM reply")
+                    reply = cur.fetchall()
+                    reply_id = reply[0][0]-1
+                    #게시글 학생 학번 찾기
+                    cur.execute("SELECT student_id FROM chatting WHERE no ="+str(chat_id) )
+                    chatstuId = cur.fetchall()
+                    chat_stuId = chatstuId[0][0]
+                    #알림 테이브렝 입력
+                    cur.execute("INSERT INTO alarm(chat_id,chat_student_id,reply_id,reply_student_id,reply_selected) Values ("+str(chat_id)+",'"+chat_stuId+"',"+str(reply_id)+",'"+stuid+"',0)")
+                    self.databasent.commit()
                     #답글 달았을 때 포인트 정리
 
 
@@ -344,7 +355,48 @@ class ServerSocket:
                     print('답글 저장완료')
 
 
+                elif commend == 'Alarm': #알림용
+                    print(side)
+                    ChatAlarmText = ""
+                    ReplyAlarmText = ""
+                    cur = self.databasent.cursor()
+                    #내가 쓴 게시글의 댓글 개수(count(*))와 게시글 id
+                    cur.execute("SELECT count(*),chat_id FROM alarm WHERE chat_student_id ='" + str(side[0]) + "' GROUP BY chat_id")
+                    chatAlarm = cur.fetchall()
+                    #내가 쓴 댓글의 게시글 id
+                    cur.execute("SELECT chat_id FROM alarm WHERE reply_student_id ='" + str(side[0]) + "' AND reply_selected = 1")
+                    replyAlarm = cur.fetchall()
 
+                    if len(chatAlarm) > 0:
+                        for i in range(len(chatAlarm)):
+                            #게시글id로 카테고리id 얻기
+                            cur.execute("SELECT category_id FROM chatting WHERE no =" + str(chatAlarm[i][1]) + "")
+                            cat_id = cur.fetchall()
+                            #카테고리id로 강의코드 얻기
+                            cur.execute("SELECT lecture_code FROM category WHERE no =" + str(cat_id[0][0]) + "")
+                            lec_co = cur.fetchall()
+                            #강의코드로 강의이름 얻기
+                            cur.execute("SELECT lecture_name FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
+                            lecture_name = cur.fetchall()
+                            ChatAlarmText += lecture_name[0][0] + "," + str(chatAlarm[i][0]) +"." # "강의이름,댓글 수" 
+                        ChatAlarmText = ChatAlarmText.rstrip()
+
+
+                    if len(replyAlarm) > 0:
+                        for i in range(len(chatAlarm)):
+                            #위와 동일
+                            cur.execute("SELECT category_id FROM chatting WHERE no =" + str(replyAlarm[i][0]) + "")
+                            cat_id = cur.fetchall()
+                            cur.execute("SELECT lecture_code FROM category WHERE no =" + str(cat_id[0][0]) + "")
+                            lec_co = cur.fetchall()
+                            cur.execute("SELECT lecture_name FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
+                            lecture_name = cur.fetchall()
+                            ReplyAlarmText += lecture_name[0][0] + "." #강의 이름
+                        ReplyAlarmText = ReplyAlarmText.rstrip()
+                    AlarmText = ChatAlarmText + "/" + ReplyAlarmText
+                    client.send(AlarmText.encode('utf-8'))
+                
+                
                 elif commend == 'chat_history':
                     print(side)
                     cur = self.databasent.cursor()
@@ -485,6 +537,7 @@ class ServerSocket:
                             for i in range(len(allSQLRows)):
                                 cur.execute("SELECT nickname FROM user WHERE student_id ='" + str(allSQLRows[i][1]) + "'") #해당 학번의 닉네임 호출
                                 allSQLRows2 = cur.fetchall()
+                                print(">>>>>ID: " + str(allSQLRows2))
                                 UnivRank += str(allSQLRows[i][0]) + "," + str(allSQLRows2[0][0]) + " " # "포인트,닉네임"
                         UnivRank.rstrip()
                         print(UnivRank)
@@ -501,6 +554,7 @@ class ServerSocket:
                             for i in range(len(allSQLRows)):
                                 cur.execute("SELECT nickname FROM user WHERE student_id ='" + str(allSQLRows[i][1]) + "'") #해당 학번의 닉네임 호출
                                 allSQLRows2 = cur.fetchall()
+                                print(">>>>>ID: " + str(allSQLRows2))
                                 inDeptRank += str(allSQLRows[i][0]) + "," + str(allSQLRows2[0][0]) + " "  # "포인트,닉네임"
                         inDeptRank.rstrip()
                         print(inDeptRank)

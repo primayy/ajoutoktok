@@ -14,7 +14,7 @@ class Window(QMainWindow):
         self.clientSock = socket(AF_INET, SOCK_STREAM)
         #self.clientSock.connect(('34.84.112.149', port))
         self.clientSock.connect(('192.168.0.14', port))
-        #self.clientSock.connect(('192.168.25.28', port))
+        # self.clientSock.connect(('192.168.25.28', port))
         
 
         self.login = login.login(self)

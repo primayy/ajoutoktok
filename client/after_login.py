@@ -175,7 +175,7 @@ class App(QWidget):
 
     def showAlarm(self):
         self.rightSideInfo.close()
-        self.rightSideInfo = alarm.alarm()
+        self.rightSideInfo = alarm.alarm(self,self.studId)#clientSocket이랑 학번이 필요함
         self.rightSideInfo.setMinimumSize(300,500)
 
         self.rightSideLayout.addWidget(self.rightSideInfo)

@@ -19,6 +19,8 @@ class Register(QWidget):
 
         self.courses = self.getCourses()
 
+        self.overlap_status =0
+
         self.mainWidget = QWidget()
         self.widgetLayout = QVBoxLayout()
         self.mainWidget.setLayout(self.widgetLayout)
@@ -47,7 +49,7 @@ class Register(QWidget):
 
         init_register_label = QLabel('초기 등록')
         init_register_word = QPixmap('./ui/register_ui/초기등록2.png')
-        init_register_word = init_register_word.scaled(122,53,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+        init_register_word = init_register_word.scaled(277,53,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
         init_register_label.setPixmap(init_register_word)
         #init_register_label.setAlignment(Qt.AlignTop)
         #init_register_label.setStyleSheet('''font-weight: Bold; font-size: 16pt''')
@@ -66,21 +68,20 @@ class Register(QWidget):
         explanation_label.setPixmap(explanation_img)
 
         #이름
-        student_name_label = QLabel('이름')
-        #student_name_label.setStyleSheet('''font-size: 10pt; font-family:NanumSquareRoundB''')
-        # student_name_img = QPixmap('./ui/register_ui/이름.png')
-        # student_name_img = student_name_img.scaled(60,40,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
-        # student_name_label.setPixmap(student_name_img)
+        student_name_label = QLabel(' 이름')
         student_name_label.setStyleSheet("font: 9pt 나눔바른펜")
         student_name = QLabel(self.studName)
+        student_name.setStyleSheet("font: 9pt 나눔바른펜")
+
 
         #학번
-        student_id_label = QLabel('학번')
+        student_id_label = QLabel(' 학번')
         student_id_label.setStyleSheet("font: 9pt 나눔바른펜")
         # student_id_img = QPixmap('./ui/register_ui/학번.png')
         # student_id_img = student_id_img.scaled(75,47,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
         # student_id_label.setPixmap(student_id_img)
-        sutdent_id =  QLabel(self.studId)
+        student_id =  QLabel(self.studId)
+        student_id.setStyleSheet("font: 9pt 나눔바른펜")
 
         #학과
         department_label = QLabel('학과')
@@ -90,6 +91,11 @@ class Register(QWidget):
         # department_label.setPixmap(department_img)
         
         department_comboBox = QComboBox(self)
+        department_comboBox.setStyleSheet('''
+                QListWidget:item:{background:white};
+                QListWidget:item:hover{background:white};
+                QListWidget:item{padding:0px; width:100px; height:23}
+                ''')
         if 1==1:
         #if department_label_upper == '공과대학' :
             #department_comboBox.clear()
@@ -168,44 +174,53 @@ class Register(QWidget):
         nickname_label = QLabel('닉네임')
         nickname_label.setStyleSheet("font: 9pt 나눔바른펜")
         self.nickname_textbox = QLineEdit()
-        nickname_overlap = QPushButton()
-        nickname_overlap.setStyleSheet('''
+        self.nickname_textbox.setStyleSheet('height:20; width:90px')
+        self.nickname_overlap = QPushButton()
+        self.nickname_overlap.setStyleSheet('''
                         QPushButton{image:url(./ui/register_ui/중복확인.png); border:0px; width:100px; height:50px}
                         ''')
-        nickname_overlap.clicked.connect(self.nickname_overlap_check)
+        self.nickname_overlap.clicked.connect(self.nickname_overlap_check)
 
        #등록
         register_button = QPushButton()
         register_button.setStyleSheet('''
-                        QPushButton{image:url(./ui/register_ui/등록.png); border:0px; width:100px; height:50px}        
+                        QPushButton{image:url(./ui/register_ui/등록.png); border:0px; width:95px; height:45px}        
                         
                         ''')
         register_button.clicked.connect(lambda: self.register(self.nickname_textbox.text(),department_comboBox.currentText() ))
         
-        self.title.addWidget(init_register_label)
-
-        self.id.addWidget(student_id_label, alignment=(QtCore.Qt.AlignTop))
-        self.id.addWidget(sutdent_id)
+        self.title.addWidget(init_register_label,alignment=(QtCore.Qt.AlignCenter))
 
         self.name.addWidget(student_name_label)
         self.name.addWidget(student_name)
+        self.name.addStretch(1)
 
+        self.id.addWidget(student_id_label, alignment=(QtCore.Qt.AlignTop))
+        self.id.addWidget(student_id)
+        self.id.addStretch(1)
+
+        self.department.addStretch(1)
         self.department.addWidget(department_label)
         self.department.addWidget(department_comboBox)
+        self.department.addStretch(12)
 
+        self.nickname.addStretch(1)
         self.nickname.addWidget(nickname_label)
         self.nickname.addWidget(self.nickname_textbox)
-        self.nickname.addWidget(nickname_overlap)
+        self.nickname.addWidget(self.nickname_overlap)
+        self.nickname.addStretch(4)
 
+        self.widgetLayout.addStretch(2)
         self.widgetLayout.addLayout(self.title)
-        self.widgetLayout.addWidget(horizon_line,alignment=Qt.AlignTop)
-        self.widgetLayout.addStretch(1)
+        #self.widgetLayout.addWidget(horizon_line,alignment=Qt.AlignTop)
+        self.widgetLayout.addWidget(explanation_label)
+        #self.widgetLayout.addStretch(1)
         self.widgetLayout.addLayout(self.name)
         self.widgetLayout.addLayout(self.id)
         self.widgetLayout.addLayout(self.department)
         self.widgetLayout.addLayout(self.nickname)
         self.widgetLayout.addWidget(register_button)
-        self.widgetLayout.addStretch(1)
+        self.widgetLayout.addStretch(3)
 
         self.setFixedSize(358,600)
         self.show
@@ -263,6 +278,8 @@ class Register(QWidget):
         answer = self.clientSocket.recv(1024).decode('utf-8')
         if answer == "newone":
             self.regi_qual=1
+            self.overlap_status=1
+            self.overlap_button_toggle()
         elif answer == "overlap":
             self.regi_qual=2
 
@@ -303,6 +320,14 @@ class Register(QWidget):
 
     def mouseMoveEvent(self, event):
         self.oldPos = event.globalPos()
+
+
+    def overlap_button_toggle(self):
+        if (self.overlap_status == True):
+            self.nickname_overlap.setStyleSheet('''
+                                QPushButton{image:url(./ui/register_ui/확인완료.png); border:0px; width:100px; height:50px}                        
+                                ''')
+            self.widget_on_off_button_status = False
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

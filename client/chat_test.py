@@ -54,8 +54,8 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        #self.chatSocket.connect(('192.168.0.13', 3334))
-        self.chatSocket.connect(('192.168.25.22', 3334))
+        self.chatSocket.connect(('192.168.0.13', 3334))
+        # self.chatSocket.connect(('192.168.25.22', 3334))
         #self.chatSocket.connect(('34.84.112.149', 3334))
 
         self.history = self.getChatHistory()
@@ -195,7 +195,6 @@ class chatRoom(QWidget):
         self.show()
 
     def chat_Update(self):
-        # print('ㅇㅇㅇ')
         self.category_changed()
 
     def quitClicked(self):

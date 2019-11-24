@@ -5,26 +5,34 @@ from PyQt5.QtWidgets import QMainWindow
 import login
 from socket import *
 from PyQt5.QtWidgets import QApplication,QGraphicsDropShadowEffect
+import systemTray
 
 class Window(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
+        #서버연결
         port = 3333
-
         self.clientSock = socket(AF_INET, SOCK_STREAM)
         #self.clientSock.connect(('34.84.112.149', port))
-        # self.clientSock.connect(('192.168.0.13', port))
-        self.clientSock.connect(('192.168.25.22', port))
-        
+        self.clientSock.connect(('192.168.0.13', port))
+        # self.clientSock.connect(('192.168.25.22', port))
 
+        #트레이 아이콘 생성
+        self.tray = systemTray.SystemTrayIcon(self)
+
+        #첫 화면 로그인 설정
         self.login = login.login(self)
-        # self.login.setGraphicsEffect(shadow)
 
         self.init_window()
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.setContentsMargins(0,0,5,5)
         self.oldPos = self.pos()
+
+    def quitClicked(self):
+        commend = 'exit'
+        self.clientSock.send(commend.encode('utf-8'))
+        QApplication.quit()
 
     def init_window(self):
         self.setCentralWidget(self.login)

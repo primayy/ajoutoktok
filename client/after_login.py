@@ -15,10 +15,14 @@ class App(QWidget):
     def __init__(self, window, studid, studname, lecid):
         super().__init__()
         QApplication.setActiveWindow(window)
+
+        #그림자 효과
         shadow = QGraphicsDropShadowEffect()
         shadow.setBlurRadius(5)
         shadow.setOffset(3)
         self.setGraphicsEffect(shadow)
+
+        self.w = window
 
         #클라이언트 소켓
         self.clientSocket = window.clientSock
@@ -193,10 +197,10 @@ class App(QWidget):
         self.rightSideLayout.addWidget(self.rightSideInfo)
 
     def quitClicked(self):
-        commend = 'exit'
-        self.clientSocket.send(commend.encode('utf-8'))
-        QApplication.quit()
-
+        # commend = 'exit'
+        # self.clientSocket.send(commend.encode('utf-8'))
+        # QApplication.quit()
+        self.w.hide()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

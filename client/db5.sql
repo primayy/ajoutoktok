@@ -275,7 +275,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user`(student_id,name,nickname,department) VALUES (201856370,"한해가","NewY",'미디어학과'),(201620139,"전일건","JRTHP",'소프트웨어학과'),(201423510,"다갔네","훋",'소프트웨어학과'),(201620949,"하루도","DAy",'사이버보안학과'),(201736985,"지났고","핻",'미디어학과'),(201135421,"졸립다","Zzz",'미디어학과');
+INSERT INTO `user`(student_id,name,nickname,department) VALUES (201856370,"한해가","NewY",'미디어학과'),(201620139,"전일건","JRTHP",'소프트웨어학과'),(201423510,"다갔네","훋",'소프트웨어학과'),(201620949,"하루도","DAy",'사이버보안학과'),(201736985,"지났고","하이루염",'미디어학과'),(201135421,"졸립다","Zzz",'미디어학과');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

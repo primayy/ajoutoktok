@@ -399,7 +399,7 @@ class ServerSocket:
                     if len(chatAlarm) > 0:
                         for i in range(len(chatAlarm)):
                             #게시글id로 카테고리id 얻기
-                            cur.execute("SELECT category_id FROM chatting WHERE no =" + str(chatAlarm[i][1]) + "")
+                            cur.execute("SELECT category_id,comment FROM chatting WHERE no =" + str(chatAlarm[i][1]) + "")
                             cat_id = cur.fetchall()
                             #카테고리id로 강의코드 얻기
                             cur.execute("SELECT lecture_code FROM category WHERE no =" + str(cat_id[0][0]) + "")
@@ -407,20 +407,20 @@ class ServerSocket:
                             #강의코드로 강의이름 얻기
                             cur.execute("SELECT lecture_name FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
                             lecture_name = cur.fetchall()
-                            ChatAlarmText += lecture_name[0][0] + "," + str(chatAlarm[i][0]) +"." # "강의이름,댓글 수" 
+                            ChatAlarmText += lecture_name[0][0]+ "," +str(cat_id[0][1]) + "," + str(chatAlarm[i][0]) +"." # "강의이름,댓글 수" 
                         ChatAlarmText = ChatAlarmText.rstrip()
 
 
                     if len(replyAlarm) > 0:
                         for i in range(len(chatAlarm)):
                             #위와 동일
-                            cur.execute("SELECT category_id FROM chatting WHERE no =" + str(replyAlarm[i][0]) + "")
+                            cur.execute("SELECT category_id,comment FROM chatting WHERE no =" + str(replyAlarm[i][0]) + "")
                             cat_id = cur.fetchall()
                             cur.execute("SELECT lecture_code FROM category WHERE no =" + str(cat_id[0][0]) + "")
                             lec_co = cur.fetchall()
                             cur.execute("SELECT lecture_name FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
                             lecture_name = cur.fetchall()
-                            ReplyAlarmText += lecture_name[0][0] + "." #강의 이름
+                            ReplyAlarmText += lecture_name[0][0] + "," +str(cat_id[0][1]) + "." #강의 이름
                         ReplyAlarmText = ReplyAlarmText.rstrip()
                     AlarmText = ChatAlarmText + "/" + ReplyAlarmText
                     client.send(AlarmText.encode('utf-8'))
@@ -493,28 +493,52 @@ class ServerSocket:
                 elif commend == 'OvelapCheck':
                     print(str(side[0]))
                     Answer = ""
+                    kor_begin = 44032
+                    kor_end = 55203
+                    chosung_base = 588
+                    jungsung_base = 28
+                    jaum_begin = 12593
+                    jaum_end = 12622
+                    moum_begin = 12623
+                    moum_end = 12643
 
                     #특수문자 ㄴㄴ해
                     for i in range(len(str(side[0]))):
-                        print("ord(str(side[0])[i])" + str(ord(str(side[0])[i])))
-                        if 122 < ord(str(side[0])[i]):
-                            Answer = "noMark"
-                            print(Answer+"4")
-                            client.send(Answer.encode('utf-8'))
+                        
+                        if 55203 < ord(str(side[0])[i]):
+                            continue
+                        
+                        if 12643 < ord(str(side[0])[i]):
+                            if 44032 > ord(str(side[0])[i]):
+                                continue
                             
-                        elif 90 < ord(str(side[0])[i]):
+                        if 12622 < ord(str(side[0])[i]):
+                            if 12623 > ord(str(side[0])[i]):
+                                continue
+                           
+                        
+                        if 122 < ord(str(side[0])[i]):
+                            if 12593 > ord(str(side[0])[i]):
+                                Answer = "noMark"
+                                print(Answer+"4")
+                                client.send(Answer.encode('utf-8'))
+                                
+                            else:
+                                continue
+                            
+                        if 90 < ord(str(side[0])[i]):
                             if 97 > ord(str(side[0])[i]):
                                 Answer = "noMark"
                                 print(Answer+"3")
                                 client.send(Answer.encode('utf-8'))
 
-                        elif 57 < ord(str(side[0])[i]):
+                        if 57 < ord(str(side[0])[i]):
                             if 65 > ord(str(side[0])[i]):
                                 Answer = "noMark"
                                 print(Answer+"2")
                                 client.send(Answer.encode('utf-8'))
 
-                        elif 48 > ord(str(side[0])[i]):
+                        if 48 > ord(str(side[0])[i]):
                             Answer = "noMark"
                             print(Answer+"1")
                             client.send(Answer.encode('utf-8'))
@@ -530,7 +554,7 @@ class ServerSocket:
                     #     client.send(Answer.encode('utf-8'))
 
                     cur = self.databasent.cursor()
-                    cur.execute("SELECT nickname FROM user WHERE student_id ='" + str(side[0]) + "'")
+                    cur.execute("SELECT * FROM user WHERE nickname ='" + str(side[0]) + "'")
                     allSQLRows = cur.fetchall()
                     if len(Answer)==0:
                         if len(allSQLRows) > 0:

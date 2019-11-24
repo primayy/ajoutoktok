@@ -47,11 +47,12 @@ class alarm(QWidget):
         print(replyAlarm)
         for i in range(len(chatAlarm)):
                 chattyAlarm = chatAlarm[i].split(",")
-                viewer.addItem(str("[강의: "+chattyAlarm[0]+"]에 게시한 글에 "+chattyAlarm[1]+"개의 댓글이 추가되었습니다."))#게시글 관련 알림 추가
+                viewer.addItem(str("[강의: "+chattyAlarm[0]+"]에 게시한 글 '"+chattyAlarm[1]+"'에 "+chattyAlarm[2]+"개의 댓글이 추가되었습니다."))#게시글 관련 알림 추가
         
         
         for i in range(len(replyAlarm)):
-                viewer.addItem(str("[강의: "+replyAlarm[i]+"]에 작성한 댓글이 채택되었습니다.")) #댓글 관련 알림 추가
+                replylyAlarm = replyAlarm[i].split(",")
+                viewer.addItem(str("[강의: "+replylyAlarm[0]+"]에 작성한 댓글'"+replylyAlarm[1]+"'이 채택되었습니다.")) #댓글 관련 알림 추가
         
         viewer.addItem(item) #혹시 몰라서 삭제 안함
         self.title.addWidget(group)

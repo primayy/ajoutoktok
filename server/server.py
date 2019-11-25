@@ -102,6 +102,7 @@ class ServerSocket:
                 print('3334 msg:'+ com)
                 com = com.split(' ')
 
+
                 if len(com) != 1:
                     commend = com[0]
                     side = []
@@ -120,9 +121,23 @@ class ServerSocket:
                     break
 
                 elif commend == 'chat_update':
-                    data = 'update'
+                    data = 'update,'
+
+                    cur = self.databasent.cursor()
+                    cur.execute("SELECT * FROM chatting WHERE no =" + str(side[0]) + "")
+                    chat_info = cur.fetchall()
+
+                    result = ""
+                    result += str(chat_info[0][4]) + ","  # stuid
+                    result += str(chat_info[0][3]) + ","  # nickname
+                    result += str(chat_info[0][2]) + ","  # comment
+                    result += str(chat_info[0][6]) + ","  # likes
+                    result += str(chat_info[0][1]) + ","  # category_id
+                    result += str(chat_info[0][5]) + ","  # time
+                    result += str(chat_info[0][0])  # chatting_id
                     #채팅방에 들어와 있는 애들만 어떻게 선정?
                     # print(self.clients)
+                    data += result
                     #여기서 가끔 문제발생
                     for c in self.chat_clients:
                         print(c)
@@ -316,6 +331,8 @@ class ServerSocket:
                 elif commend == 'sendMsg':
                     # print(side)
                     cur = self.databasent.cursor()
+
+                    #채팅 내용 저장
                     query = 'INSERT INTO chatting (category_id,comment,nickname,student_id) Values (%s,%s,%s,%s)'
                     category_name = str(side[0])
                     lecid = str(side[1])
@@ -340,7 +357,13 @@ class ServerSocket:
                     cur.execute("UPDATE points SET points = points + 5 WHERE Student_id='"+str(stuid)+"' AND Lec_id = '" + str(lecture_code[0][0]) + "'")
                     self.databasent.commit()
 
-                    client.send('o'.encode('utf-8'))
+                    cur.execute("SELECT no FROM chatting")
+                    res = cur.fetchall()
+
+                    print(str(res[-1][0]))
+
+                    s = 'o '+str(res[-1][0])
+                    client.send(s.encode('utf-8'))
                     print('sendmsg끝')
 
                 elif commend == 'sendReplyMsg':

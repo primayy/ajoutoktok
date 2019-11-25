@@ -4,7 +4,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QMainWindow
 import login
 from socket import *
-from PyQt5.QtWidgets import QApplication,QGraphicsDropShadowEffect
+from PyQt5.QtWidgets import QApplication
 import systemTray
 
 class Window(QMainWindow):
@@ -14,8 +14,9 @@ class Window(QMainWindow):
         port = 3333
         self.clientSock = socket(AF_INET, SOCK_STREAM)
         #self.clientSock.connect(('34.84.112.149', port))
-        #self.clientSock.connect(('192.168.0.13', port))
-        self.clientSock.connect(('192.168.25.22', port))
+        self.clientSock.connect(('192.168.0.13', port))
+        # self.clientSock.connect(('192.168.43.180', port))
+        # self.clientSock.connect(('192.168.25.22', port))
 
         #트레이 아이콘 생성
         self.tray = systemTray.SystemTrayIcon(self)

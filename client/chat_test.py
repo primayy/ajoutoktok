@@ -14,7 +14,7 @@ import chat_search
 import chat_mine
 
 class update_listener(QThread):
-    chatUpdate = pyqtSignal()
+    chatUpdate = pyqtSignal(list)
 
     def __init__(self,parent = None):
         super().__init__()
@@ -27,14 +27,24 @@ class update_listener(QThread):
 
             update_commend = self.chatSocket.recv(1024)
             update_commend = update_commend.decode('utf-8')
+            update_commend = update_commend.split(',')
 
-            if update_commend == 'update':
-                self.chatUpdate.emit()
-                # print('업데이트 시그널 emit')
-            elif update_commend =='stop':
-                self.go = False
-                print('멈춤')
-                # break
+            if len(update_commend) != 1:
+                if update_commend[0] == 'update':
+                    tmp = []
+                    for i in range(1,len(update_commend)):
+                        tmp.append(update_commend[i])
+                    self.chatUpdate.emit(tmp)
+                    # print('업데이트 시그널 emit')
+                elif update_commend[0] == 'stop':
+                    self.go = False
+                    # print('멈춤')
+
+            else:
+                if update_commend =='stop':
+                    self.go = False
+                    # print('멈춤')
+                    # break
 
 
 class chatRoom(QWidget):
@@ -56,8 +66,9 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        # self.chatSocket.connect(('192.168.0.13', 3334))
-        self.chatSocket.connect(('192.168.25.22', 3334))
+        self.chatSocket.connect(('192.168.0.13', 3334))
+        # self.chatSocket.connect(('192.168.43.180', 3334))
+        # self.chatSocket.connect(('192.168.25.22', 3334))
         #self.chatSocket.connect(('34.84.112.149', 3334))
 
         self.history = self.getChatHistory()
@@ -210,15 +221,24 @@ class chatRoom(QWidget):
 
         self.show()
 
-    def chat_Update(self):
-        self.category_changed()
+    def chat_Update(self,msg):
+        #새로 업데이트된 메시지만 위젯에 추가함
+        item = QListWidgetItem(self.tab.currentWidget())
+
+        custom_widget = chatWidget(self,msg,self.parent)
+        item.setSizeHint(custom_widget.sizeHint())
+        self.tab.currentWidget().setItemWidget(item, custom_widget)
+        self.tab.currentWidget().addItem(item)
+        self.tab.update()
+        self.tab.currentWidget().scrollToBottom()
 
     def quitClicked(self):
         commend = 'exit'
         self.chatSocket.send(commend.encode('utf-8'))
         #쓰레드 삭제
         self.t.quit()
-        self.close()
+        # self.close()
+        self.hide()
 
     def category_changed(self):
         self.tab.currentWidget().clear()
@@ -330,8 +350,12 @@ class chatRoom(QWidget):
             self.clientSocket.send(commend.encode('utf-8'))
 
             tmp = self.clientSocket.recv(1024)
+            tmp = tmp.decode('utf-8')
+
+            chat_id = tmp.split(' ')
             #chat server에 전송 -> 모두에게 뿌리기 위해
-            self.chatSocket.send('chat_update'.encode('utf-8'))
+            data = 'chat_update '+chat_id[1]
+            self.chatSocket.send(data.encode('utf-8'))
 
 class category_create(QDialog):
     def __init__(self,window,parent):

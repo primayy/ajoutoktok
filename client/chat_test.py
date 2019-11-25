@@ -69,7 +69,7 @@ class chatRoom(QWidget):
         self.chatSocket.connect(('192.168.0.13', 3334))
         # self.chatSocket.connect(('192.168.43.180', 3334))
         # self.chatSocket.connect(('192.168.25.22', 3334))
-        #self.chatSocket.connect(('34.84.112.149', 3334))
+        # self.chatSocket.connect(('34.84.112.149', 3334))
 
         self.history = self.getChatHistory()
         if len(self.history) != 0:
@@ -106,8 +106,9 @@ class chatRoom(QWidget):
         self.chatContentLayout.addWidget(self.chatWidget)
 
         #입력창
-        self.chat_input = QTextEdit()
-        self.chat_input.setStyleSheet('background:white')
+        self.chat_input = QLineEdit()
+        self.chat_input.setStyleSheet('background:white; height:78px')
+        self.chat_input.returnPressed.connect(lambda: self.sendMsg(self.chat_input.text()))  # 엔터 처리
 
         self.chatLayoutWidget = QWidget()
         self.chatLayoutWidget.setStyleSheet('background-color:#5218FA')
@@ -133,7 +134,9 @@ class chatRoom(QWidget):
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 
         self.initUI()
-
+    def test(self, event):
+        if event.key() == Qt.Key_Enter:
+            print('aaa')
     def initUI(self):
         # 쓰레드
         self.t = update_listener(parent=self)
@@ -214,7 +217,7 @@ class chatRoom(QWidget):
         chat_enter.setMinimumHeight(78)
         chat_enter.setIcon(QIcon('./icon/send.png'))
         chat_enter.setIconSize(QSize(50,50))
-        chat_enter.clicked.connect(lambda: self.sendMsg(self.chat_input.toPlainText()))
+        chat_enter.clicked.connect(lambda: self.sendMsg(self.chat_input.text()))
 
         self.chatInputLayout.addWidget(self.chat_input)
         self.chatInputLayout.addWidget(chat_enter)
@@ -330,7 +333,7 @@ class chatRoom(QWidget):
         self.oldPos = event.globalPos()
 
     def sendMsg(self,msg):
-        self.chat_input.setPlainText('')
+        self.chat_input.setText('')
         if self.sendType == False:
             commend = 'sendReplyMsg ' + self.comment_info[6] + " " + self.parent.stuid + " " + msg
             print(commend)

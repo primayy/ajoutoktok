@@ -120,7 +120,6 @@ class login(QWidget):
         self.setLayout(self.main)
         self.setFixedSize(358, 590)
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        # self.show()
 
     def checkGoToBB(self):
         if self.goToBB is False:

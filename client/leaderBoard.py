@@ -35,7 +35,7 @@ class LeaderBoard(QWidget):
         commend += "1 " + self.studId
         self.clientSocket.send(commend.encode('utf-8'))
         result = self.clientSocket.recv(1024).decode('utf-8')
-        print(str(result))
+        # print(str(result))
         UnivRank = str(result).split(" ")
         for i in range(len(UnivRank)):
             if len(UnivRank[i])>0:
@@ -68,7 +68,7 @@ class LeaderBoard(QWidget):
             commend += "1 " + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
             result = self.clientSocket.recv(1024).decode('utf-8')
-            print(str(result))
+            # print(str(result))
             UnivRank = str(result).split(" ")
             for i in range(len(UnivRank)):
                 if len(UnivRank[i])>0:#있을 때만, index out of range 오류 피하기
@@ -83,13 +83,13 @@ class LeaderBoard(QWidget):
             commend += "2 " + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
             result = self.clientSocket.recv(1024).decode('utf-8')
-            print(str(result))
+            # print(str(result))
             inDeptRank = result.split(" ")
-            print(inDeptRank)
+            # print(inDeptRank)
             for i in range(len(inDeptRank)):
                 if len(inDeptRank[i])>0:#있을 때만, index out of range 오류 피하기
                     inDepartRank = inDeptRank[i].split(",")
-                    print(inDepartRank)
+                    # print(inDepartRank)
                     if len(inDepartRank)>0:#있을 때만, index out of range 오류 피하기
                         self.show_inDepart.addItem(str("Points: "+inDepartRank[0]+" / 아이디: "+inDepartRank[1]))
 
@@ -99,9 +99,9 @@ class LeaderBoard(QWidget):
             commend += "3 " + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
             result = self.clientSocket.recv(1024).decode('utf-8')
-            print(str(result))
+            # print(str(result))
             DeptRank = result.split(" ")
-            print(DeptRank)
+            # print(DeptRank)
             for i in range(len(DeptRank)):
                 if len(DeptRank[i])>0:#있을 때만, index out of range 오류 피하기
                     compDepartRank = DeptRank[i].split(",")

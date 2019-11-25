@@ -426,6 +426,60 @@ class ServerSocket:
                     client.send(AlarmText.encode('utf-8'))
                 
                 
+                
+                elif commend == 'ChatSearch':
+                    print(side)
+                    cur = self.databasent.cursor()
+                    cur.execute("SELECT no FROM category WHERE lecture_code = '" + str(side[1])+"'")
+                    cat_id = cur.fetchall()
+                    cur.execute("SELECT comment FROM chatting WHERE comment LIKE '%" + str(side[0]) + "%' AND category_id=" + str(cat_id[0][0]))
+                    chat_log = cur.fetchall()
+                    print(chat_log)
+                    if len(chat_log) != 0:
+
+                        if len(chat_log) == 0:
+                            result = 'x'
+                            client.send(result.encode('utf-8'))
+                        else:
+                            result = ""
+                            for i in range(len(chat_log)):
+                                result += str(chat_log[i][0]) + "/" #comment
+
+                            client.sendall(result.encode('utf-8'))
+                            print('chat_Search 끝')
+                    else:
+                        print('Search읽기 오류')
+                        result = 'x'
+                        client.send(result.encode('utf-8'))
+                        
+                
+                elif commend == 'ChatMine':
+                    print(side)
+                    cur = self.databasent.cursor()
+                    cur.execute("SELECT no FROM category WHERE lecture_code = '" + str(side[1])+"'")
+                    cat_id = cur.fetchall()
+                    cur = self.databasent.cursor()
+                    cur.execute("SELECT comment FROM chatting WHERE student_id = '" + str(side[0]) + "' AND category_id=" + str(cat_id[0][0]))
+                    chat_log = cur.fetchall()
+                    print(chat_log)
+                    if len(chat_log) != 0:
+
+                        if len(chat_log) == 0:
+                            result = 'x'
+                            client.send(result.encode('utf-8'))
+                        else:
+                            result = ""
+                            for i in range(len(chat_log)):
+                                result += str(chat_log[i][0]) + "/" #comment
+
+                            client.sendall(result.encode('utf-8'))
+                            print('chat_Search 끝')
+                    else:
+                        print('Search읽기 오류')
+                        result = 'x'
+                        client.send(result.encode('utf-8'))
+                        
+
                 elif commend == 'chat_history':
                     print(side)
                     cur = self.databasent.cursor()

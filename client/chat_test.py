@@ -10,6 +10,8 @@ from email.mime.text import MIMEText
 from socket import *
 import time
 import reply
+import chat_search
+import chat_mine
 
 class update_listener(QThread):
     chatUpdate = pyqtSignal()
@@ -45,7 +47,7 @@ class chatRoom(QWidget):
 
         #필수 변수
         self.parent = parent
-        self.clientSocket = parent.w.clientSock
+        self.clientSocket = self.parent.w.clientSock
         self.lecId = self.getLecId()
         self.sendType = True
         self.comment_info = 0
@@ -54,8 +56,8 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.13', 3334))
-        # self.chatSocket.connect(('192.168.25.22', 3334))
+        # self.chatSocket.connect(('192.168.0.13', 3334))
+        self.chatSocket.connect(('192.168.25.22', 3334))
         #self.chatSocket.connect(('34.84.112.149', 3334))
 
         self.history = self.getChatHistory()
@@ -142,6 +144,18 @@ class chatRoom(QWidget):
         btExit.setIconSize(QSize(15, 15))
         btExit.clicked.connect(self.quitClicked)
 
+        BtnSearch  = QPushButton()
+        BtnSearch.setStyleSheet('''border:0px''')
+        BtnSearch.setIcon(QIcon('./icon/comm_search.png'))
+        BtnSearch.setIconSize(QSize(30,30))
+        BtnSearch.clicked.connect(self.searchClicked)
+        
+        BtnMine  = QPushButton()
+        BtnMine.setStyleSheet('''border:0px''')
+        BtnMine.setIcon(QIcon('./icon/comm_my.png'))
+        BtnMine.setIconSize(QSize(30,30))
+        BtnMine.clicked.connect(self.mineClicked)
+
 
         self.titleLayoutTop.addStretch(1)
         self.titleLayoutTop.addWidget(btMini,alignment=QtCore.Qt.AlignRight)
@@ -162,6 +176,8 @@ class chatRoom(QWidget):
         download.setIcon(QIcon('./icon/download.png'))
         download.setIconSize(QSize(30,30))
         self.titleLayoutBot.addWidget(profName)
+        self.titleLayoutBot.addWidget(BtnMine,alignment=QtCore.Qt.AlignRight)
+        self.titleLayoutBot.addWidget(BtnSearch,alignment=QtCore.Qt.AlignRight)
         self.titleLayoutBot.addWidget(download)
 
         #질문 목록
@@ -248,6 +264,20 @@ class chatRoom(QWidget):
 
         return result.decode('utf-8')
 
+    
+    def searchClicked(self):
+        self.search = chat_search.Search(self,self.parent.course[1])
+
+        self.search.setWindowTitle("Search")
+        self.search.setMinimumSize(QSize(400, 400))
+
+    def mineClicked(self):
+        self.mine = chat_mine.Mine(self,self.parent.stuid,self.parent.course[1])
+
+        self.mine.setWindowTitle("Mine")
+        self.mine.setMinimumSize(QSize(400, 400))
+    
+    
     def getChatHistory(self):
         commend = 'chat_history '+ self.lecId + " " + self.tab.tabText(self.tab.currentIndex())
         self.clientSocket.send(commend.encode('utf-8'))

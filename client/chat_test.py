@@ -304,7 +304,8 @@ class chatRoom(QWidget):
     def getChatHistory(self):
         commend = 'chat_history '+ self.lecId + " " + self.tab.tabText(self.tab.currentIndex())
         self.clientSocket.send(commend.encode('utf-8'))
-        result = self.clientSocket.recv(1024)
+        result = self.clientSocket.recv(2048)
+        print(len(result))
         result = result.decode('utf-8')
 
         if result == 'x':

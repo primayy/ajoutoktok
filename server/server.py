@@ -671,6 +671,13 @@ class ServerSocket:
                                 UnivRank += str(allSQLRows[i][0]) + "," + str(allSQLRows2[0][0]) + " " # "포인트,닉네임"
                         UnivRank.rstrip()
                         print(UnivRank)
+
+                        #내 등수 찾기
+                        cur.execute("SELECT count(*)+1 from (SELECT sum(points) as p FROM points GROUP BY Student_id ORDER BY sum(points) DESC) as tt where p > (select sum(points) from points where Student_id='" + str(side[1]) + "')")
+                        myRank = cur.fetchall()
+                        myRank = str(myRank[0][0])
+                        UnivRank += " " +myRank
+
                         client.send(str(UnivRank).encode('utf-8'))
                     elif side[0] == '2': #학과내
                         print(Department)
@@ -688,7 +695,13 @@ class ServerSocket:
                                 inDeptRank += str(allSQLRows[i][0]) + "," + str(allSQLRows2[0][0]) + " "  # "포인트,닉네임"
                         inDeptRank.rstrip()
                         print(inDeptRank)
+                        cur.execute("SELECT count(*)+1 from (SELECT sum(points) as p FROM points where Depart ='" + Department + "'GROUP BY Student_id ORDER BY sum(points) DESC) as tt where p > (select sum(points) from points where Student_id='" + str(side[1])+ "')")
+                        myRank = str(cur.fetchall()[0][0])
+
+                        inDeptRank += " "+myRank
+                        print(inDeptRank)
                         client.send(str(inDeptRank).encode('utf-8'))
+
                     elif side[0] == '3':
                         DeptRank = ""
                         #학과로 묶어서 포인트의 합과 학과을 얻는다(내림차순)
@@ -700,6 +713,11 @@ class ServerSocket:
                             for i in range(len(allSQLRows)):
                                 DeptRank += str(allSQLRows[i][0]) + "," + str(allSQLRows[i][1]) + " " # "포인트,학과"
                         DeptRank.rstrip()
+
+                        #우리과 등수 찾기
+                        cur.execute("SELECT count(*)+1 from (SELECT sum(points) as p FROM points GROUP BY Depart ORDER BY sum(points) DESC) as tt where p > (select sum(points) from points where Depart='" + Department+ "')")
+                        myRank = str(cur.fetchall()[0][0])
+                        DeptRank += " "+myRank
                         print(DeptRank)
                         client.send(str(DeptRank).encode('utf-8'))
 
@@ -709,7 +727,18 @@ class ServerSocket:
                     #    #강의별 랭킹 서치
                     #    print('efg')
                     #    client.send('4'.encode('utf-8'))
-                  
+
+                #내 점수 얻어오기
+                elif commend == 'getMyPoint':
+                    print(side)
+                    cur = self.databasent.cursor()
+
+                    cur.execute("SELECT sum(points) FROM points WHERE Student_id ='" + str(side[0]) + "'")  # 해당 유저의 학과 ==> '학과내'에 사용
+                    point = cur.fetchall()
+                    point = str(point[0][0])
+
+                    client.send(point.encode('utf-8'))
+
                 elif commend == 'getCategory':
                     cur = self.databasent.cursor()
                     cur.execute("SELECT chatroom_name FROM category WHERE lecture_id ='" + str(side[0]) + "'")

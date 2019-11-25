@@ -12,12 +12,19 @@ class LeaderBoard(QWidget):
         self.parent = parent
         self.studId = studId
         self.clientSocket = parent.clientSocket
+
+        #레이아웃 설정
         self.mainLayout=QVBoxLayout()
         self.rankWidget = QWidget()
         self.title = QHBoxLayout()
+        self.myRankLayout = QVBoxLayout()
+
+        #랭크 탭 설정
         self.tab = QTabWidget()
         self.tab.setStyleSheet('''
         QTabBar:tab{width:100px}''')
+
+        #랭크 리스트 설정
         self.show_all = QListWidget(self)
         self.show_inDepart = QListWidget(self)
         self.show_compDepart = QListWidget(self)
@@ -30,6 +37,20 @@ class LeaderBoard(QWidget):
         group.setStyleSheet('''
                         font-weight:bold;
                         font-size:16pt''')
+
+        self.myRankLabel = QLabel('내 등수는')
+        self.myRank = QLabel()
+        self.myRank.setStyleSheet("font-size:15pt")
+        myPoint = QLabel()
+        mP = self.getMyPoint()
+
+        tmp = "내 점수는 "+ mP + " Points!"
+        myPoint.setText(tmp)
+
+        self.myRankLayout.addWidget(self.myRankLabel)
+        self.myRankLayout.addWidget(self.myRank)
+        self.myRankLayout.addWidget(myPoint)
+
         ##### 첫화면에서 바로 전체 순위 확인할 수 있도록
         commend = "getRank "
         commend += "1 " + self.studId
@@ -37,6 +58,9 @@ class LeaderBoard(QWidget):
         result = self.clientSocket.recv(1024).decode('utf-8')
         # print(str(result))
         UnivRank = str(result).split(" ")
+        myRank = UnivRank.pop()
+        myRank = str(myRank[0]) + " 등!"
+        self.myRank.setText(myRank)
         for i in range(len(UnivRank)):
             if len(UnivRank[i])>0:
                 allRank = UnivRank[i].split(",")
@@ -55,36 +79,55 @@ class LeaderBoard(QWidget):
         self.title.addWidget(group)
         self.mainLayout.addLayout(self.title)
         self.mainLayout.addWidget(horizon_line)
+        self.mainLayout.addLayout(self.myRankLayout)
         self.mainLayout.addWidget(self.tab)
 
-        self.tab.setMinimumSize(300,500)
+        self.tab.setMinimumSize(300,430)
 
         self.setLayout(self.mainLayout)
+
+    def getMyPoint(self):
+        commend = "getMyPoint " + self.studId
+        self.clientSocket.send(commend.encode('utf-8'))
+        point = self.clientSocket.recv(1024)
+        point = point.decode('utf-8')
+
+        return point
 
     def getRank(self):
         commend = "getRank "
         if self.tab.tabText(self.tab.currentIndex()) == '전체':
+            self.myRankLabel.setText('내 등수는')
             self.show_all.clear()
             commend += "1 " + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
             result = self.clientSocket.recv(1024).decode('utf-8')
             # print(str(result))
+            #등수 추가
             UnivRank = str(result).split(" ")
+            myRank = UnivRank.pop()
+            myRank = str(myRank[0]) +" 등!"
+            self.myRank.setText(myRank)
+
             for i in range(len(UnivRank)):
                 if len(UnivRank[i])>0:#있을 때만, index out of range 오류 피하기
                     allRank = UnivRank[i].split(",")
                     if len(allRank)>0:#있을 때만, index out of range 오류 피하기
                         self.show_all.addItem(str("Points: "+allRank[0]+" / 아이디: "+allRank[1]))
 
-            
 
         elif self.tab.tabText(self.tab.currentIndex()) == '학과내':
+            self.myRankLabel.setText('내 등수는')
             self.show_inDepart.clear()
             commend += "2 " + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
             result = self.clientSocket.recv(1024).decode('utf-8')
             # print(str(result))
+            #등수 추가
             inDeptRank = result.split(" ")
+            myRank = inDeptRank.pop()
+            myRank = str(myRank[0]) +" 등!"
+            self.myRank.setText(myRank)
             # print(inDeptRank)
             for i in range(len(inDeptRank)):
                 if len(inDeptRank[i])>0:#있을 때만, index out of range 오류 피하기
@@ -95,20 +138,26 @@ class LeaderBoard(QWidget):
 
 
         elif self.tab.tabText(self.tab.currentIndex()) == '학과별':
+            self.myRankLabel.setText('우리과 등수는')
             self.show_compDepart.clear()
             commend += "3 " + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
             result = self.clientSocket.recv(1024).decode('utf-8')
             # print(str(result))
+
             DeptRank = result.split(" ")
+            myRank = DeptRank.pop()
+            myRank = str(myRank[0]) +" 등!"
+            self.myRank.setText(myRank)
+
             # print(DeptRank)
             for i in range(len(DeptRank)):
                 if len(DeptRank[i])>0:#있을 때만, index out of range 오류 피하기
                     compDepartRank = DeptRank[i].split(",")
                     if len(compDepartRank)>0:#있을 때만, index out of range 오류 피하기
                         self.show_compDepart.addItem(str("Points: "+compDepartRank[0]+" / 학과: "+compDepartRank[1]))
-        
-        
+
+
 
 
 if __name__ == "__main__":

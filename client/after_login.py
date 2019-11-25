@@ -37,7 +37,7 @@ class App(QWidget):
         # 왼쪽 레이아웃
         self.leftSide = QWidget(self)
         self.leftSide.setFixedWidth(100)
-        self.leftSide.setStyleSheet("background-color:#F6F6F3")
+        self.leftSide.setStyleSheet("background-color:white")
 
         self.leftSideLayout = QVBoxLayout()
         self.leftSideLayout.setContentsMargins(0, 50, 0, 0)
@@ -47,7 +47,7 @@ class App(QWidget):
         # 오른쪽 레이아웃
         self.rightSide = QWidget(self)
 
-        self.rightSide.setStyleSheet('background-color:white')
+        self.rightSide.setStyleSheet('background-color:#eef5f6')
 
         self.rightSideLayout = QVBoxLayout()
         self.rightSideTitle = QHBoxLayout()
@@ -62,7 +62,7 @@ class App(QWidget):
         self.mainLayout.addWidget(self.rightSide)
         self.mainLayout.addLayout(self.rightSideLayout)
 
-        self.mainLayout.setContentsMargins(0, 0, 0, 0)
+        self.mainLayout.setContentsMargins(1, 1, 1, 1)
         self.mainLayout.setSpacing(0)
 
         self.initUI(studid, studname, self.lecId)
@@ -80,14 +80,16 @@ class App(QWidget):
         user_img.clicked.connect(self.goToBB)
 
         userName = QLabel(studname)
+        userName.setStyleSheet("font: 9pt 나눔스퀘어라운드 Regular;color:#42808a")
+        
         userHakNum = QLabel(str(studid))
-
+        userHakNum.setStyleSheet("font: 8pt 나눔스퀘어라운드 Regular;color:#42808a")
         ##왼쪽 레이아웃 버튼
         btnList = QPushButton()
         btnList.setMaximumHeight(200)
         btnList.setMaximumWidth(200)
         btnList.setStyleSheet('''
-                        QPushButton{image:url(./icon/list.png); border:0px; width:32px; height:42px}        
+                        QPushButton{image:url(./ui/afterlogin_ui/list.png); border:0px; width:32px; height:32px}        
                         QPushButton:hover{background:#e9e9e2; border:0px}
                         ''')
         btnList.setToolTip('강의 목록')
@@ -97,7 +99,7 @@ class App(QWidget):
         btnAlram.setMaximumHeight(200)
         btnAlram.setMaximumWidth(200)
         btnAlram.setStyleSheet('''
-                        QPushButton{image:url(./icon/bell.png); border:0px; width:32px; height:42px}        
+                        QPushButton{image:url(./ui/afterlogin_ui/alarm.png); border:0px; width:36px; height:36px}        
                         QPushButton:hover{image:url(./icon/bell2.png); background:#e9e9e2; border:0px}
                         ''')
         btnAlram.setToolTip('알림')
@@ -106,7 +108,7 @@ class App(QWidget):
         btnLeaderBoard = QPushButton()
         btnLeaderBoard.setToolTip('리더보드')
         btnLeaderBoard.setStyleSheet('''
-                QPushButton{image:url(./icon/leaderboard.png); border:0px; width:32px; height:42px}        
+                QPushButton{image:url(./ui/afterlogin_ui/trophy.png); border:0px; width:40px; height:40px}        
                 QPushButton:hover{background:#e9e9e2; border:0px}
                 ''')
         btnLeaderBoard.clicked.connect(self.showLeader)
@@ -114,7 +116,7 @@ class App(QWidget):
         btnMore = QPushButton()
         btnMore.setToolTip('설정')
         btnMore.setStyleSheet('''
-                        QPushButton{image:url(./icon/more.png); border:0px; width:32px; height:42px}        
+                        QPushButton{image:url(./ui/afterlogin_ui/setting.png); border:0px; width:32px; height:32px}        
                         QPushButton:hover{background:#e9e9e2; border:0px}
                         ''')
         btnMore.clicked.connect(self.showSetting)
@@ -139,15 +141,15 @@ class App(QWidget):
         # 최소화
         btMini = QPushButton()
         btMini.setStyleSheet('''border:0px''')
-        btMini.setIcon(QIcon('./icon/minimize.png'))
-        btMini.setIconSize(QSize(15,15))
+        btMini.setIcon(QIcon('./ui/afterlogin_ui/minimize_button.png'))
+        btMini.setIconSize(QSize(17,17))
         btMini.clicked.connect(lambda: QApplication.activeWindow().showMinimized())
 
         # 종료
         btExit = QPushButton()
         btExit.setStyleSheet('''border:0px''')
-        btExit.setIcon(QIcon('./icon/icons8-close-window-16.png'))
-        btExit.setIconSize(QSize(15,15))
+        btExit.setIcon(QIcon('./ui/afterlogin_ui/close_button.png'))
+        btExit.setIconSize(QSize(17,17))
         btExit.clicked.connect(self.quitClicked)
 
         self.rightSideTitle.addStretch(1)

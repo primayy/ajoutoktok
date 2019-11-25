@@ -21,11 +21,15 @@ class lecture_list(QWidget):
 
         #강의 목록 그리기
         group = QLabel('강의 목록')
-        horizon_line = QLabel('─────────────────────')
-
-        group.setStyleSheet('''
-                font-weight:bold;
-                font-size:16pt''')
+        group.setStyleSheet("font: 20pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a")
+        #horizon_line = QLabel('─────────────────────')
+            #구분선
+        horizon_line = QLabel()
+        horizon_img = QPixmap('./ui/afterlogin_ui/horizon_line.png')
+        horizon_img = horizon_img.scaled(310,12,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+        horizon_line.setPixmap(horizon_img)
+        horizon_line.setAlignment(Qt.AlignTop)
+        
         self.viewer = QListWidget(self)
 
         self.viewer.setMinimumSize(300, 500)
@@ -67,6 +71,7 @@ class lecture_list(QWidget):
             self.viewer.addItem(item)
 
         item = QListWidgetItem(self.viewer)
+        
         custom_widget = lecture_group('add', QApplication.activeWindow(),self)
         item.setSizeHint(custom_widget.sizeHint())
         self.viewer.setItemWidget(item, custom_widget)
@@ -211,7 +216,7 @@ class group_search_dialog(QDialog):
             msg.exec_()
 
     def getLectureList(self):
-        if self.lecId is 'x':
+        if self.lecId == 'x':
             return []
         else:
             lectureList = "lecture "
@@ -240,19 +245,19 @@ class lecture(QWidget):
 
         self.mainLayout = QVBoxLayout()
         self.mainWidget = QWidget()
-        self.mainWidget.setStyleSheet('background-color:grey')
-        self.mainWidget.setMinimumSize(200,80)
+        self.mainWidget.setStyleSheet("background-color:#eef5f6;")
+        self.mainWidget.setMinimumSize(100,50)
         self.mainLayout.setContentsMargins(0,0,0,0)
         self.mainLayout.addWidget(self.mainWidget)
 
-        if course[0] is 'add':
+        if course[0] == 'add':
             self.layout = QVBoxLayout()
             self.layout.setContentsMargins(0,0,0,0)
             self.layout_middle = QHBoxLayout()
 
             # middle
             self.lecture = QPushButton()
-            self.lecture.setStyleSheet('''border:0px;''')
+            self.lecture.setStyleSheet('''border:2px;''')
             self.lecture.setIcon(QIcon('./icon/add.png'))
             self.lecture.setIconSize(QSize(40, 70))
             self.lecture.clicked.connect(lambda: self.group_search_popup(self.w))
@@ -276,6 +281,8 @@ class lecture(QWidget):
 
             # middle
             self.lecture = QLabel(course[0])
+            self.lecture.setStyleSheet('font: 10pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a')
+            #font: 20pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a
             # print(course)
             self.layout_middle.addWidget(self.lecture)
             self.layout_middle.addWidget(self.btExit, alignment=(QtCore.Qt.AlignTop | QtCore.Qt.AlignRight))
@@ -288,6 +295,7 @@ class lecture(QWidget):
             self.msg_widget.setStyleSheet('''border:0px''')
             self.msg_widget.setIcon(QIcon('./icon/msg_widget.png'))
             self.prof = QLabel(course[1])
+            self.prof.setStyleSheet('font: 7pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a')
             self.msg_widget.clicked.connect(self.msg_widget_on)
             self.layout_bottom.addWidget(self.prof)
             self.layout_bottom.addWidget(self.msg_widget, alignment=(QtCore.Qt.AlignRight))

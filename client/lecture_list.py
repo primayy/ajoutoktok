@@ -21,7 +21,7 @@ class lecture_list(QWidget):
 
         #강의 목록 그리기
         group = QLabel('강의 목록')
-        group.setStyleSheet("font: 20pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a")
+        group.setStyleSheet("font: 18pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a")
         #horizon_line = QLabel('─────────────────────')
             #구분선
         horizon_line = QLabel()
@@ -345,7 +345,7 @@ class lecture_group(QWidget):
         course = courses.split(',')
         # print(course)
         self.mainLayout = QVBoxLayout()
-        self.mainLayout.setContentsMargins(1,3,1,3)
+        self.mainLayout.setContentsMargins(5,5,5,5)
         #그룹 그리기
         # self.mainWidget = lecture(course, parent.studid, w, parent.viewer, parent.lecId)
         self.mainWidget = lecture(self.parent, course, w)

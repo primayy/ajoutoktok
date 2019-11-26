@@ -52,7 +52,7 @@ class replyRoom(QWidget):
 
         #chat server와 연결
         self.parent.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.parent.chatSocket.connect(('192.168.0.13', 3334))
+        self.parent.chatSocket.connect(('192.168.0.49', 3334))
         #self.chatSocket.connect(('34.84.112.149', 3334))
 
         self.history = self.parent.getChatHistory()

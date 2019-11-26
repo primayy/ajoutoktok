@@ -81,7 +81,7 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.13', 3334))
+        self.chatSocket.connect(('192.168.0.49', 3334))
         # self.chatSocket.connect(('192.168.43.180', 3334))
         # self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
@@ -97,9 +97,9 @@ class chatRoom(QWidget):
 
         #타이틀 -> 강의이름/타이틀바
         self.titleWidget = QWidget()
-        self.titleWidget.setStyleSheet('background-color:#5218FA')
+        self.titleWidget.setStyleSheet('background-color:#a1d2d7')
         self.titleLayout = QVBoxLayout()
-        self.titleLayout.setContentsMargins(15,10,15,10)
+        self.titleLayout.setContentsMargins(10,10,10,10)
 
         self.titleLayoutTop = QHBoxLayout()
         self.titleLayoutMid = QHBoxLayout()
@@ -109,23 +109,26 @@ class chatRoom(QWidget):
         self.titleLayout.addLayout(self.titleLayoutMid)
         self.titleLayout.addLayout(self.titleLayoutBot)
         self.titleWidget.setLayout(self.titleLayout)
+        self.titleWidget.setMaximumHeight(120)
+        self.titleWidget.setMinimumWidth(500)
 
         #채팅 내용
         self.chatContentLayout = QVBoxLayout()
         self.chatWidget = QWidget()
-        self.chatWidget.setStyleSheet('background-color:white')
+        #e8f3f4
+        self.chatWidget.setStyleSheet('background-color:#e8f3f4; border:0px')
         self.chatLayout = QVBoxLayout()
         self.chatWidget.setLayout(self.chatLayout)
         self.chatContentLayout.addWidget(self.chatWidget)
 
         #입력창
         self.chat_input = QLineEdit()
-        self.chat_input.setStyleSheet('background:white; height:78px')
+        self.chat_input.setStyleSheet('background:white; height:100px')
         self.chat_input.returnPressed.connect(lambda: self.sendMsg(self.chat_input.text()))  # 엔터 처리
-
+        #a1d2d7
         self.chatLayoutWidget = QWidget()
-        self.chatLayoutWidget.setStyleSheet('background-color:#5218FA')
-        self.chatLayoutWidget.setMaximumHeight(100)
+        self.chatLayoutWidget.setStyleSheet('background-color:#a1d2d7')
+        self.chatLayoutWidget.setMinimumHeight(100)
         self.chatInputLayout = QHBoxLayout()
         self.chatLayoutWidget.setLayout(self.chatInputLayout)
 
@@ -142,7 +145,7 @@ class chatRoom(QWidget):
         self.showLayout.addWidget(self.mainWidget)
         self.showLayout.setContentsMargins(0,0,0,0)
         self.setLayout(self.showLayout)
-        self.setMinimumSize(500,700)
+        self.setMinimumSize(500,800)
         # self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 
@@ -171,14 +174,14 @@ class chatRoom(QWidget):
 
         BtnSearch  = QPushButton()
         BtnSearch.setStyleSheet('''border:0px''')
-        BtnSearch.setIcon(QIcon('./icon/comm_search.png'))
+        BtnSearch.setIcon(QIcon('./ui/chatting_ui/find.png'))
         BtnSearch.setIconSize(QSize(30,30))
         BtnSearch.clicked.connect(self.searchClicked)
         
         BtnMine  = QPushButton()
         BtnMine.setStyleSheet('''border:0px''')
-        BtnMine.setIcon(QIcon('./icon/comm_my.png'))
-        BtnMine.setIconSize(QSize(30,30))
+        BtnMine.setIcon(QIcon('./ui/chatting_ui/내질문3.png'))
+        BtnMine.setIconSize(QSize(80,30))
         BtnMine.clicked.connect(self.mineClicked)
 
 
@@ -188,21 +191,24 @@ class chatRoom(QWidget):
 
         #강의명
         lecName = QLabel(self.parent.course[0])
-        lecName.setStyleSheet('font-weight:bold; font-size:16pt')
+        lecName.setStyleSheet('font-weight:bold; font:13pt 나눔스퀘어라운드 Regular;color:#27565b')
 
         self.titleLayoutMid.addWidget(lecName,alignment=QtCore.Qt.AlignLeft)
 
         #강의 정보
         profName = QLabel(self.parent.course[1])
+        profName.setStyleSheet('font:10pt 나눔스퀘어라운드 Regular;color:#27565b')
+
         download = QPushButton()
         download.clicked.connect(self.sendQuestionToEmail)
-        download.setMaximumWidth(25)
+        download.setMaximumWidth(30)
         download.setStyleSheet('border:0px')
-        download.setIcon(QIcon('./icon/download.png'))
+        download.setIcon(QIcon('./ui/chatting_ui/download.png'))
         download.setIconSize(QSize(30,30))
-        self.titleLayoutBot.addWidget(profName)
-        self.titleLayoutBot.addWidget(BtnMine,alignment=QtCore.Qt.AlignRight)
-        self.titleLayoutBot.addWidget(BtnSearch,alignment=QtCore.Qt.AlignRight)
+        self.titleLayoutBot.addWidget(profName,alignment=QtCore.Qt.AlignLeft)
+        self.titleLayoutBot.addStretch(1)
+        self.titleLayoutBot.addWidget(BtnMine)
+        self.titleLayoutBot.addWidget(BtnSearch)
         self.titleLayoutBot.addWidget(download)
 
         #질문 목록
@@ -222,12 +228,15 @@ class chatRoom(QWidget):
         self.chatLayout.setContentsMargins(0,0,0,0)
 
         #채팅입력
-
         chat_enter = QPushButton()
-        chat_enter.setStyleSheet('background:#F6F6F3')
-        chat_enter.setMinimumHeight(78)
-        chat_enter.setIcon(QIcon('./icon/send.png'))
-        chat_enter.setIconSize(QSize(50,50))
+        #chat_enter.setStyleSheet('background:#F6F6F3;image:url(./ui/chatting_ui/보내기.png); border:0px;')
+        chat_enter.setStyleSheet('''
+                        QPushButton{image:url(./ui/chatting_ui/보내기.png); border:0px; width:60px; height:80px}        
+                        
+                        ''')
+        # chat_enter.setMinimumHeight(78)
+        # chat_enter.setIcon(QIcon('./icon/send.png'))
+        # chat_enter.setIconSize(QSize(50,50))
         chat_enter.clicked.connect(lambda: self.sendMsg(self.chat_input.text()))
 
         self.chatInputLayout.addWidget(self.chat_input)
@@ -451,27 +460,41 @@ class chatWidget(QWidget):
             self.BtnLike = QPushButton(self.comments[3])
             self.BtnLike.setIcon(QIcon('./icon/heart_unchecked.png'))
             self.BtnLike.setStyleSheet('''
-            QPushButton{border:0px}''')
-            self.BtnLike.setIconSize(QSize(20,20))
+            QPushButton{border:0px; background-color:#e8f3f4; width:45px}''')
+            self.BtnLike.setIconSize(QSize(30,30))
+            #BtnLike.setMaximumWidth()
+            self.BtnLike.clicked.connect(self.likeClicked)
+
+            question = QLabel()
+            #42939c#24565b
+            question.setText(self.comments[2])
+            question.setStyleSheet("color: black;"
+                               "background-color: white;"
+                               "border-style: solid;"
+                               "border-width: 1px;"
+                               "border-color: #42939c;"
+                               "font:9pt 나눔스퀘어라운드 Regular;"
+                               )
+            question.setFixedHeight(38)
+            question.setFixedWidth(360)
+        else:
+            self.BtnLike = QPushButton('0')
+            self.BtnLike.setIcon(QIcon('./icon/heart_unchecked.png'))
+            self.BtnLike.setStyleSheet('''
+                        QPushButton{border:0px}''')
+            self.BtnLike.setIconSize(QSize(20, 20))
             self.BtnLike.setMaximumWidth(35)
             self.BtnLike.clicked.connect(self.likeClicked)
 
             question = QLabel()
-            question.setText(self.comments[2])
-        else:
-            BtnLike = QPushButton('0')
-            BtnLike.setIcon(QIcon('./icon/heart_unchecked.png'))
-            BtnLike.setStyleSheet('''
-                        QPushButton{border:0px}''')
-            BtnLike.setIconSize(QSize(20, 20))
-            BtnLike.setMaximumWidth(35)
-            BtnLike.clicked.connect(self.likeClicked)
-
-            question = QLabel()
             question.setText(self.comments[0])
 
+        self.mainLayout.setContentsMargins(5,5,5,5)
+        self.mainLayout.addStretch(1)
         self.mainLayout.addWidget(question)
+        #self.mainLayout.setAlignment(Qt.AlignLeft)
         self.mainLayout.addWidget(self.BtnLike)
+        self.mainLayout.addStretch(1)
 
     def likeClicked(self):
         # print(self.comments)

@@ -48,6 +48,8 @@ class Reply(QWidget):
         shadow.setOffset(3)
         self.setGraphicsEffect(shadow)
         self.oldPos = self.pos()
+        #맨윗줄 톱 바
+        self.topbar = QHBoxLayout()
 
         self.mainLayout = QVBoxLayout()
         self.mainLayout.setSpacing(0)
@@ -55,17 +57,19 @@ class Reply(QWidget):
 
         #배경색 지정할 위젯 선언
         self.mainWidget = QWidget()
-        self.mainWidget.setStyleSheet('background-color:white')
+        self.mainWidget.setStyleSheet('background-color:#e8f3f4')
 
         #질문 타이틀 레이아웃
         self.questionWidget = QWidget()
-        self.questionWidget.setStyleSheet('background-color:grey;')
+        self.questionWidget.setStyleSheet("background-color:white;")
+        
         self.question_title_bottom = QHBoxLayout()
 
         #타이틀 관련 위젯은 questionLayout에 추가
         self.questionLayout = QVBoxLayout()
         self.questionWidget.setLayout(self.questionLayout)
-        self.questionWidget.setMaximumSize(500,200)
+        self.questionWidget.setMaximumSize(500,180)
+        
         # self.questionLayout.setContentsMargins(0,0,0,0)
 
 
@@ -89,27 +93,36 @@ class Reply(QWidget):
         #위젯은 widgetLayout에 추가하면 됨
         btnBack =QPushButton()
         btnBack.setIconSize(QSize(30, 30))
-        btnBack.setMaximumWidth(30)
-        btnBack.setStyleSheet('width:30px; border:0px')
-        btnBack.setIcon(QIcon('./icon/return.png'))
+        btnBack.setMaximumWidth(40)
+        btnBack.setStyleSheet('width:40px; border:0px')
+        btnBack.setIcon(QIcon('./ui/chatting_ui/back.png'))
         btnBack.clicked.connect(self.returnToChat)
 
-        btnRefresh = QPushButton('새로고침')
+        btnRefresh = QPushButton()
+        btnRefresh.setStyleSheet('''QPushButton{image:url(./ui/chatting_ui/refresh.png); border:0px; width:30px; height:30px} ''')
+        
         btnRefresh.clicked.connect(self.refresh)
+        
 
 
         #질문 타이틀
         self.question_title = QLabel()
-        self.questionLayout.addWidget(self.question_title)
+
+        self.question_title2 = QTextBrowser()
+        self.question_title2.setMaximumHeight(80)
+        self.question_title2.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;background-color:white;border:0px')
+        
+        self.questionLayout.addWidget(self.question_title2)
 
         #질문 타이틀 bottom
         self.dateLabel = QLabel()
+        self.dateLabel.setStyleSheet('font:7pt 나눔스퀘어라운드 Regular')
         self.btnLike = QPushButton()
         # self.btnLike.setText(str(self.comment_info[3]))
-        self.btnLike.setIcon(QIcon('./icon/heart_unchecked.png'))
+        self.btnLike.setIcon(QIcon('./ui/chatting_ui/unchecked_heart.png'))
         self.btnLike.setStyleSheet('''
                                 QPushButton{border:0px}''')
-        self.btnLike.setIconSize(QSize(20, 20))
+        self.btnLike.setIconSize(QSize(23, 23))
         self.btnLike.setMaximumWidth(35)
         # self.btnLike.clicked.connect(self.likeClicked)
 
@@ -122,19 +135,25 @@ class Reply(QWidget):
         #질문 목록
         self.question_reply = QListWidget()
         self.question_reply.scrollToBottom()
-        self.question_reply.setBaseSize(500, 200)
-        self.question_reply.setMaximumSize(500,200)
+        #self.question_reply.setBaseSize(500,)
+        #self.question_reply.setMaximumSize(500,400)
 
         self.question_reply.setStyleSheet('''
-                        # QListWidget:item:hover{background:white};
+                        # QListWidget:item:hover{background:pink};
                         # QListWidget:item{padding:0px}
                         ''')
 
-        #widgetLayout에 추가
-        self.widgetLayout.addWidget(btnBack)
-        self.widgetLayout.addWidget(btnRefresh)
+        #widgetLayout에 추가(총 세로 레이아웃:탑, 질문, 댓글)
+        self.topbar.addWidget(btnBack)
+        self.topbar.addStretch(1)
+        self.topbar.addWidget(btnRefresh)
+        self.widgetLayout.addLayout(self.topbar,1)
+        #self.widgetLayout.setStretchFactor(self.topbar,1)
+        
         self.widgetLayout.addWidget(self.questionWidget)
+        self.widgetLayout.setStretchFactor(self.questionWidget,2)
         self.widgetLayout.addWidget(self.question_reply)
+        self.widgetLayout.setStretchFactor(self.question_reply,5)
 
         # self.show()
 
@@ -175,32 +194,18 @@ class Reply(QWidget):
 
         else:
             res = res.split('/')
+            print(res)
             res.pop()
             reply = []
 
-            # for i in range(len(res)):
-            #     reply.append(res[i].split(','))
             for i in range(len(res)):
-                tmp = res[i].split(',')
-                tmp = [x for x in tmp if x]
-
-                if len(tmp) == 3:
-                    reply.append(tmp)
-
-                elif len(tmp) > 3:
-                    msglen = len(tmp) - 3
-                    msg = ",".join(tmp[0:1+msglen])
-
-                    for i in range(msglen+1):
-                        del tmp[0]
-                    tmp.insert(0,msg)
-                    reply.append(tmp)
+                reply.append(res[i].split(','))
 
             return reply
 
     #리스트 위젯에 답글 추가
     def showReply(self):
-        self.question_title.setText(str(self.comment_info[2]))
+        self.question_title2.setText(str(self.comment_info[2]))
         self.btnLike.setText(str(self.comment_info[3]))
         self.dateLabel.setText(str(self.comment_info[5]))
 
@@ -226,34 +231,60 @@ class replyWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        BtnLike = QPushButton()
-        BtnLike.setIcon(QIcon('./icon/heart_unchecked.png'))
-        BtnLike.setStyleSheet('''
-                                QPushButton{border:0px}''')
-        BtnLike.setIconSize(QSize(20, 20))
-        BtnLike.setMaximumWidth(35)
-        BtnLike.clicked.connect(self.likeClicked)
+        # BtnLike = QPushButton()
+        # BtnLike.setIcon(QIcon('./ui/chatting_ui/champion.png'))
+        # BtnLike.setStyleSheet('''
+        #                         QPushButton{border:0px}''')
+        # BtnLike.setIconSize(QSize(40, 40))
+        # BtnLike.setMaximumWidth(40)
+        # BtnLike.clicked.connect(self.likeClicked)
+        
+        adopt_medal = QLabel()
+        adopt_medal_img = QPixmap('./ui/chatting_ui/champion.png')
+        adopt_medal_img = adopt_medal_img.scaled(45,45)
+        adopt_medal.setPixmap(adopt_medal_img)
+        adopt_medal.setAlignment(Qt.AlignRight)
 
         question = QLabel()
+        question.setMinimumWidth(400)
+        question.setMaximumWidth(400)
+        question.setWordWrap(True)
+        
+        question.setStyleSheet('width:400px;')
+
+        #question.setStyleSheet('width:200px')
         question.setText(self.comments[0])
 
+        question2 = QTextBrowser()
+        question2.setMaximumWidth(400)
+        #question2.setMaximumHeight(70)
+        question2.setFixedHeight(100)
+        question2.setStyleSheet("border:1px;"
+                                "border-color:red;"
+                                "font: 9pt 나눔스퀘어라운드 Regular;")
+        
+        question2.setText(self.comments[0])
+
+
         date = QLabel()
+        date.setStyleSheet('font:8pt;color:#7f7f7f')
         date.setText(self.comments[2])
 
-
-        self.replyLayout.addWidget(question)
+        #replyLayout: 댓글+날짜 (수직 레이아웃)
+        self.replyLayout.addWidget(question2)
         self.replyLayout.addWidget(date)
-        self.mainLayout.addLayout(self.replyLayout)
-        self.mainLayout.addWidget(BtnLike)
+        #mainLayout: replyLayout+메달 (수평 레이아웃)
+        self.mainLayout.addLayout(self.replyLayout,)
+        self.mainLayout.addWidget(adopt_medal,alignment=QtCore.Qt.AlignRight)
 
     def likeClicked(self):
-        # print(self.comments)
+        print(self.comments)
         commend = 'like_update ' + self.comments[6] + " " + self.grandparent.stuid  # 학번 + msg
         self.clientSocket.send(commend.encode('utf-8'))
-        # print(commend)
+        print(commend)
         result = self.clientSocket.recv(1024)
         result = result.decode('utf-8')
-        # print(result)
+        print(result)
         self.parent.category_changed()
 
     def mousePressEvent(self, QMouseEvent):

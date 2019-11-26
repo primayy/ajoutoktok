@@ -36,7 +36,7 @@ class profile(QWidget):
         changeNick = QPushButton("변경")
         changeNick.setMaximumHeight(100)
         changeNick.setMaximumWidth(150)
-        changeNick.clicked.connect(self.changeNickname)
+        changeNick.clicked.connect(self.changeNicknamePop)
 
         self.Dept = QLabel()
         self.Query = QLabel()
@@ -64,10 +64,6 @@ class profile(QWidget):
         self.setLayout(self.mainLayout)
         self.setFixedSize(self.sizeHint())
 
-    def changeNickname(self):
-        commend = 'changeNick ' + self.studid
-        # self.clientSocket.send(commend.encode('utf-8'))
-
     def getProfile(self):
         commend = 'getProfile ' + self.studid
         self.clientSocket.send(commend.encode('utf-8'))
@@ -80,3 +76,53 @@ class profile(QWidget):
         self.Query.setText("질문: " + res[2])
         self.Respond.setText("답변: " + res[3])
         self.Points.setText("포인트: " + res[4])
+
+    def changeNicknamePop(self):
+        dlg = changeNickPop(self)
+        dlg.exec_()
+
+class changeNickPop(QDialog):
+    def __init__(self,parent):
+        super().__init__()
+        self.parent=parent
+        self.clientSocket = self.parent.clientSocket
+
+        self.mainLayout = QVBoxLayout()
+        self.btnLayout = QHBoxLayout()
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.setMinimumSize(150,150)
+        self.initUi()
+
+    def initUi(self):
+        nick_input = QLineEdit()
+        nick_input.setPlaceholderText('변경할 닉네임')
+        change = QPushButton('변경')
+        cancel = QPushButton('취소')
+
+        cancel.clicked.connect(self.close)
+        change.clicked.connect(lambda: self.changeNickname(nick_input.text()))
+
+        self.btnLayout.addWidget(change)
+        self.btnLayout.addWidget(cancel)
+
+        self.mainLayout.addWidget(nick_input)
+        self.mainLayout.addLayout(self.btnLayout)
+        self.setLayout(self.mainLayout)
+
+    def changeNickname(self,nick):
+        #중복검사 안함 추가해야됨
+        commend = 'changeNick ' + self.parent.studid + " " + nick
+        self.clientSocket.send(commend.encode('utf-8'))
+        res = self.clientSocket.recv(1024).decode('utf-8')
+
+        self.parent.nickname.setText(nick)
+        self.close()
+
+    def mousePressEvent(self, event):
+        self.oldPos = event.globalPos()
+
+    def mouseMoveEvent(self, event):
+        delta = QPoint(event.globalPos() - self.oldPos)
+        # print(delta)
+        self.move(self.x() + delta.x(), self.y() + delta.y())
+        self.oldPos = event.globalPos()

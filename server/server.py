@@ -1013,18 +1013,14 @@ class ServerSocket:
 
                     client.send(res.encode('utf-8'))
 
-                elif commend == 'changeNick':
-                    cur = self.databasent.cursor()
-                    # cur.execute("UPDATE nickname ='" + "FROM user WHERE student_id = '" + str(side[0]) + "'")
-                    user_info = cur.fetchall()
-                    res = ""
-                    res += str(user_info[0][3]) + "," #닉네임
-                    res += str(user_info[0][4]) + ","#학과
-                    res += str(user_info[0][5]) + "," #질문수
-                    res += str(user_info[0][6]) + "," #답변수
-                    res += str(user_info[0][7]) #포인트
 
-                    client.send(res.encode('utf-8'))
+                elif commend == 'changeNick':
+
+                    cur = self.databasent.cursor()
+                    cur.execute("UPDATE user set nickname ='" + str(side[1]) +"' where student_id ='" + str(side[0]) +"'")
+                    self.databasent.commit()
+
+                    client.send('changed'.encode('utf-8'))
 
                 elif commend == 'exit':
                     self.removeClient(addr, client)

@@ -175,12 +175,26 @@ class Reply(QWidget):
 
         else:
             res = res.split('/')
-            print(res)
             res.pop()
             reply = []
 
+            # for i in range(len(res)):
+            #     reply.append(res[i].split(','))
             for i in range(len(res)):
-                reply.append(res[i].split(','))
+                tmp = res[i].split(',')
+                tmp = [x for x in tmp if x]
+
+                if len(tmp) == 3:
+                    reply.append(tmp)
+
+                elif len(tmp) > 3:
+                    msglen = len(tmp) - 3
+                    msg = ",".join(tmp[0:1+msglen])
+
+                    for i in range(msglen+1):
+                        del tmp[0]
+                    tmp.insert(0,msg)
+                    reply.append(tmp)
 
             return reply
 
@@ -233,13 +247,13 @@ class replyWidget(QWidget):
         self.mainLayout.addWidget(BtnLike)
 
     def likeClicked(self):
-        print(self.comments)
+        # print(self.comments)
         commend = 'like_update ' + self.comments[6] + " " + self.grandparent.stuid  # 학번 + msg
         self.clientSocket.send(commend.encode('utf-8'))
-        print(commend)
+        # print(commend)
         result = self.clientSocket.recv(1024)
         result = result.decode('utf-8')
-        print(result)
+        # print(result)
         self.parent.category_changed()
 
     def mousePressEvent(self, QMouseEvent):

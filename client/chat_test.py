@@ -32,8 +32,23 @@ class update_listener(QThread):
             if len(update_commend) != 1:
                 if update_commend[0] == 'update':
                     tmp = []
-                    for i in range(1,len(update_commend)):
-                        tmp.append(update_commend[i])
+                    # print(update_commend)
+                    if len(update_commend) == 8:
+                        for i in range(1, len(update_commend)):
+                            tmp.append(update_commend[i])
+                    elif len(update_commend) > 8:
+                        msglen = len(update_commend) - 8
+                        msg = ",".join(update_commend[3:4 + msglen])
+
+                        for i in range(msglen + 1):
+                            del update_commend[3]
+                        update_commend.insert(3, msg)
+                        # print(update_commend)
+
+                        for i in range(1, len(update_commend)):
+                            tmp.append(update_commend[i])
+                        # print(tmp)
+
                     self.chatUpdate.emit(tmp)
                     # print('업데이트 시그널 emit')
                 elif update_commend[0] == 'stop':
@@ -66,14 +81,12 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.13', 3334))
+        self.chatSocket.connect(('192.168.0.8', 3334))
         # self.chatSocket.connect(('192.168.43.180', 3334))
         # self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
 
         self.history = self.getChatHistory()
-        if len(self.history) != 0:
-            self.history.pop()
         self.tab.currentChanged.connect(self.category_changed)
 
         #디자인
@@ -134,9 +147,7 @@ class chatRoom(QWidget):
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 
         self.initUI()
-    def test(self, event):
-        if event.key() == Qt.Key_Enter:
-            print('aaa')
+
     def initUI(self):
         # 쓰레드
         self.t = update_listener(parent=self)
@@ -269,6 +280,7 @@ class chatRoom(QWidget):
         dlg.exec_()
 
     def showQuestions(self):
+        print(self.history)
         for i in range(len(self.history)):
             item = QListWidgetItem(self.tab.currentWidget())
 
@@ -316,8 +328,20 @@ class chatRoom(QWidget):
             question = []
 
             for i in range(len(result)):
-                question.append(result[i].split(','))
+                tmp = result[i].split(',')
+                tmp = [x for x in tmp if x]
 
+                if len(tmp) == 7:
+                    question.append(tmp)
+
+                elif len(tmp) > 7:
+                    msglen = len(tmp) - 7
+                    msg = ",".join(tmp[2:3+msglen])
+
+                    for i in range(msglen+1):
+                        del tmp[2]
+                    tmp.insert(2,msg)
+                    question.append(tmp)
             return question
 
     def add_new_tab(self):
@@ -337,13 +361,13 @@ class chatRoom(QWidget):
         self.chat_input.setText('')
         if self.sendType == False:
             commend = 'sendReplyMsg ' + self.comment_info[6] + " " + self.parent.stuid + " " + msg
-            print(commend)
+            # print(commend)
 
             # main server에 알림
             self.clientSocket.send(commend.encode('utf-8'))
 
             tmp = self.clientSocket.recv(1024)
-            print(tmp)
+            # print(tmp)
             self.chatWidget.refresh()
             # chat server에 전송 -> 모두에게 뿌리기 위해
             # self.chatSocket.send('chat_update'.encode('utf-8'))
@@ -401,7 +425,7 @@ class category_create(QDialog):
     def create_category(self, name):
         #db로 보내서 등록하고 탭 늘려야됨
         commend = 'category_create ' + self.parent.lecId + " " + name
-        print(commend)
+        # print(commend)
         self.clientSocket.send(commend.encode('utf-8'))
 
         new_tab = QListWidget(self)
@@ -424,13 +448,13 @@ class chatWidget(QWidget):
 
     def initUI(self):
         if len(self.comments) != 2:
-            BtnLike = QPushButton(self.comments[3])
-            BtnLike.setIcon(QIcon('./icon/heart_unchecked.png'))
-            BtnLike.setStyleSheet('''
+            self.BtnLike = QPushButton(self.comments[3])
+            self.BtnLike.setIcon(QIcon('./icon/heart_unchecked.png'))
+            self.BtnLike.setStyleSheet('''
             QPushButton{border:0px}''')
-            BtnLike.setIconSize(QSize(20,20))
-            BtnLike.setMaximumWidth(35)
-            BtnLike.clicked.connect(self.likeClicked)
+            self.BtnLike.setIconSize(QSize(20,20))
+            self.BtnLike.setMaximumWidth(35)
+            self.BtnLike.clicked.connect(self.likeClicked)
 
             question = QLabel()
             question.setText(self.comments[2])
@@ -447,18 +471,17 @@ class chatWidget(QWidget):
             question.setText(self.comments[0])
 
         self.mainLayout.addWidget(question)
-        self.mainLayout.addWidget(BtnLike)
+        self.mainLayout.addWidget(self.BtnLike)
 
     def likeClicked(self):
-        print(self.comments)
+        # print(self.comments)
         commend = 'like_update '+ self.comments[6] + " " + self.grandparent.stuid#학번 + msg
         self.clientSocket.send(commend.encode('utf-8'))
-        print(commend)
+        # print(commend)
         result = self.clientSocket.recv(1024)
         result = result.decode('utf-8')
-        print(result)
-        self.parent.category_changed()
 
+        self.BtnLike.setText(result)
 
     def mousePressEvent(self, QMouseEvent):
         if QMouseEvent.button() == Qt.LeftButton:

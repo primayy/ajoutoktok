@@ -329,7 +329,7 @@ class ServerSocket:
                     # client.send(group_info.encode('utf-8'))
 
                 elif commend == 'sendMsg':
-                    # print(side)
+                    print(side)
                     cur = self.databasent.cursor()
 
                     #채팅 쿼리
@@ -956,10 +956,14 @@ class ServerSocket:
                         cur.execute("UPDATE user SET point = point +1 WHERE student_id='" + str(side[1]) + "'")
 
                         self.databasent.commit()
-                        
-                    
+
+                    cur = self.databasent.cursor()
+                    cur.execute("SELECT likes FROM chatting WHERE no = '" + str(side[0]) + "'")
+                    likeCount = cur.fetchall()
+                    likeCount = str(likeCount[0][0])
+
                     print('좋아요 업데이트')
-                    client.send('like_updated'.encode('utf-8'))
+                    client.send(likeCount.encode('utf-8'))
 
                 elif commend == 'getProfile':
                     cur = self.databasent.cursor()

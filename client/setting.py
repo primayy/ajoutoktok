@@ -5,10 +5,12 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
+import profile
 
 class setting(QWidget):
-    def __init__(self):
+    def __init__(self,parent):
         super().__init__()
+        self.parent = parent
         self.mainLayout = QVBoxLayout()
         self.title = QHBoxLayout()
         self.line = QVBoxLayout()
@@ -16,11 +18,18 @@ class setting(QWidget):
         self.initUi()
 
     def initUi(self):
-        # alarm_widget_box = QFrame()
-        # alarm_widget_box.setFrameShape(QFrame.Box)
-        # self.line.addWidget(splitter)
+        pf = profile.profile(self.parent)
+
+        #로그아웃 버튼
+        logoutbtn = QPushButton()
+        logoutbtn.setMaximumHeight(32)
+        logoutbtn.setMaximumWidth(42)
+        logoutbtn.setStyleSheet(''' QPushButton{image:url(./icon/logout.png); border: 0px; width:32px; height:42px}        
+                                        QPushButton:hover{background:rgba(0,0,0,0); border:0px}
+                                        ''')
+
         alarm_groupbox = QGroupBox('알림')
-        alarm_groupbox.setMinimumSize(300,500)
+        alarm_groupbox.setMinimumSize(300,320)
 
         setting_label = QLabel('설정')
         setting_label.setAlignment(Qt.AlignLeft)
@@ -56,11 +65,10 @@ class setting(QWidget):
         self.sound_on_off_button_status = True
         self.sound_on_off_button.clicked.connect(self.sound_button_toggle)
 
-        # custom_widget = lecture_group('add', studid, QApplication.activeWindow())
-        # item.setSizeHint(custom_widget.sizeHint())
-        # self.viewer.setItemWidget(item, custom_widget)
 
         self.title.addWidget(setting_label)
+        self.title.addWidget(logoutbtn)
+
         self.line.addWidget(alarm_widget_label)
         self.line.addWidget(self.widget_on_off_button,alignment=(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop))
         self.line.addWidget(alarm_sound_label)
@@ -71,7 +79,9 @@ class setting(QWidget):
 
         self.mainLayout.addLayout(self.title)
         self.mainLayout.addWidget(horizon_line)
+        self.mainLayout.addWidget(pf, alignment=QtCore.Qt.AlignCenter)
         self.mainLayout.addWidget(alarm_groupbox)
+        self.mainLayout.addStretch(1)
 
     def widget_button_toggle(self):
         if (self.widget_on_off_button_status == True):

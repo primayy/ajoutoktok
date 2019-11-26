@@ -195,7 +195,7 @@ class App(QWidget):
 
     def showSetting(self):
         self.rightSideInfo.close()
-        self.rightSideInfo = setting.setting()
+        self.rightSideInfo = setting.setting(self)
         self.rightSideLayout.addWidget(self.rightSideInfo)
 
     def quitClicked(self):

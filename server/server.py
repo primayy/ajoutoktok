@@ -332,7 +332,7 @@ class ServerSocket:
                     # print(side)
                     cur = self.databasent.cursor()
 
-                    #채팅 내용 저장
+                    #채팅 쿼리
                     query = 'INSERT INTO chatting (category_id,comment,nickname,student_id) Values (%s,%s,%s,%s)'
                     category_name = str(side[0])
                     lecid = str(side[1])
@@ -347,6 +347,8 @@ class ServerSocket:
                     cur.execute("SELECT no FROM category WHERE chatroom_name ='" + str(category_name) + "'"+ "AND lecture_id = '"+ str(lecid)+"'")
                     category_id = cur.fetchall()
                     # print(category_id)
+
+                    #채팅 저장
                     cur.execute(query, (category_id, msg, nick,stuid))
                     self.databasent.commit()
                     
@@ -356,6 +358,12 @@ class ServerSocket:
                     #점수 +
                     cur.execute("UPDATE points SET points = points + 5 WHERE Student_id='"+str(stuid)+"' AND Lec_id = '" + str(lecture_code[0][0]) + "'")
                     self.databasent.commit()
+
+                    #질문한 학생 정보 업데이트
+                    cur.execute("UPDATE user SET point = point + 5 WHERE student_id='"+str(stuid) + "'")
+                    cur.execute("UPDATE user SET quest = quest + 1 WHERE student_id='"+str(stuid) + "'")
+                    self.databasent.commit()
+
 
                     cur.execute("SELECT no FROM chatting")
                     res = cur.fetchall()
@@ -401,6 +409,11 @@ class ServerSocket:
                     #답글 달았을 때 포인트 정리 (5점 증가)
                     cur.execute("UPDATE points SET points = points + 5 WHERE Student_id='"+str(stuid)+"' AND Lec_id = '" + str(lec_code) + "'")
                     self.databasent.commit()
+
+                    #답글 작성한 유저 정보 업데이트
+                    cur.execute("UPDATE user SET point = point + 5 WHERE student_id='"+str(stuid) + "'")
+                    cur.execute("UPDATE user SET answer = answer + 1 WHERE student_id='"+str(stuid) + "'")
+
 
                     client.send('o'.encode('utf-8'))
 
@@ -911,6 +924,9 @@ class ServerSocket:
                             self.databasent.commit()
                             #점수 +
                             cur.execute("UPDATE points SET points = points + 1 WHERE Student_id='"+str(side[1])+"' AND Lec_id = '" + str(lec_id) + "'")
+                            #유저정보 업데이트
+                            cur.execute("UPDATE user SET point = point + 1 WHERE student_id='" + str(side[1]) + "'")
+
                             self.databasent.commit()
                             
                             
@@ -923,6 +939,9 @@ class ServerSocket:
                             self.databasent.commit()
                             #점수 -
                             cur.execute("UPDATE points SET points = points - 1 WHERE Student_id='"+str(side[1])+"' AND Lec_id = '" + str(lec_id) + "'")
+                            #유저정보 업데이트
+                            cur.execute("UPDATE user SET point = point - 1 WHERE student_id='" + str(side[1]) + "'")
+
                             self.databasent.commit()
                     
                     else:
@@ -933,11 +952,40 @@ class ServerSocket:
                         self.databasent.commit()
                         #점수+
                         cur.execute("UPDATE points SET points = points + 1 WHERE Student_id='"+str(side[1])+"' AND Lec_id = '" + str(lec_id) + "'")
+                        # 유저정보 업데이트
+                        cur.execute("UPDATE user SET point = point +1 WHERE student_id='" + str(side[1]) + "'")
+
                         self.databasent.commit()
                         
                     
                     print('좋아요 업데이트')
                     client.send('like_updated'.encode('utf-8'))
+
+                elif commend == 'getProfile':
+                    cur = self.databasent.cursor()
+                    cur.execute("SELECT * FROM user WHERE student_id = '" + str(side[0]) + "'")
+                    user_info = cur.fetchall()
+                    res = ""
+                    res += str(user_info[0][3]) + "," #닉네임
+                    res += str(user_info[0][4]) + ","#학과
+                    res += str(user_info[0][5]) + "," #질문수
+                    res += str(user_info[0][6]) + "," #답변수
+                    res += str(user_info[0][7]) #포인트
+
+                    client.send(res.encode('utf-8'))
+
+                elif commend == 'changeNick':
+                    cur = self.databasent.cursor()
+                    # cur.execute("UPDATE nickname ='" + "FROM user WHERE student_id = '" + str(side[0]) + "'")
+                    user_info = cur.fetchall()
+                    res = ""
+                    res += str(user_info[0][3]) + "," #닉네임
+                    res += str(user_info[0][4]) + ","#학과
+                    res += str(user_info[0][5]) + "," #질문수
+                    res += str(user_info[0][6]) + "," #답변수
+                    res += str(user_info[0][7]) #포인트
+
+                    client.send(res.encode('utf-8'))
 
                 elif commend == 'exit':
                     self.removeClient(addr, client)

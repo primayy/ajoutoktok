@@ -7,18 +7,12 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
 
 class profile(QWidget):
-
-    def cngPic(self):
-        print("Yeah!")
-
-    def cngNic(self):
-        print("Yeah!!")
-
-    def LGout(self):
-        print("Yeah!!!")
-
-    def __init__(self, Nicky, quest, answe, pointearned, Department, studentId):
+    def __init__(self, after_login):
         super().__init__()
+        self.after_login = after_login
+        self.clientSocket = after_login.clientSocket
+        self.studid = after_login.studId
+
         self.mainLayout = QVBoxLayout()
         self.head = QHBoxLayout()
         self.body = QVBoxLayout()
@@ -28,78 +22,61 @@ class profile(QWidget):
         self.bodypart22 = QHBoxLayout()
         self.tail = QVBoxLayout()
 
-        self.initUi(Nicky, quest, answe, pointearned, Department, studentId)
+        self.mainLayout.setContentsMargins(0,0,0,0)
 
-    def initUi(self, Nicky, quest, answe, pointearned, Department, studentId):
-        self.headbodyDiv = QLabel('─────────────────────')
-        self.bodytailDiv = QLabel('─────────────────────')
+        self.initUi()
 
-        title = QLabel('프로필')
-        title.setStyleSheet('''
-                        font-weight:bold;
-                        font-size:16pt''')
+    def initUi(self):
+        profile_groupbox = QGroupBox('프로필')
+        profile_groupbox.setLayout(self.body)
+        profile_groupbox.setMinimumWidth(300)
 
-        logoutbtn = QPushButton()
-        logoutbtn.setMaximumHeight(200)
-        logoutbtn.setMaximumWidth(200)
-        logoutbtn.setStyleSheet('''
-                                QPushButton{image:url(./icon/logout.png); border:0px; width:32px; height:42px}        
-                                QPushButton:hover{background:rgba(0,0,0,0); border:0px}
-                                ''')
 
-        logoutbtn.clicked.connect(self.LGout)
-
-        profilebtn = QPushButton()
-        profilebtn.setMaximumHeight(200)
-        profilebtn.setMaximumWidth(200)
-        profilebtn.setStyleSheet('''
-                                QPushButton{image:url(./icon/user.png); border:0px; width:32px; height:42px}        
-                                QPushButton:hover{background:rgba(0,0,0,0); border:0px}
-                                ''')
-        profilebtn.clicked.connect(self.cngPic)
-
-        nickname = QLabel(Nicky)
+        self.nickname = QLabel()
         changeNick = QPushButton("변경")
         changeNick.setMaximumHeight(100)
         changeNick.setMaximumWidth(150)
-        changeNick.clicked.connect(self.cngNic)
-        Query = QLabel("질문: " + quest)
-        Respond = QLabel("답변: " + answe)
-        Points = QLabel(pointearned + " points")
+        changeNick.clicked.connect(self.changeNickname)
 
-        Dept = QLabel("소속: " + Department)
-        ID = QLabel("학번: " + studentId)
+        self.Dept = QLabel()
+        self.Query = QLabel()
+        self.Respond = QLabel()
+        self.Points = QLabel()
 
-        self.bodypart11.addWidget(nickname)
+        self.getProfile()
+
+        self.bodypart11.addWidget(self.nickname)
         self.bodypart11.addWidget(changeNick)
-        self.bodypart22.addWidget(Query)
-        self.bodypart22.addWidget(Respond)
+        self.bodypart22.addWidget(self.Query)
+        self.bodypart22.addWidget(self.Respond)
 
         self.bodypart1.setLayout(self.bodypart11)
         self.bodypart2.setLayout(self.bodypart22)
 
-        self.head.addWidget(title)
-        self.head.addWidget(logoutbtn, alignment=QtCore.Qt.AlignRight)
-
-        self.body.addWidget(profilebtn, alignment=QtCore.Qt.AlignCenter)
         self.body.addWidget(self.bodypart1, alignment=QtCore.Qt.AlignCenter)
+        self.body.addWidget(self.Dept, alignment=QtCore.Qt.AlignCenter)
         self.body.addWidget(self.bodypart2, alignment=QtCore.Qt.AlignCenter)
-        self.body.addWidget(Points, alignment=QtCore.Qt.AlignCenter)
+        self.body.addWidget(self.Points, alignment=QtCore.Qt.AlignCenter)
 
-        self.tail.addWidget(Dept)
-        self.tail.addWidget(ID)
 
         self.mainLayout.addLayout(self.head)
-        self.mainLayout.addWidget(self.headbodyDiv)
-        self.mainLayout.addLayout(self.body)
-        self.mainLayout.addWidget(self.bodytailDiv)
-        self.mainLayout.addLayout(self.tail)
+        self.mainLayout.addWidget(profile_groupbox)
         self.setLayout(self.mainLayout)
         self.setFixedSize(self.sizeHint())
-        self.show()
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    form = profile('A', 'A', 'A', 'A', 'A', 'A')
-    form.show()
-    exit(app.exec_())
+    def changeNickname(self):
+        commend = 'changeNick ' + self.studid
+        # self.clientSocket.send(commend.encode('utf-8'))
+
+    def getProfile(self):
+        commend = 'getProfile ' + self.studid
+        self.clientSocket.send(commend.encode('utf-8'))
+        res = self.clientSocket.recv(1024)
+        res = res.decode('utf-8')
+        res = res.split(',')
+
+        self.nickname.setText("닉네임: " + res[0])
+        self.Dept.setText("소속: " + res[1])
+        self.Query.setText("질문: " + res[2])
+        self.Respond.setText("답변: " + res[3])
+        self.Points.setText("포인트: " + res[4])

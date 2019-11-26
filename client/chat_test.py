@@ -81,7 +81,7 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.8', 3334))
+        self.chatSocket.connect(('192.168.0.13', 3334))
         # self.chatSocket.connect(('192.168.43.180', 3334))
         # self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
@@ -292,7 +292,7 @@ class chatRoom(QWidget):
 
 
     def getLecId(self):
-        commend = "get_lecture_id "+self.parent.course[1]
+        commend = "get_lecture_id "+self.parent.course[-1]
 
         self.clientSocket.send(commend.encode('utf-8'))
         result = self.clientSocket.recv(1024)
@@ -301,13 +301,13 @@ class chatRoom(QWidget):
 
     
     def searchClicked(self):
-        self.search = chat_search.Search(self,self.parent.course[1])
+        self.search = chat_search.Search(self,self.parent.course[-1])
 
         self.search.setWindowTitle("Search")
         self.search.setMinimumSize(QSize(400, 400))
 
     def mineClicked(self):
-        self.mine = chat_mine.Mine(self,self.parent.stuid,self.parent.course[1])
+        self.mine = chat_mine.Mine(self,self.parent.stuid,self.parent.course[-1])
 
         self.mine.setWindowTitle("Mine")
         self.mine.setMinimumSize(QSize(400, 400))

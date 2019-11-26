@@ -438,27 +438,27 @@ class ServerSocket:
                             cur.execute("SELECT category_id,comment FROM chatting WHERE no =" + str(chatAlarm[i][1]) + "")
                             cat_id = cur.fetchall()
                             #카테고리id로 강의코드 얻기
-                            cur.execute("SELECT lecture_code FROM category WHERE no =" + str(cat_id[0][0]) + "")
+                            cur.execute("SELECT lecture_code,chatroom_name FROM category WHERE no =" + str(cat_id[0][0]) + "")
                             lec_co = cur.fetchall()
                             #강의코드로 강의이름 얻기
-                            cur.execute("SELECT lecture_name FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
+                            cur.execute("SELECT lecture_name,no FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
                             lecture_name = cur.fetchall()
-                            ChatAlarmText += lecture_name[0][0]+ "," +str(cat_id[0][1]) + "," + str(chatAlarm[i][0]) +"." # "강의이름,댓글 수" 
+                            ChatAlarmText += lecture_name[0][0]+ "#&$@" +str(cat_id[0][1]) + "#&$@" + str(chatAlarm[i][0])+ "#&$@" + str(lecture_name[0][1])+ "#&$@" + str(lec_co[0][1])+ "#&$@" + str(lec_co[0][0]) +"*&^%" # "강의이름,게시글,댓글 수,강의탭,강의코드" 
                         ChatAlarmText = ChatAlarmText.rstrip()
 
 
                     if len(replyAlarm) > 0:
-                        for i in range(len(chatAlarm)):
+                        for i in range(len(replyAlarm)):
                             #위와 동일
                             cur.execute("SELECT category_id,comment FROM chatting WHERE no =" + str(replyAlarm[i][0]) + "")
                             cat_id = cur.fetchall()
                             cur.execute("SELECT lecture_code FROM category WHERE no =" + str(cat_id[0][0]) + "")
                             lec_co = cur.fetchall()
-                            cur.execute("SELECT lecture_name FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
+                            cur.execute("SELECT lecture_name,no FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
                             lecture_name = cur.fetchall()
-                            ReplyAlarmText += lecture_name[0][0] + "," +str(cat_id[0][1]) + "." #강의 이름
+                            ReplyAlarmText += lecture_name[0][0] + "#&$@" +str(cat_id[0][1])+ "#&$@" + str(lecture_name[0][1])+ "#&$@" + str(lec_co[0][1])+ "#&$@" + str(lec_co[0][0]) + "*&^%" #강의 이름,댓글,강의ID,강의탭,강의코드
                         ReplyAlarmText = ReplyAlarmText.rstrip()
-                    AlarmText = ChatAlarmText + "/" + ReplyAlarmText
+                    AlarmText = ChatAlarmText + "$#%^" + ReplyAlarmText
                     client.send(AlarmText.encode('utf-8'))
                 
                 
@@ -547,6 +547,41 @@ class ServerSocket:
                         print('history읽기 오류')
                         result = 'x'
                         client.send(result.encode('utf-8'))
+
+                
+
+                elif commend == 'AlarmToReply':
+                    print(side)
+                    cur = self.databasent.cursor()
+                    cur.execute("SELECT no FROM category WHERE lecture_id ='" + str(side[0]) + "'AND chatroom_name = '"+str(side[1])+"'")
+                    category_id = cur.fetchall()
+                    print(category_id)
+                    if len(category_id) != 0:
+                        cur = self.databasent.cursor()
+                        cur.execute("SELECT * FROM chatting WHERE category_id ='" + str(category_id[0][0]) + "' AND comment = '"+str(side[2])+"'")
+                        chat_log = cur.fetchall()
+
+                        if len(chat_log) == 0:
+                            result = 'x'
+                            client.send(result.encode('utf-8'))
+                        else:
+                            result = ""
+                            for i in range(len(chat_log)):
+                                result += str(chat_log[i][4]) + "#$%#" #stuid
+                                result += str(chat_log[i][3]) + "#$%#" #nickname
+                                result += str(chat_log[i][2]) + "#$%#" #comment
+                                result += str(chat_log[i][6]) + "#$%#" #likes
+                                result += str(chat_log[i][1]) + "#$%#" #category_id
+                                result += str(chat_log[i][5]) + "#$%#" #time
+                                result += str(chat_log[i][0]) + "/" #chatting_id
+
+                            client.sendall(result.encode('utf-8'))
+                            print('chat_history 끝')
+                    else:
+                        print('history읽기 오류')
+                        result = 'x'
+                        client.send(result.encode('utf-8'))
+                     
 
                 elif commend == 'replyHistory':
                     print(side)

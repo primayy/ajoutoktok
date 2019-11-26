@@ -5,6 +5,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
+import chat_test
+import reply
 
 class alarm(QWidget):
     def __init__(self,parent,studId):
@@ -19,48 +21,171 @@ class alarm(QWidget):
         group.setStyleSheet('''
                 font-weight:bold;
                 font-size:16pt''')
-        viewer = QListWidget(self)
+        self.viewer = QListWidget(self)
 
-        viewer.setMinimumSize(300, 500)
-        viewer.setStyleSheet('''
+        self.viewer.setMinimumSize(300, 500)
+        self.viewer.setStyleSheet('''
                 # QListWidget:item:hover{background:white};
                 # QListWidget:item:selected:active{background:white}
                 ''')
+        self.alarm_list = self.getAlarmList()
+        self.showAlarms()
 
-        item = QListWidgetItem(viewer)
+        item = QListWidgetItem(self.viewer)
         # custom_widget = lecture_group('add', studid, QApplication.activeWindow())
         # item.setSizeHint(custom_widget.sizeHint())
         # self.viewer.setItemWidget(item, custom_widget)
-        commend = "Alarm " + self.stuid
-        self.clientSocket.send(commend.encode('utf-8'))
-        result = self.clientSocket.recv(1024).decode('utf-8')
-        print(str(result))
-        alarmList = result.split("/")
-        chatAlarm = alarmList[0] #게시글에 댓글 달림
-        replyAlarm = alarmList[1] #댓글이 채택됨
-        print(alarmList)
-        print(chatAlarm)
-        print(replyAlarm)
-        chatAlarm = chatAlarm.split(".")[:-1] # 끝에 생성되는 [''] 삭제
-        replyAlarm = replyAlarm.split(".")[:-1] # 끝에 생성되는 [''] 삭제
-        print(chatAlarm)
-        print(replyAlarm)
-        for i in range(len(chatAlarm)):
-                chattyAlarm = chatAlarm[i].split(",")
-                viewer.addItem(str("[강의: "+chattyAlarm[0]+"]에 게시한 글 '"+chattyAlarm[1]+"'에 "+chattyAlarm[2]+"개의 댓글이 추가되었습니다."))#게시글 관련 알림 추가
+        # commend = "Alarm " + self.stuid
+        # self.clientSocket.send(commend.encode('utf-8'))
+        # result = self.clientSocket.recv(1024).decode('utf-8')
+        # print(str(result))
+        # alarmList = result.split("/")
+        # chatAlarm = alarmList[0] #게시글에 댓글 달림
+        # replyAlarm = alarmList[1] #댓글이 채택됨
+        # print(alarmList)
+        # print(chatAlarm)
+        # print(replyAlarm)
+        # chatAlarm = chatAlarm.split(".")[:-1] # 끝에 생성되는 [''] 삭제
+        # replyAlarm = replyAlarm.split(".")[:-1] # 끝에 생성되는 [''] 삭제
+        # print(chatAlarm)
+        # print(replyAlarm)
+        # for i in range(len(chatAlarm)):
+        #         chattyAlarm = chatAlarm[i].split(",")
+        #         viewer.addItem(str("[강의: "+chattyAlarm[0]+"]에 게시한 글 '"+chattyAlarm[1]+"'에 "+chattyAlarm[2]+"개의 댓글이 추가되었습니다."))#게시글 관련 알림 추가
         
         
-        for i in range(len(replyAlarm)):
-                replylyAlarm = replyAlarm[i].split(",")
-                viewer.addItem(str("[강의: "+replylyAlarm[0]+"]에 작성한 댓글'"+replylyAlarm[1]+"'이 채택되었습니다.")) #댓글 관련 알림 추가
+        # for i in range(len(replyAlarm)):
+        #         replylyAlarm = replyAlarm[i].split(",")
+        #         viewer.addItem(str("[강의: "+replylyAlarm[0]+"]에 작성한 댓글'"+replylyAlarm[1]+"'이 채택되었습니다.")) #댓글 관련 알림 추가
         
-        viewer.addItem(item) #혹시 몰라서 삭제 안함
+        self.viewer.addItem(item) #혹시 몰라서 삭제 안함
         self.title.addWidget(group)
         self.title.addWidget(btn_remove_all,alignment=QtCore.Qt.AlignRight)
         self.mainLayout.addLayout(self.title)
         self.mainLayout.addWidget(horizon_line)
-        self.mainLayout.addWidget(viewer)
+        self.mainLayout.addWidget(self.viewer)
         self.setLayout(self.mainLayout)
+    
+    
+    def showAlarms(self):
+        for i in range(len(self.alarm_list)):
+            for ii in range(len(self.alarm_list[i])):
+                item = QListWidgetItem(self.viewer)
+                custom_widget = alarm_group(self.alarm_list[i][ii], QApplication.activeWindow(),self,i)
+                item.setSizeHint(custom_widget.sizeHint())
+                self.viewer.setItemWidget(item, custom_widget)
+                self.viewer.addItem(item)
+
+    def getAlarmList(self):
+        commend = "Alarm " + self.stuid
+        self.clientSocket.send(commend.encode('utf-8'))
+        result = self.clientSocket.recv(1024).decode('utf-8')
+        
+        alarmList = result.split("$#%^")
+        chatAlarm = alarmList[0] #게시글에 댓글 달림
+        replyAlarm = alarmList[1] #댓글이 채택됨
+
+        chatAlarm = chatAlarm.split("*&^%")[:-1] # 끝에 생성되는 [''] 삭제
+        replyAlarm = replyAlarm.split("*&^%")[:-1] # 끝에 생성되는 [''] 삭제
+        print(chatAlarm)
+        print(replyAlarm)
+        return [chatAlarm,replyAlarm]
+
+class alarm_group(QWidget):
+    def __init__(self, courses,w,parent,chatORreply):
+        super().__init__()
+        self.parent = parent
+        course = courses.split('#&$@')
+        # print(course)
+        self.mainLayout = QVBoxLayout()
+        self.mainLayout.setContentsMargins(1,3,1,3)
+        #그룹 그리기
+        # self.mainWidget = lecture(course, parent.studid, w, parent.viewer, parent.lecId)
+        self.mainWidget = lecture(self.parent, course, w, chatORreply)
+
+        self.mainLayout.addWidget(self.mainWidget)
+        self.setLayout(self.mainLayout)
+
+class lecture(QWidget):
+    def __init__(self, alarm_list_Widget, course,window,chatORreply):
+        super().__init__()
+        self.alarm_list_Widget = alarm_list_Widget
+        self.stuid = alarm_list_Widget.stuid
+
+        self.w = window
+        self.clientSocket = self.w.clientSock
+        self.viewer = alarm_list_Widget.viewer
+        self.course = course
+
+        self.mainLayout = QVBoxLayout()
+        self.mainWidget = QWidget()
+        self.mainWidget.setStyleSheet("background-color:#eef5f6;")
+        self.mainWidget.setMinimumSize(100,50)
+        self.mainLayout.setContentsMargins(0,0,0,0)
+        self.mainLayout.addWidget(self.mainWidget)
+
+        
+        self.layout = QVBoxLayout()
+        self.layout_middle = QHBoxLayout()
+
+            # top
+
+            # middle
+        if chatORreply == 0:
+                self.alarm = QLabel(str("[강의: "+course[0]+"]에 게시한 글 '"+course[1]+"'에 "+course[2]+"개의 댓글이 추가되었습니다."))
+        elif chatORreply == 1:
+                self.alarm = QLabel(str("[강의: "+course[0]+"]에 작성한 댓글'"+course[1]+"'이 채택되었습니다."))
+        self.chatComm = course[1]
+        self.chatName = course[-2]
+        self.LecID = course[-3]
+        self.alarm.setStyleSheet('font: 10pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a')
+            #font: 20pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a
+            # print(course)
+        self.layout_middle.addWidget(self.alarm)
+
+        self.layout.addLayout(self.layout_middle)
+        self.mainWidget.setLayout(self.layout)
+        self.setLayout(self.mainLayout)
+
+
+    def mousePressEvent(self, QMouseEvent):
+        title = self.course
+        # self.chat = chat.chatRoom(title,self.stuid,self.w)
+        self.chat = chat_test.chatRoom(self)
+
+        self.chat.setWindowTitle(title[0])
+        self.chat.setMinimumSize(QSize(400, 400))
+        print(self.chatName)
+
+        commend = "AlarmToReply " + self.LecID + " " + self.chatName + " " + self.chatComm
+        self.clientSocket.send(commend.encode('utf-8'))
+        self.coursep = self.clientSocket.recv(1024).decode('utf-8')
+        self.coursep = self.coursep.split("/")
+        self.coursep = self.coursep[0]
+        self.reply = reply.Reply(self)
+        self.coursep = self.coursep.split("#$%#")
+        self.chat.comment_info = self.coursep
+        # self.reply = self.chat.reply
+        self.reply.widgetTmp = self.chat.chatWidget
+        self.reply.clientSocket = self.clientSocket
+
+        self.chat.chatWidget = self.reply
+
+        
+        #리플 위젯 화면 뿌려주기
+        self.chat.chatWidget.comment_info = self.coursep
+        self.chat.chatWidget.replyList = self.chat.chatWidget.getReply()
+        self.chat.chatWidget.showReply()
+        self.chat.chatContentLayout.addWidget(self.chat.chatWidget)
+
+        self.reply.setWindowTitle(title[0])
+        self.reply.setMinimumSize(QSize(400, 400))
+        self.reply.show()
+        
+
+
+
+
 
 
 

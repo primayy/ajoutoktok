@@ -1044,7 +1044,8 @@ class ServerSocket:
                     res += str(user_info[0][4]) + ","#학과
                     res += str(user_info[0][5]) + "," #질문수
                     res += str(user_info[0][6]) + "," #답변수
-                    res += str(user_info[0][7]) #포인트
+                    res += str(user_info[0][7]) + ","  # 포인트
+                    res += str(user_info[0][2])  # 이름
 
                     client.send(res.encode('utf-8'))
 

@@ -82,8 +82,8 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.31', 3334))
-        # self.chatSocket.connect(('192.168.43.180', 3334))
+        # self.chatSocket.connect(('192.168.0.31', 3334))
+        self.chatSocket.connect(('192.168.43.180', 3334))
         # self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
 
@@ -526,6 +526,69 @@ class chatWidget(QWidget):
         
         elif QMouseEvent.button() == Qt.RightButton:
             print("Right Button Clicked")
+            dlg = studentInfo(self)
+            dlg.exec_()
+
+class studentInfo(QDialog):
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+        self.mainLayout = QVBoxLayout()
+        self.btnLayout = QHBoxLayout()
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.initUi()
+
+        print(self.parent.comments)
+
+    def initUi(self):
+        head = QLabel('정보')
+        head.setStyleSheet('font-weight:bold; font-size:13pt')
+
+        # 학생 정보
+        self.name = QLabel('이름')
+        self.depart = QLabel('소속')
+        self.student_id = QLabel('학번')
+
+        # 버튼
+        check = QPushButton('확인')
+        check.clicked.connect(self.close)
+
+        self.btnLayout.addWidget(check)
+
+        self.mainLayout.addStretch(1)
+        self.mainLayout.addWidget(head)
+        self.mainLayout.addWidget(self.name)
+        self.mainLayout.addWidget(self.depart)
+        self.mainLayout.addWidget(self.student_id)
+        self.mainLayout.addLayout(self.btnLayout)
+        self.mainLayout.addStretch(1)
+
+        self.student_info()
+
+        self.setFixedSize(200, 150)
+        self.setLayout(self.mainLayout)
+
+    def student_info(self):
+        commend = 'getProfile ' + self.parent.comments[0]
+        self.parent.clientSocket.send(commend.encode('utf-8'))
+
+        info = self.parent.clientSocket.recv(1024).decode('utf-8')
+        info = info.split(',')
+
+        self.name.setText('이름: '+info[5])
+        self.depart.setText('학과: '+info[1])
+        self.student_id.setText('학번: '+self.parent.comments[0])
+
+
+
+    def mousePressEvent(self, event):
+        self.oldPos = event.globalPos()
+
+    def mouseMoveEvent(self, event):
+        delta = QPoint(event.globalPos() - self.oldPos)
+        # print(delta)
+        self.move(self.x() + delta.x(), self.y() + delta.y())
+        self.oldPos = event.globalPos()
 
 class sendQuestion(QDialog):
     def __init__(self,parent):

@@ -199,8 +199,21 @@ class Reply(QWidget):
             reply = []
 
             for i in range(len(res)):
-                reply.append(res[i].split(','))
+                tmp = res[i].split(',')
+                tmp = [x for x in tmp if x]
 
+                if len(tmp) == 3:
+                    reply.append(tmp)
+
+                elif len(tmp) > 3:
+                    msglen = len(tmp) - 3
+                    msg = ",".join(tmp[0:1 + msglen])
+
+                    for i in range(msglen + 1):
+                        del tmp[0]
+                    tmp.insert(0, msg)
+                    reply.append(tmp)
+                    
             return reply
 
     #리스트 위젯에 답글 추가

@@ -5,13 +5,13 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
-import smtplib
-from email.mime.text import MIMEText
+
 from socket import *
 import time
 import reply
 import chat_search
 import chat_mine
+import pandas as pd
 
 class update_listener(QThread):
     chatUpdate = pyqtSignal(list)
@@ -81,8 +81,8 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.49', 3334))
-        # self.chatSocket.connect(('192.168.43.180', 3334))
+        # self.chatSocket.connect(('192.168.0.13', 3334))
+        self.chatSocket.connect(('192.168.43.180', 3334))
         # self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
 
@@ -535,6 +535,7 @@ class chatWidget(QWidget):
 class sendQuestion(QDialog):
     def __init__(self,parent):
         super().__init__()
+        self.parent = parent
         self.mainLayout = QVBoxLayout()
         self.btnLayout = QHBoxLayout()
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
@@ -544,8 +545,8 @@ class sendQuestion(QDialog):
     def initUi(self):
         head = QLabel('질문 전송')
         head.setStyleSheet('font-weight:bold; font-size:13pt')
-        email = QLineEdit()
-        email.setPlaceholderText('이메일')
+        self.email = QLineEdit()
+        self.email.setPlaceholderText('이메일')
         send = QPushButton('전송')
         send.clicked.connect(self.sendToEmail)
         cancel = QPushButton('취소')
@@ -556,7 +557,7 @@ class sendQuestion(QDialog):
 
         self.mainLayout.addStretch(1)
         self.mainLayout.addWidget(head)
-        self.mainLayout.addWidget(email)
+        self.mainLayout.addWidget(self.email)
         self.mainLayout.addLayout(self.btnLayout)
         self.mainLayout.addStretch(1)
 
@@ -564,29 +565,20 @@ class sendQuestion(QDialog):
         self.setLayout(self.mainLayout)
 
 
-    # 당분간 사용 금지
     def sendToEmail(self):
-        print('aa')
-        # try:
-        #     smtp = smtplib.SMTP('smtp.gmail.com', 587)
-        #     smtp.ehlo()
-        #     smtp.starttls()
-        #     smtp.login('primayy@ajou.ac.kr', 'cssprcyzfogxtmbu')
-        #
-        #     msg = MIMEText('되나')
-        #     msg['Subject'] = '제목 테스트'
-        #     msg['To'] = '테스트'
-        #     smtp.sendmail('primayy@ajou.ac.kr', 'primayy@naver.com', msg.as_string())
-        #
-        #     smtp.quit()
-        # except smtplib.SMTPException:
-        #     print('error')
-        # else:
-        #     self.close()
-        #     send_ok = QMessageBox()
-        #     send_ok.setStyleSheet("background-color:#FFFFFF")
-        #     send_ok.setText('전송 되었습니다')
-        #     send_ok.exec_()
+        #이메일로 전송할 목록 정할수있게 해야할듯
+        commend = "sendToEmail " + self.parent.tab.tabText(self.parent.tab.currentIndex()) + " " + self.parent.lecId + " "+ self.email.text()
+        self.parent.clientSocket.send(commend.encode('utf-8'))
+
+        res = self.parent.clientSocket.recv(1024).decode('utf-8')
+
+        if res == 'success':
+            self.close()
+            send_ok = QMessageBox()
+            send_ok.setStyleSheet("background-color:#FFFFFF")
+            send_ok.setText('전송 되었습니다')
+            send_ok.exec_()
+
 
     def mousePressEvent(self, event):
         self.oldPos = event.globalPos()

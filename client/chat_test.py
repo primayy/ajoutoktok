@@ -82,9 +82,9 @@ class chatRoom(QWidget):
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
         # self.chatSocket.connect(('192.168.0.13', 3334))
-        self.chatSocket.connect(('192.168.43.180', 3334))
+        # self.chatSocket.connect(('192.168.43.180', 3334))
         # self.chatSocket.connect(('192.168.25.22', 3334))
-        # self.chatSocket.connect(('34.84.112.149', 3334))
+        self.chatSocket.connect(('34.84.112.149', 3334))
 
         self.history = self.getChatHistory()
         self.tab.currentChanged.connect(self.category_changed)
@@ -266,8 +266,8 @@ class chatRoom(QWidget):
     def category_changed(self):
         self.tab.currentWidget().clear()
         self.history = self.getChatHistory()
-        if len(self.history) != 0:
-            self.history.pop()
+        # if len(self.history) != 0:
+        #     self.history.pop()
         self.showQuestions()
 
     def getCategory(self):
@@ -492,7 +492,6 @@ class chatWidget(QWidget):
         self.mainLayout.setContentsMargins(5,5,5,5)
         self.mainLayout.addStretch(1)
         self.mainLayout.addWidget(question)
-        #self.mainLayout.setAlignment(Qt.AlignLeft)
         self.mainLayout.addWidget(self.BtnLike)
         self.mainLayout.addStretch(1)
 

@@ -167,7 +167,10 @@ class App(QWidget):
         # self.show()
 
     def goToBB(self):
-        webbrowser.open('eclass2.ajou.ac.kr')
+        w = QApplication.activeWindow()
+        url = w.user['bb_url']
+        print(url)
+        webbrowser.open(url)
 
     def profile(self):
         self.profile = profile.profile('A', 'A', 'A', 'A', 'A', self.studId)

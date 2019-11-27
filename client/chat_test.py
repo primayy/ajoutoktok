@@ -72,6 +72,7 @@ class chatRoom(QWidget):
 
         #필수 변수
         self.parent = parent
+        self.user = parent.w.user
         self.clientSocket = self.parent.w.clientSock
         self.lecId = self.getLecId()
         self.sendType = True
@@ -538,14 +539,12 @@ class sendQuestion(QDialog):
         self.mainLayout = QVBoxLayout()
         self.btnLayout = QHBoxLayout()
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-
         self.initUi()
 
     def initUi(self):
         head = QLabel('질문 전송')
         head.setStyleSheet('font-weight:bold; font-size:13pt')
-        self.email = QLineEdit()
-        self.email.setPlaceholderText('이메일')
+        self.email = QLabel(self.parent.user['email']+'@ajou.ac.kr')
         send = QPushButton('전송')
         send.clicked.connect(self.sendToEmail)
         cancel = QPushButton('취소')

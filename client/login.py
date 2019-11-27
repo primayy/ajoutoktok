@@ -137,11 +137,15 @@ class login(QWidget):
         #로그인 성공
         if len(res_split) != 1:
             cookie = res_split[2]
-
+            window = QApplication.activeWindow()
+            window.user['email'] = self.id_input.text()
             r1 = self.session.get('https://eclass2.ajou.ac.kr' + cookie)
+            window.user['bb_url'] = 'https://eclass2.ajou.ac.kr' + cookie
+
             if self.goToBB is True:
                 url = 'https://eclass2.ajou.ac.kr' + cookie
                 webbrowser.open(url)
+
 
             studentName = r1.text.split('title')[1].split('.')[1].split(' ')[0]
             studentId = res_split[0]

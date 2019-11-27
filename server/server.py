@@ -1063,74 +1063,80 @@ class ServerSocket:
                 elif commend == 'sendToEmail':
                     print(side)
                     cur = self.databasent.cursor()
+
+                    #선택한 카테고리의 아이디 값을 가져옴
                     cur.execute("SELECT no FROM category WHERE chatroom_name = '" + str(side[0]) + "' AND lecture_id ='"+str(side[1])+"'")
                     category_id = cur.fetchall()
                     category_id = str(category_id[0][0])
 
-                    cur.execute("SELECT comment,student_id,date_time,likes FROM chatting WHERE category_id = '" + category_id + "'")
+                    #질문 선택
+                    cur.execute("SELECT comment,student_id,date_time,likes FROM chatting WHERE category_id = '" + category_id + "'AND date(date_time) >='" + str(side[3])+"'AND date(date_time) <='" + str(side[4]) +"'")
                     quest_list = cur.fetchall()
 
-                    res = ""
-                    for i in range(len(quest_list)):
-                        res += str(quest_list[i][1]) + ","
-                        res += str(quest_list[i][2]) + ","
-                        res += str(quest_list[i][0]) + ","
-                        res += str(quest_list[i][3]) + "/"
-
-
-                    cur.execute("SELECT lecture_name FROM lecture WHERE no = '" + str(side[1]) + "'")
-                    lec_name = cur.fetchall()
-                    lec_name = str(lec_name[0][0])
-
-                    # 질문,학번,날짜,좋아요 순서로 들어있음
-                    quest_list = res.split('/')
-                    quest_list.pop()
-                    tmp = []
-
-                    for i in range(len(quest_list)):
-                        tmp.append(quest_list[i].split(','))
-
-                    data = pd.DataFrame(tmp)
-                    data.columns = ['학번', '날짜','질문', '공감수']
-                    fileName = '[아주똑똑]' + lec_name + '.csv'
-                    data.to_csv(fileName, encoding='euc-kr')
-
-                    try:
-                        smtp = smtplib.SMTP('smtp.gmail.com', 587)
-                        smtp.ehlo()
-                        smtp.starttls()
-                        smtp.login('primayy@ajou.ac.kr', 'cssprcyzfogxtmbu')
-
-                        quest = ""
-                        for i in range(len(quest_list)):
-                            quest += quest_list[i]
-
-                        msg = MIMEMultipart()
-
-                        #제목 및 받는 사람
-                        msg['Subject'] = "[아주똑똑] " + lec_name + " 과목 질문 목록입니다."
-                        msg['To'] = str(side[2])
-
-                        #본문
-                        text = lec_name + "강의에 등록된 질문 목록입니다.\n 학번,날짜,질문,공감수로 정리되어 있습니다."
-                        contentPart = MIMEText(text)  # MIMEText(text , _charset = "utf8")
-                        msg.attach(contentPart)
-
-                        #파일첨부
-                        with open(fileName, 'rb') as etcFD:
-                            etcPart = MIMEApplication(etcFD.read())
-                            # 첨부파일의 정보를 헤더로 추가
-                            etcPart.add_header('Content-Disposition', 'attachment', filename=fileName)
-                            msg.attach(etcPart)
-
-                        #전송
-                        smtp.sendmail('primayy@ajou.ac.kr', str(side[2]), msg.as_string())
-
-                        smtp.quit()
-                    except smtplib.SMTPException:
-                        print('error')
+                    if len(quest_list) == 0:
+                        client.send('no'.encode('utf-8'))
                     else:
-                        client.send('success'.encode('utf-8'))
+                        res = ""
+                        for i in range(len(quest_list)):
+                            res += str(quest_list[i][1]) + ","
+                            res += str(quest_list[i][2].strftime('%Y-%m-%d %H:%M:%S')) + ","
+                            res += str(quest_list[i][0]) + ","
+                            res += str(quest_list[i][3]) + "/"
+                        print(res)
+
+                        cur.execute("SELECT lecture_name FROM lecture WHERE no = '" + str(side[1]) + "'")
+                        lec_name = cur.fetchall()
+                        lec_name = str(lec_name[0][0])
+
+                        # 질문,학번,날짜,좋아요 순서로 들어있음
+                        quest_list = res.split('/')
+                        quest_list.pop()
+                        tmp = []
+
+                        for i in range(len(quest_list)):
+                            tmp.append(quest_list[i].split(','))
+
+                        data = pd.DataFrame(tmp)
+                        data.columns = ['학번', '날짜','질문', '공감수']
+                        fileName = '[아주똑똑]' + lec_name + '.csv'
+                        data.to_csv(fileName, encoding='euc-kr')
+
+                        try:
+                            smtp = smtplib.SMTP('smtp.gmail.com', 587)
+                            smtp.ehlo()
+                            smtp.starttls()
+                            smtp.login('primayy@ajou.ac.kr', 'cssprcyzfogxtmbu')
+
+                            quest = ""
+                            for i in range(len(quest_list)):
+                                quest += quest_list[i]
+
+                            msg = MIMEMultipart()
+
+                            #제목 및 받는 사람
+                            msg['Subject'] = "[아주똑똑] " + lec_name + " 과목 질문 목록입니다."
+                            msg['To'] = str(side[2])
+
+                            #본문
+                            text = lec_name + " 강의에 <"+ str(side[3]) + " ~ " + str(side[4]) + "> 에 등록된 질문 목록입니다.\n학번,날짜,질문,공감수로 정리되어 있습니다."
+                            contentPart = MIMEText(text)
+                            msg.attach(contentPart)
+
+                            #파일첨부
+                            with open(fileName, 'rb') as etcFD:
+                                etcPart = MIMEApplication(etcFD.read())
+                                # 첨부파일의 정보를 헤더로 추가
+                                etcPart.add_header('Content-Disposition', 'attachment', filename=fileName)
+                                msg.attach(etcPart)
+
+                            #전송
+                            smtp.sendmail('primayy@ajou.ac.kr', str(side[2]), msg.as_string())
+
+                            smtp.quit()
+                        except smtplib.SMTPException:
+                            print('error')
+                        else:
+                            client.send('success'.encode('utf-8'))
 
 
                 elif commend == 'exit':

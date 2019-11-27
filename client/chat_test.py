@@ -5,13 +5,13 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
-
 from socket import *
 import time
 import reply
 import chat_search
 import chat_mine
-import pandas as pd
+
+import calendarW
 
 class update_listener(QThread):
     chatUpdate = pyqtSignal(list)
@@ -21,6 +21,7 @@ class update_listener(QThread):
         self.parent = parent
         self.chatSocket = parent.chatSocket
         self.go = True
+
     def run(self):
         while self.go:
             time.sleep(1)  # 클라이언트 처리 과부하 방지
@@ -82,8 +83,8 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        # self.chatSocket.connect(('192.168.0.31', 3334))
-        self.chatSocket.connect(('192.168.43.180', 3334))
+        self.chatSocket.connect(('192.168.0.13', 3334))
+        # self.chatSocket.connect(('192.168.43.180', 3334))
         # self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
 
@@ -286,8 +287,8 @@ class chatRoom(QWidget):
             self.tab.addTab(QListWidget(self), category[i])
 
     def sendQuestionToEmail(self):
-        dlg = sendQuestion(self)
-        dlg.exec_()
+        self.dlg = sendQuestion(self)
+        self.dlg.show()
 
     def showQuestions(self):
         print(self.history)
@@ -590,11 +591,14 @@ class studentInfo(QDialog):
         self.move(self.x() + delta.x(), self.y() + delta.y())
         self.oldPos = event.globalPos()
 
-class sendQuestion(QDialog):
+class sendQuestion(QWidget):
     def __init__(self,parent):
         super().__init__()
         self.parent = parent
         self.mainLayout = QVBoxLayout()
+        self.dateLayout1 = QHBoxLayout()
+        self.dateLayout2 = QHBoxLayout()
+
         self.btnLayout = QHBoxLayout()
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.initUi()
@@ -603,6 +607,17 @@ class sendQuestion(QDialog):
         head = QLabel('질문 전송')
         head.setStyleSheet('font-weight:bold; font-size:13pt')
         self.email = QLabel(self.parent.user['email']+'@ajou.ac.kr')
+
+        self.startDate = QLabel('시작 날짜: ')
+        self.btnStart = QPushButton('날짜 입력')
+        self.btnStart.setStyleSheet('border:0px')
+        self.btnStart.clicked.connect(lambda : self.openCalendar('start'))
+
+        self.finishDate = QLabel('종료 날짜: ')
+        self.btnFinish = QPushButton('날짜 입력')
+        self.btnFinish.setStyleSheet('border:0px')
+        self.btnFinish.clicked.connect(lambda : self.openCalendar('finish'))
+
         send = QPushButton('전송')
         send.clicked.connect(self.sendToEmail)
         cancel = QPushButton('취소')
@@ -611,29 +626,62 @@ class sendQuestion(QDialog):
         self.btnLayout.addWidget(send)
         self.btnLayout.addWidget(cancel)
 
+        self.dateLayout1.addWidget(self.startDate)
+        self.dateLayout1.addWidget(self.btnStart)
+
+        self.dateLayout2.addWidget(self.finishDate)
+        self.dateLayout2.addWidget(self.btnFinish)
+
+
         self.mainLayout.addStretch(1)
         self.mainLayout.addWidget(head)
         self.mainLayout.addWidget(self.email)
+        self.mainLayout.addLayout(self.dateLayout1)
+        self.mainLayout.addLayout(self.dateLayout2)
+
         self.mainLayout.addLayout(self.btnLayout)
         self.mainLayout.addStretch(1)
 
-        self.setFixedSize(200,150)
+        self.setFixedSize(200,200)
         self.setLayout(self.mainLayout)
 
+    def openCalendar(self, type):
+        self.calendar = calendarW.calendarWidget(self, type)
+        self.calendar.exec_()
 
     def sendToEmail(self):
-        #이메일로 전송할 목록 정할수있게 해야할듯
+        #카테고리 이름, lecid, email주소
         commend = "sendToEmail " + self.parent.tab.tabText(self.parent.tab.currentIndex()) + " " + self.parent.lecId + " "+ self.email.text()
-        self.parent.clientSocket.send(commend.encode('utf-8'))
+        if self.btnStart.text() == '날짜 입력':
+            errMsg = QMessageBox()
+            errMsg.setStyleSheet("background-color:#FFFFFF")
+            errMsg.setText('날짜를 입력해주세요')
+            errMsg.exec_()
+        elif self.btnFinish.text() == '날짜 입력':
+            errMsg = QMessageBox()
+            errMsg.setStyleSheet("background-color:#FFFFFF")
+            errMsg.setText('날짜를 입력해주세요')
+            errMsg.exec_()
 
-        res = self.parent.clientSocket.recv(1024).decode('utf-8')
+        else:
+            commend += " " + self.btnStart.text()  # 3 시작 날짜
+            commend += " " + self.btnFinish.text()  # 4 종료 날짜
 
-        if res == 'success':
-            self.close()
-            send_ok = QMessageBox()
-            send_ok.setStyleSheet("background-color:#FFFFFF")
-            send_ok.setText('전송 되었습니다')
-            send_ok.exec_()
+            self.parent.clientSocket.send(commend.encode('utf-8'))
+
+            res = self.parent.clientSocket.recv(1024).decode('utf-8')
+
+            if res == 'success':
+                self.close()
+                send_ok = QMessageBox()
+                send_ok.setStyleSheet("background-color:#FFFFFF")
+                send_ok.setText('전송 되었습니다')
+                send_ok.exec_()
+            elif res == 'no':
+                noMsg = QMessageBox()
+                noMsg.setStyleSheet("background-color:#FFFFFF")
+                noMsg.setText('질문이 존재하지 않습니다.')
+                noMsg.exec_()
 
 
     def mousePressEvent(self, event):

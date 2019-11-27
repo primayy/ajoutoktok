@@ -13,15 +13,15 @@ class Window(QMainWindow):
         #서버연결
         port = 3333
         self.clientSock = socket(AF_INET, SOCK_STREAM)
-        self.clientSock.connect(('34.84.112.149', port))
-        # self.clientSock.connect(('192.168.0.13', port))
+        # self.clientSock.connect(('34.84.112.149', port))
+        self.clientSock.connect(('192.168.0.31', port))
         # self.clientSock.connect(('192.168.43.180', port))
         # self.clientSock.connect(('192.168.25.22', port))
 
         #트레이 아이콘 생성
         self.tray = systemTray.SystemTrayIcon(self)
 
-        #첫 화면 로그인 설정
+        # 첫 화면 로그인 설정
         self.user = {'email':'','bb_url':'',}
         self.login = login.login(self)
 

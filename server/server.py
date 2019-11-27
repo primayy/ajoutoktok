@@ -432,10 +432,10 @@ class ServerSocket:
                     ReplyAlarmText = ""
                     cur = self.databasent.cursor()
                     #내가 쓴 게시글의 댓글 개수(count(*))와 게시글 id
-                    cur.execute("SELECT count(*),chat_id FROM alarm WHERE chat_student_id ='" + str(side[0]) + "' GROUP BY chat_id")
+                    cur.execute("SELECT count(*),chat_id FROM alarm WHERE reply_student_id != '"+str(side[0])+"' AND chat_student_id ='" + str(side[0]) + "' GROUP BY chat_id")
                     chatAlarm = cur.fetchall()
                     #내가 쓴 댓글의 게시글 id
-                    cur.execute("SELECT chat_id FROM alarm WHERE reply_student_id ='" + str(side[0]) + "' AND reply_selected = 1")
+                    cur.execute("SELECT chat_id FROM alarm WHERE reply_student_id ='" + str(side[0]) + "' AND reply_selected = 1 AND chat_student_id !='" + str(side[0]) + "'")
                     replyAlarm = cur.fetchall()
 
                     if len(chatAlarm) > 0:
@@ -601,8 +601,9 @@ class ServerSocket:
                             print(reply[i][2])
                             result += str(reply[i][2]) +"," #msg
                             result += str(reply[i][3]) +"," #stuId
-                            result += str(reply[i][4].strftime('%Y.%m.%d %H:%M:%S')) +"/" #time
-
+                            result += str(reply[i][4].strftime('%Y.%m.%d.%H.%M')) + "," #time
+                            result += str(reply[i][0]) + "/"  #replyId
+                        
                         client.sendall(result.encode('utf-8'))
                         print('reply 끝')
                     else:
@@ -844,6 +845,34 @@ class ServerSocket:
                         client.send('first'.encode('utf-8'))
                     else:
                         client.send('already_registerd'.encode('utf-8'))
+
+
+                elif commend == 'reply_select':
+                    print(side) #reply_id + 학번
+                    cur = self.databasent.cursor()
+                    cur.execute("SELECT chat_id,student_id FROM reply WHERE no =" + str(side[0]) + "")
+                    chat_id = cur.fetchall()
+                    if(chat_id[0][1] != str(side[1])):
+                        cur.execute("SELECT reply_selected FROM chatting WHERE no =" + str(chat_id[0][0]) + "")
+                        chat_reply_sel = cur.fetchall()
+                        if chat_reply_sel[0][0] == 0:
+                            cur.execute("UPDATE chatting SET reply_selected = 1 WHERE no = " + str(chat_id[0][0]) + "")
+                            cur.execute("UPDATE reply SET reply_selected = 1 WHERE no = " + str(side[0]) + "")
+                            self.databasent.commit()
+                            ANSWER = "update"
+                            print("Update: "+ANSWER)
+                        else:
+                            ANSWER = "already"
+                            print("Already: "+ANSWER)
+                    else:
+                        ANSWER = "same"
+                        print("Same: "+ANSWER)
+
+                    client.send(ANSWER.encode('utf-8'))
+                        
+
+
+
 
                 elif commend == 'register':
                     print(side)

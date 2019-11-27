@@ -202,11 +202,11 @@ class Reply(QWidget):
                 tmp = res[i].split(',')
                 tmp = [x for x in tmp if x]
 
-                if len(tmp) == 3:
+                if len(tmp) == 4:
                     reply.append(tmp)
 
-                elif len(tmp) > 3:
-                    msglen = len(tmp) - 3
+                elif len(tmp) > 4:
+                    msglen = len(tmp) - 4
                     msg = ",".join(tmp[0:1 + msglen])
 
                     for i in range(msglen + 1):
@@ -288,17 +288,12 @@ class replyWidget(QWidget):
         self.replyLayout.addWidget(date)
         #mainLayout: replyLayout+메달 (수평 레이아웃)
         self.mainLayout.addLayout(self.replyLayout,)
+        
         self.mainLayout.addWidget(adopt_medal,alignment=QtCore.Qt.AlignRight)
 
     def likeClicked(self):
         print(self.comments)
-        commend = 'like_update ' + self.comments[6] + " " + self.grandparent.stuid  # 학번 + msg
-        self.clientSocket.send(commend.encode('utf-8'))
-        print(commend)
-        result = self.clientSocket.recv(1024)
-        result = result.decode('utf-8')
-        print(result)
-        self.parent.category_changed()
+        
 
     def mousePressEvent(self, QMouseEvent):
         if QMouseEvent.button() == Qt.LeftButton:
@@ -307,6 +302,47 @@ class replyWidget(QWidget):
 
         elif QMouseEvent.button() == Qt.RightButton:
             print("Right Button Clicked")
+            dlg = sendQuestion(self)
+            dlg.exec_()
+
+class sendQuestion(QDialog):
+    def __init__(self,parent):
+        super().__init__()
+        self.parent = parent
+        self.mainLayout = QVBoxLayout()
+        self.btnLayout = QHBoxLayout()
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+
+        self.initUi()
+
+    def initUi(self):
+        head = QLabel('\t현 댓글을 채택하시겠습니까?\n(주의! 한 번 채택하시면 현 게시글의 댓글에 더 이상 \n 채택을 하시지 못하시며 취소도 하실수 없습니다.)')
+        head.setStyleSheet('font-weight:bold; font-size:13pt;')
+        send = QPushButton('확인')
+        send.clicked.connect(self.sendToEmail)
+        cancel = QPushButton('취소')
+        cancel.clicked.connect(self.close)
+
+        self.btnLayout.addWidget(send)
+        self.btnLayout.addWidget(cancel)
+
+        self.mainLayout.addStretch(1)
+        self.mainLayout.addWidget(head)
+        self.mainLayout.addLayout(self.btnLayout)
+        self.mainLayout.addStretch(1)
+
+        self.setFixedSize(550,200)
+        self.setLayout(self.mainLayout)
+
+    def sendToEmail(self):
+        self.close()
+        print(self.parent.comments)
+        commend = 'reply_select ' + self.parent.comments[3] + " " + self.parent.parent.parent.stuid  # reply_id + 학번
+        self.parent.parent.clientSocket.send(commend.encode('utf-8'))
+        # print(commend)
+        result = self.parent.parent.clientSocket.recv(1024)
+        result = result.decode('utf-8')
+        print(result)
 
 
 if __name__ == '__main__':

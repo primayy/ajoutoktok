@@ -601,7 +601,7 @@ class ServerSocket:
                             print(reply[i][2])
                             result += str(reply[i][2]) +"," #msg
                             result += str(reply[i][3]) +"," #stuId
-                            result += str(reply[i][4].strftime('%Y.%m.%d.%H.%M')) +"/" #time
+                            result += str(reply[i][4].strftime('%Y.%m.%d %H:%M:%S')) +"/" #time
 
                         client.sendall(result.encode('utf-8'))
                         print('reply 끝')

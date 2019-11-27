@@ -449,6 +449,7 @@ class chatWidget(QWidget):
         self.grandparent = grandparent
 
         self.mainLayout = QHBoxLayout()
+        self.questLayoutinMain = QVBoxLayout()
         self.setLayout(self.mainLayout)
         self.clientSocket = parent.clientSocket
 
@@ -478,21 +479,15 @@ class chatWidget(QWidget):
                                )
             question.setFixedHeight(38)
             question.setFixedWidth(360)
-        else:
-            self.BtnLike = QPushButton('0')
-            self.BtnLike.setIcon(QIcon('./icon/heart_unchecked.png'))
-            self.BtnLike.setStyleSheet('''
-                        QPushButton{border:0px}''')
-            self.BtnLike.setIconSize(QSize(20, 20))
-            self.BtnLike.setMaximumWidth(35)
-            self.BtnLike.clicked.connect(self.likeClicked)
 
-            question = QLabel()
-            question.setText(self.comments[0])
+            date = QLabel()
+            date.setText(self.comments[5])
 
         self.mainLayout.setContentsMargins(5,5,5,5)
         self.mainLayout.addStretch(1)
-        self.mainLayout.addWidget(question)
+        self.questLayoutinMain.addWidget(question)
+        self.questLayoutinMain.addWidget(date)
+        self.mainLayout.addLayout(self.questLayoutinMain)
         self.mainLayout.addWidget(self.BtnLike)
         self.mainLayout.addStretch(1)
 

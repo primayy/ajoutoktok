@@ -10,13 +10,14 @@ import time
 
 
 class Search(QWidget):
-    def __init__(self,parent,LeCode):
+    def __init__(self,parent,LeCode,tabId):
         super().__init__()
         #변수 설정
         self.parent = parent
         self.clientSocket = self.parent.parent.w.clientSock
         self.comment_info = 0
         self.lecture_code = LeCode
+        self.tabId = tabId
         self.searchList = 0
         self.widgetTmp = QWidget()
         #효과 설정
@@ -115,7 +116,7 @@ class Search(QWidget):
 
     #질문에 대한 답글 읽어옴
     def getSearch(self):
-        commend = 'ChatSearch ' + self.search_input.toPlainText() +" "+ self.lecture_code
+        commend = 'ChatSearch ' + self.search_input.toPlainText() +" "+ self.lecture_code +" "+self.tabId
         print(commend)
         self.clientSocket.send(commend.encode('utf-8'))
         

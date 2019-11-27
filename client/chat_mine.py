@@ -10,13 +10,14 @@ import time
 
 
 class Mine(QWidget):
-    def __init__(self,parent,stdid,LeCode):
+    def __init__(self,parent,stdid,LeCode,tabId):
         super().__init__()
         #변수 설정
         self.parent = parent
         self.clientSocket = self.parent.parent.w.clientSock
         self.comment_info = 0
         self.mineList = 0
+        self.tabId = tabId
         self.student_id = stdid
         self.lecture_code = LeCode
         self.widgetTmp = QWidget()
@@ -102,7 +103,7 @@ class Mine(QWidget):
 
     #질문에 대한 답글 읽어옴
     def getMine(self):
-        commend = 'ChatMine ' + self.student_id +" "+ self.lecture_code
+        commend = 'ChatMine ' + self.student_id +" "+ self.lecture_code+" "+self.tabId
         print(commend)
         self.clientSocket.send(commend.encode('utf-8'))
         

@@ -472,7 +472,7 @@ class ServerSocket:
                 elif commend == 'ChatSearch':
                     print(side)
                     cur = self.databasent.cursor()
-                    cur.execute("SELECT no FROM category WHERE lecture_code = '" + str(side[1])+"'")
+                    cur.execute("SELECT no FROM category WHERE chatroom_name = '" + str(side[2])+"'")
                     cat_id = cur.fetchall()
                     cur.execute("SELECT comment FROM chatting WHERE comment LIKE '%" + str(side[0]) + "%' AND category_id=" + str(cat_id[0][0]))
                     chat_log = cur.fetchall()
@@ -498,10 +498,10 @@ class ServerSocket:
                 elif commend == 'ChatMine':
                     print(side)
                     cur = self.databasent.cursor()
-                    cur.execute("SELECT no FROM category WHERE lecture_code = '" + str(side[1])+"'")
+                    cur.execute("SELECT no FROM category WHERE chatroom_name = '" + str(side[2])+"'")
                     cat_id = cur.fetchall()
                     cur = self.databasent.cursor()
-                    cur.execute("SELECT comment FROM chatting WHERE student_id = '" + str(side[0]) + "' AND category_id=" + str(cat_id[0][0]))
+                    cur.execute("SELECT comment FROM chatting WHERE student_id = '" + str(side[0]) + "' AND category_id = " + str(cat_id[0][0]))
                     chat_log = cur.fetchall()
                     print(chat_log)
                     if len(chat_log) != 0:

@@ -311,13 +311,13 @@ class chatRoom(QWidget):
 
     
     def searchClicked(self):
-        self.search = chat_search.Search(self,self.parent.course[-1])
+        self.search = chat_search.Search(self,self.parent.course[-1],self.tab.tabText(self.tab.currentIndex()))
 
         self.search.setWindowTitle("Search")
         self.search.setMinimumSize(QSize(400, 400))
 
     def mineClicked(self):
-        self.mine = chat_mine.Mine(self,self.parent.stuid,self.parent.course[-1])
+        self.mine = chat_mine.Mine(self,self.parent.stuid,self.parent.course[-1],self.tab.tabText(self.tab.currentIndex()))
 
         self.mine.setWindowTitle("Mine")
         self.mine.setMinimumSize(QSize(400, 400))

@@ -287,7 +287,7 @@ class Register(QWidget):
         elif answer == "overlap":
             send_noCheck = QMessageBox()
             send_noCheck.setStyleSheet("background-color:#FFFFFF")
-            send_noCheck.setText("ERROR[검사X]: 중복검사 필요")
+            send_noCheck.setText("ERROR[overlap]: 닉네임 중복")
             send_noCheck.exec_()
         elif answer == "length":
             send_length = QMessageBox()

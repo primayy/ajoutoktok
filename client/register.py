@@ -277,23 +277,32 @@ class Register(QWidget):
         print("중복확인")
         answer = self.clientSocket.recv(1024).decode('utf-8')
         if answer == "newone":
-            self.regi_qual=1
-            self.overlap_status=1
-            self.overlap_button_toggle()
-        elif answer == "overlap":
-            self.regi_qual=2
-        elif answer == "length":
-            self.regi_qual=3
-        elif answer == "noMark":
-            self.regi_qual=4
-
-    def register(self,nick,department):
-        if self.regi_qual == 1 :#새로운 아이디일때 (밑으로는 모두 한단계 indendation이 되었다.)
-            
             send_newone = QMessageBox()
             send_newone.setStyleSheet("background-color:#FFFFFF")
             send_newone.setText("닉네임 사용가능")
             send_newone.exec_()
+            self.regi_qual=1
+            self.overlap_status=1
+            self.overlap_button_toggle()
+        elif answer == "overlap":
+            send_noCheck = QMessageBox()
+            send_noCheck.setStyleSheet("background-color:#FFFFFF")
+            send_noCheck.setText("ERROR[검사X]: 중복검사 필요")
+            send_noCheck.exec_()
+        elif answer == "length":
+            send_length = QMessageBox()
+            send_length.setStyleSheet("background-color:#FFFFFF")
+            send_length.setText("ERROR[length]: 길이 4자~8자")
+            send_length.exec_()
+        elif answer == "noMark":
+            send_noMark = QMessageBox()
+            send_noMark.setStyleSheet("background-color:#FFFFFF")
+            send_noMark.setText("ERROR[noMark]: 특수문자 감지")
+            send_noMark.exec_()
+
+    def register(self,nick,department):
+        print(self.regi_qual)
+        if self.regi_qual == 1 :#새로운 아이디일때 (밑으로는 모두 한단계 indendation이 되었다.)
 
             commend = 'register '+nick+" "+department+" "+self.studName+" "+self.studId
             self.clientSocket.send(commend.encode('utf-8'))
@@ -321,25 +330,12 @@ class Register(QWidget):
                 self.close()
 
         elif self.regi_qual == 0 :
-            send_noMark = QMessageBox()
-            send_noMark.setStyleSheet("background-color:#FFFFFF")
-            send_noMark.setText("ERROR[검사X]: 중복검사 필요")
-            send_noMark.exec_()
-        elif self.regi_qual == 2 :
-            send_overlap = QMessageBox()
-            send_overlap.setStyleSheet("background-color:#FFFFFF")
-            send_overlap.setText("ERROR[overlap]: 닉네임 중복")
-            send_overlap.exec_()
-        elif self.regi_qual == 3 :
-            send_overlap = QMessageBox()
-            send_overlap.setStyleSheet("background-color:#FFFFFF")
-            send_overlap.setText("ERROR[length]: 길이 4자~8자")
-            send_overlap.exec_()
-        elif self.regi_qual == 4 :
-            send_overlap = QMessageBox()
-            send_overlap.setStyleSheet("background-color:#FFFFFF")
-            send_overlap.setText("ERROR[noMark]: 특수문자 감지")
-            send_overlap.exec_()
+
+            send_noCheck = QMessageBox()
+            send_noCheck.setStyleSheet("background-color:#FFFFFF")
+            send_noCheck.setText("ERROR[확인X]: 중복검사 확인필요")
+            send_noCheck.exec_()
+
             
             
           

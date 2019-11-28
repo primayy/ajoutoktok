@@ -409,8 +409,9 @@ class ServerSocket:
                     lec_code = lecCode[0][0]
 
                     #알림 테이블에 입력
-                    cur.execute("INSERT INTO alarm(chat_id,chat_student_id,reply_id,reply_student_id,reply_selected) Values ("+str(chat_id)+",'"+chat_stuId+"',"+str(reply_id)+",'"+stuid+"',0)")
-                    self.databasent.commit()
+                    if(chat_stuId != stuid):
+                        cur.execute("INSERT INTO alarm(chat_id,chat_student_id,reply_id,reply_student_id,reply_selected) Values ("+str(chat_id)+",'"+chat_stuId+"',"+str(reply_id)+",'"+stuid+"',0)")
+                        self.databasent.commit()
 
                     #답글 달았을 때 포인트 정리 (5점 증가)
                     cur.execute("UPDATE points SET points = points + 5 WHERE Student_id='"+str(stuid)+"' AND Lec_id = '" + str(lec_code) + "'")
@@ -430,13 +431,33 @@ class ServerSocket:
                     print(side)
                     ChatAlarmText = ""
                     ReplyAlarmText = ""
+                    data_time =""
                     cur = self.databasent.cursor()
                     #내가 쓴 게시글의 댓글 개수(count(*))와 게시글 id
                     cur.execute("SELECT count(*),chat_id FROM alarm WHERE reply_student_id != '"+str(side[0])+"' AND chat_student_id ='" + str(side[0]) + "' GROUP BY chat_id")
                     chatAlarm = cur.fetchall()
+                    cur.execute("SELECT no FROM alarm WHERE reply_student_id != '"+str(side[0])+"' AND chat_student_id ='" + str(side[0]) + "'")
+                    chatAlarmIds = cur.fetchall()
+                    print(chatAlarmIds)
+                    if len(chatAlarmIds)>0:
+                        cur.execute("SELECT data_time FROM reply WHERE no =" + str(chatAlarmIds[-1][0])+"")
+                        data_time = cur.fetchall()
                     #내가 쓴 댓글의 게시글 id
                     cur.execute("SELECT chat_id FROM alarm WHERE reply_student_id ='" + str(side[0]) + "' AND reply_selected = 1 AND chat_student_id !='" + str(side[0]) + "'")
                     replyAlarm = cur.fetchall()
+                    cur.execute("SELECT no FROM alarm WHERE reply_student_id ='" + str(side[0]) + "' AND reply_selected = 1 AND chat_student_id !='" + str(side[0]) + "'")
+                    replyAlarmIds = cur.fetchall()
+
+                    chatAlId = "!@#@!"
+                    replyAlId = "!@#@!"
+                    if len(chatAlarmIds) > 0:
+                        for i in range(len(chatAlarmIds)):
+                            chatAlId += "/./"+str(chatAlarmIds[i][0])
+                    if len(replyAlarmIds) > 0:
+                        for i in range(len(replyAlarmIds)):
+                            replyAlId += "/./"+str(replyAlarmIds[i][0])
+                    
+
 
                     if len(chatAlarm) > 0:
                         for i in range(len(chatAlarm)):
@@ -449,7 +470,7 @@ class ServerSocket:
                             #강의코드로 강의이름 얻기
                             cur.execute("SELECT lecture_name,no FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
                             lecture_name = cur.fetchall()
-                            ChatAlarmText += lecture_name[0][0]+ "#&$@" +str(cat_id[0][1]) + "#&$@" + str(chatAlarm[i][0])+ "#&$@" + str(lecture_name[0][1])+ "#&$@" + str(lec_co[0][1])+ "#&$@" + str(lec_co[0][0]) +"*&^%" # "강의이름,게시글,댓글 수,강의탭,강의코드" 
+                            ChatAlarmText += lecture_name[0][0]+ "#&$@" +str(cat_id[0][1]) + "#&$@" + str(chatAlarm[i][0])+"#&$@" + str(data_time)+ "#&$@" + str(lecture_name[0][1])+ "#&$@" + str(lec_co[0][1])+ "#&$@" + str(lec_co[0][0]) +"*&^%" # "강의이름,게시글,댓글 수,강의탭,강의코드" 
                         ChatAlarmText = ChatAlarmText.rstrip()
 
 
@@ -464,7 +485,7 @@ class ServerSocket:
                             lecture_name = cur.fetchall()
                             ReplyAlarmText += lecture_name[0][0] + "#&$@" +str(cat_id[0][1])+ "#&$@" + str(lecture_name[0][1])+ "#&$@" + str(lec_co[0][1])+ "#&$@" + str(lec_co[0][0]) + "*&^%" #강의 이름,댓글,강의ID,강의탭,강의코드
                         ReplyAlarmText = ReplyAlarmText.rstrip()
-                    AlarmText = ChatAlarmText + "$#%^" + ReplyAlarmText
+                    AlarmText = ChatAlarmText + chatAlId + "$#%^" + ReplyAlarmText + replyAlId
                     client.send(AlarmText.encode('utf-8'))
                 
                 
@@ -528,6 +549,25 @@ class ServerSocket:
                         print('Search읽기 오류')
                         result = 'x'
                         client.send(result.encode('utf-8'))
+                        
+
+                elif commend == 'RemoveAlarm':
+                    print(side)
+                    chatIds = side[0].split(';;;')[:-1]
+                    replyIds = side[1].split(';;;')[:-1]
+                    if len(chatIds) > 0:
+                        for i in range(len(chatIds)):
+                            cur = self.databasent.cursor()
+                            cur.execute("DELETE FROM alarm WHERE no ="+str(chatIds[i]))
+                            self.databasent.commit()
+                    if len(replyIds) > 0:
+                        for i in range(len(replyIds)):
+                            cur = self.databasent.cursor()
+                            cur.execute("DELETE FROM alarm WHERE no ="+str(replyIds[i]))
+                            self.databasent.commit()
+                    client.send("끄트냐암".encode('utf-8'))
+                    
+                    
                         
 
                 elif commend == 'chat_history':

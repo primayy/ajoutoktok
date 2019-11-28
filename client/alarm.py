@@ -27,6 +27,7 @@ class alarm(QWidget):
         horizon_line.setAlignment(Qt.AlignTop)
 
         btn_remove_all = QPushButton('모두 삭제')
+        btn_remove_all.clicked.connect(self.remove_it_all)
         
         self.viewer = QListWidget(self)
 
@@ -48,6 +49,28 @@ class alarm(QWidget):
         self.mainLayout.addWidget(self.viewer)
         self.setLayout(self.mainLayout)
     
+    def remove_it_all(self):
+        chattyId = ""
+        replylyId = ""
+        if len(self.chatIDs)>0:
+            for i in range(len(self.chatIDs)):
+                chattyId += self.chatIDs[i] + ";;;"
+
+
+        if len(self.replyIDs)>0:
+            for i in range(len(self.replyIDs)):
+                replylyId += self.replyIDs[i] + ";;;"
+
+
+        
+
+        commend = "RemoveAlarm " + chattyId + " " + replylyId
+        self.clientSocket.send(commend.encode('utf-8'))
+        result = self.clientSocket.recv(1024).decode('utf-8')
+        self.viewer.clear()
+
+
+        
     
     def showAlarms(self):
         for i in range(len(self.alarm_list)):
@@ -66,11 +89,16 @@ class alarm(QWidget):
         alarmList = result.split("$#%^")
         chatAlarm = alarmList[0] #게시글에 댓글 달림
         replyAlarm = alarmList[1] #댓글이 채택됨
+        self.chatIDs = chatAlarm.split("!@#@!")[1].split("/./")[1:]
+        self.replyIDs = replyAlarm.split("!@#@!")[1].split("/./")[1:]
+        chatAlarm = chatAlarm.split("!@#@!")[0]
+        replyAlarm = replyAlarm.split("!@#@!")[0]
+        
 
         chatAlarm = chatAlarm.split("*&^%")[:-1] # 끝에 생성되는 [''] 삭제
         replyAlarm = replyAlarm.split("*&^%")[:-1] # 끝에 생성되는 [''] 삭제
-        print(chatAlarm)
-        print(replyAlarm)
+        # print(chatAlarm)
+        # print(replyAlarm)
         return [chatAlarm,replyAlarm]
 
 class alarm_group(QWidget):
@@ -113,7 +141,24 @@ class lecture(QWidget):
 
             # middle
         if chatORreply == 0:
-                self.alarm = QLabel(str("[강의: "+course[0]+"]에 게시한 글 '"+course[1]+"'에 "+course[2]+"개의 댓글이 추가되었습니다."))
+            self.alarm = QWidget()
+            layoutout = QVBoxLayout()
+            Qlabel1 = QLabel(str("[강의: "+course[0]+"]에 게시한 글 '"+course[1]+"'에 "+course[2]+"개의 댓글이 추가되었습니다."))
+            dateAtime = str(course[-4])
+            print(dateAtime)
+            layoutout.addWidget(Qlabel1)
+            if(len(dateAtime)>0):
+                dateBtime = dateAtime.split("(")[3].split(")")[0]
+                print(dateBtime)
+                datetime = dateBtime.split(",")
+                print(datetime)
+                date = ".".join(datetime[0:3])
+                time = ":".join(datetime[3:6])
+                print(date)
+                print(time)
+                Qlabel2 = QLabel(str(date)+" "+str(time))
+                layoutout.addWidget(Qlabel2)
+            self.alarm.setLayout(layoutout)
         elif chatORreply == 1:
                 self.alarm = QLabel(str("[강의: "+course[0]+"]에 작성한 댓글'"+course[1]+"'이 채택되었습니다."))
         self.chatComm = course[1]

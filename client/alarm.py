@@ -15,12 +15,19 @@ class alarm(QWidget):
         self.stuid = studId
         self.clientSocket = parent.clientSocket
         self.title = QHBoxLayout()
+        #강의 목록 그리기
         group = QLabel('알림')
-        horizon_line = QLabel('─────────────────────')
+        group.setStyleSheet("font: 16pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a")
+        #horizon_line = QLabel('─────────────────────')
+            #구분선
+        horizon_line = QLabel()
+        horizon_img = QPixmap('./ui/afterlogin_ui/horizon_line.png')
+        horizon_img = horizon_img.scaled(310,12,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+        horizon_line.setPixmap(horizon_img)
+        horizon_line.setAlignment(Qt.AlignTop)
+
         btn_remove_all = QPushButton('모두 삭제')
-        group.setStyleSheet('''
-                font-weight:bold;
-                font-size:16pt''')
+        
         self.viewer = QListWidget(self)
 
         self.viewer.setMinimumSize(300, 500)

@@ -21,7 +21,7 @@ class lecture_list(QWidget):
 
         #강의 목록 그리기
         group = QLabel('강의 목록')
-        group.setStyleSheet("font: 18pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a")
+        group.setStyleSheet("font: 16pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a")
         #horizon_line = QLabel('─────────────────────')
             #구분선
         horizon_line = QLabel()
@@ -34,7 +34,7 @@ class lecture_list(QWidget):
 
         self.viewer.setMinimumSize(300, 500)
         self.viewer.setStyleSheet('''
-                # QListWidget:item:hover{background:white};
+                QListWidget:item:hover{background:#95c3cb};
                 # QListWidget:item{padding:0px}
                 ''')
         self.lecture_list = self.getLectureList()
@@ -289,13 +289,13 @@ class lecture(QWidget):
 
             # bottom
             self.msg_widget = QPushButton()
-            self.msg_widget.setMaximumHeight(20)
-            self.msg_widget.setMaximumWidth(20)
-            self.msg_widget.resize(20, 20)
+            self.msg_widget.setMaximumHeight(23)
+            self.msg_widget.setMaximumWidth(23)
+            self.msg_widget.resize(23, 23)
             self.msg_widget.setStyleSheet('''border:0px''')
-            self.msg_widget.setIcon(QIcon('./icon/msg_widget.png'))
+            self.msg_widget.setIcon(QIcon('./ui/afterlogin_ui/bubble.png'))
             self.prof = QLabel(course[1])
-            self.prof.setStyleSheet('font: 7pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a')
+            self.prof.setStyleSheet('font: 8pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a')
             self.msg_widget.clicked.connect(self.msg_widget_on)
             self.layout_bottom.addWidget(self.prof)
             self.layout_bottom.addWidget(self.msg_widget, alignment=(QtCore.Qt.AlignRight))

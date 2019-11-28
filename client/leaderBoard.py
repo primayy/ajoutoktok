@@ -31,17 +31,28 @@ class LeaderBoard(QWidget):
         self.initUi()
 
     def initUi(self):
-        group = QLabel('리더보드')
 
-        horizon_line = QLabel('─────────────────────')
-        group.setStyleSheet('''
-                        font-weight:bold;
-                        font-size:16pt''')
+        #강의 목록 그리기
+        group = QLabel('리더보드')
+        group.setStyleSheet("font: 16pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a")
+        group.setAlignment(QtCore.Qt.AlignTop)
+        #horizon_line = QLabel('─────────────────────')
+            #구분선
+        horizon_line = QLabel()
+        horizon_img = QPixmap('./ui/afterlogin_ui/horizon_line.png')
+        horizon_img = horizon_img.scaled(310,12,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+        horizon_line.setPixmap(horizon_img)
+        horizon_line.setAlignment(Qt.AlignTop)
+
+        empty = QLabel(' ')
+
 
         self.myRankLabel = QLabel('내 등수는')
+        self.myRankLabel.setStyleSheet("font: 10pt 나눔스퀘어라운드 Regular;")
         self.myRank = QLabel()
-        self.myRank.setStyleSheet("font-size:15pt")
+        self.myRank.setStyleSheet("font-size:14pt 나눔스퀘어라운드 Regular;")
         myPoint = QLabel()
+        myPoint.setStyleSheet("font: 10pt 나눔스퀘어라운드 Regular;")
         mP = self.getMyPoint()
 
         tmp = "내 점수는 "+ mP + " Points!"
@@ -77,12 +88,25 @@ class LeaderBoard(QWidget):
         self.tab.currentChanged.connect(self.tab.tabText)
         self.tab.currentChanged.connect(self.getRank)
         self.title.addWidget(group)
-        self.mainLayout.addLayout(self.title)
+        self.mainLayout.addWidget(group)
+        #self.mainLayout.addLayout(self.title)
         self.mainLayout.addWidget(horizon_line)
-        self.mainLayout.addLayout(self.myRankLayout)
+        self.mainLayout.addStretch(1)
+        self.mainLayout.addWidget(empty)
+        self.mainLayout.addWidget(self.myRankLabel,alignment=(QtCore.Qt.AlignCenter))
+        self.mainLayout.addWidget(self.myRank,alignment=(QtCore.Qt.AlignCenter))
+        self.mainLayout.addWidget(myPoint,alignment=(QtCore.Qt.AlignCenter))
+        self.mainLayout.addWidget(empty)
+        self.mainLayout.addStretch(1)
+        #self.mainLayout.addLayout(self.myRankLayout)
+        #self.mainLayout.addStretch(1)
         self.mainLayout.addWidget(self.tab)
-
-        self.tab.setMinimumSize(300,430)
+        self.mainLayout.addWidget(empty)
+        self.mainLayout.addWidget(empty)
+        self.mainLayout.addWidget(empty)
+        self.mainLayout.addWidget(empty)
+        self.tab.setMinimumSize(300,300)
+        self.tab.setMaximumSize(300,400)
 
         self.setLayout(self.mainLayout)
 

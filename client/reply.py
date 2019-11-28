@@ -137,10 +137,10 @@ class Reply(QWidget):
         self.question_reply.scrollToBottom()
         #self.question_reply.setBaseSize(500,)
         #self.question_reply.setMaximumSize(500,400)
-
+        self.question_reply.setContentsMargins(0,0,0,0)
         self.question_reply.setStyleSheet('''
-                        # QListWidget:item:hover{background:pink};
-                        # QListWidget:item{padding:0px}
+                        QListWidget:item:hover{background:#95c3cb};
+                        QListWidget:item{margins:0px}
                         ''')
 
         #widgetLayout에 추가(총 세로 레이아웃:탑, 질문, 댓글)
@@ -269,9 +269,10 @@ class replyWidget(QWidget):
         question.setText(self.comments[0])
 
         question2 = QTextBrowser()
-        question2.setMaximumWidth(400)
+        question2.setMaximumWidth(370)
+        question2.setMinimumWidth(370)
         #question2.setMaximumHeight(70)
-        question2.setFixedHeight(100)
+        question2.setFixedHeight(60)
         question2.setStyleSheet("border:1px;"
                                 "border-color:red;"
                                 "font: 9pt 나눔스퀘어라운드 Regular;")
@@ -286,10 +287,13 @@ class replyWidget(QWidget):
         #replyLayout: 댓글+날짜 (수직 레이아웃)
         self.replyLayout.addWidget(question2)
         self.replyLayout.addWidget(date)
+        self.replyLayout.setContentsMargins(0,0,0,0)
         #mainLayout: replyLayout+메달 (수평 레이아웃)
-        self.mainLayout.addLayout(self.replyLayout,)
+        self.mainLayout.addLayout(self.replyLayout)
         
         self.mainLayout.addWidget(adopt_medal,alignment=QtCore.Qt.AlignRight)
+        self.mainLayout.addStretch(1)
+        self.mainLayout.setSpacing(0)
 
     def likeClicked(self):
         print(self.comments)

@@ -83,7 +83,7 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.13', 3334))
+        self.chatSocket.connect(('192.168.0.49', 3334))
         # self.chatSocket.connect(('192.168.43.180', 3334))
         # self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
@@ -147,7 +147,7 @@ class chatRoom(QWidget):
         self.showLayout.addWidget(self.mainWidget)
         self.showLayout.setContentsMargins(0,0,0,0)
         self.setLayout(self.showLayout)
-        self.setMinimumSize(500,800)
+        self.setMinimumSize(500,700)
         # self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 
@@ -461,7 +461,7 @@ class chatWidget(QWidget):
     def initUI(self):
         if len(self.comments) != 2:
             self.BtnLike = QPushButton(self.comments[3])
-            self.BtnLike.setIcon(QIcon('./icon/heart_unchecked.png'))
+            self.BtnLike.setIcon(QIcon('./ui/chatting_ui/unchecked_heart.png'))
             self.BtnLike.setStyleSheet('''
             QPushButton{border:0px; background-color:#e8f3f4; width:45px}''')
             self.BtnLike.setIconSize(QSize(30,30))
@@ -476,12 +476,13 @@ class chatWidget(QWidget):
                                "border-style: solid;"
                                "border-width: 1px;"
                                "border-color: #42939c;"
-                               "font:9pt 나눔스퀘어라운드 Regular;"
+                               "font:10pt 나눔스퀘어라운드 Regular;"
                                )
             question.setFixedHeight(38)
             question.setFixedWidth(360)
 
             date = QLabel()
+            date.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular')
             date.setText(self.comments[5])
 
         self.mainLayout.setContentsMargins(5,5,5,5)

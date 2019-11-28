@@ -30,8 +30,6 @@ CREATE TABLE `category` (
   `lecture_code` varchar(100) NOT NULL,
   `lecture_id` int(11) NOT NULL,
   `chatroom_name` varchar(100) NOT NULL,
-  `reply_selected` int(1) NOT NULL DEFAULT '0',
-
   PRIMARY KEY (`no`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -60,6 +58,7 @@ CREATE TABLE `chatting` (
   `student_id` char(9) NOT NULL,
   `date_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `likes` int(11) NOT NULL DEFAULT '0',
+  `reply_selected` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`no`)
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

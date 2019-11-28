@@ -347,6 +347,29 @@ class sendQuestion(QDialog):
         result = self.parent.parent.clientSocket.recv(1024)
         result = result.decode('utf-8')
         print(result)
+        if(result == "already"):
+            send_already = QMessageBox()
+            send_already.setStyleSheet("background-color:#FFFFFF")
+            send_already.setText("이미 채택하셨습니다")
+            send_already.exec_()
+
+        elif(result=="update"):
+            send_update = QMessageBox()
+            send_update.setStyleSheet("background-color:#FFFFFF")
+            send_update.setText("채택하셨습니다")
+            send_update.exec_()
+
+        elif(result=="notyour"):
+            send_notyour = QMessageBox()
+            send_notyour.setStyleSheet("background-color:#FFFFFF")
+            send_notyour.setText("자신의 게시글에 대한 답글에만 채택하실 수 있습니다")
+            send_notyour.exec_()
+
+        elif(result=="same"):
+            send_same = QMessageBox()
+            send_same.setStyleSheet("background-color:#FFFFFF")
+            send_same.setText("자신의 글은 채택 불가합니다")
+            send_same.exec_()
 
 
 if __name__ == '__main__':

@@ -901,17 +901,21 @@ class ServerSocket:
                     cur.execute("SELECT chat_id,student_id FROM reply WHERE no =" + str(side[0]) + "")
                     chat_id = cur.fetchall()
                     if(chat_id[0][1] != str(side[1])):
-                        cur.execute("SELECT reply_selected FROM chatting WHERE no =" + str(chat_id[0][0]) + "")
+                        cur.execute("SELECT reply_selected,student_id FROM chatting WHERE no =" + str(chat_id[0][0]) + "")
                         chat_reply_sel = cur.fetchall()
-                        if chat_reply_sel[0][0] == 0:
-                            cur.execute("UPDATE chatting SET reply_selected = 1 WHERE no = " + str(chat_id[0][0]) + "")
-                            cur.execute("UPDATE reply SET reply_selected = 1 WHERE no = " + str(side[0]) + "")
-                            self.databasent.commit()
-                            ANSWER = "update"
-                            print("Update: "+ANSWER)
+                        if(chat_reply_sel[0][1] == str(side[1])):
+                            if chat_reply_sel[0][0] == 0:
+                                cur.execute("UPDATE chatting SET reply_selected = 1 WHERE no = " + str(chat_id[0][0]) + "")
+                                cur.execute("UPDATE reply SET reply_selected = 1 WHERE no = " + str(side[0]) + "")
+                                self.databasent.commit()
+                                ANSWER = "update"
+                                print("Update: "+ANSWER)
+                            else:
+                                ANSWER = "already"
+                                print("Already: "+ANSWER)
                         else:
-                            ANSWER = "already"
-                            print("Already: "+ANSWER)
+                            ANSWER = "notyour"
+                            print("NotYour: "+ANSWER)
                     else:
                         ANSWER = "same"
                         print("Same: "+ANSWER)

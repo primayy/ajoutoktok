@@ -16,6 +16,7 @@ class lecture_list(QWidget):
         self.w = w
         self.clientSocket = w.clientSock
 
+
         self.mainLayout=QVBoxLayout()
         self.title = QHBoxLayout()
 
@@ -237,6 +238,7 @@ class lecture(QWidget):
         self.lecture_list_Widget = lecture_list_Widget
         self.stuid = lecture_list_Widget.studid
         self.lecid = lecture_list_Widget.lecId
+        self.chat = 0
 
         self.w = window
         self.clientSocket = self.w.clientSock
@@ -328,11 +330,12 @@ class lecture(QWidget):
 
     def mousePressEvent(self, QMouseEvent):
         title = self.course
-        # self.chat = chat.chatRoom(title,self.stuid,self.w)
-        self.chat = chat_test.chatRoom(self)
 
-        self.chat.setWindowTitle(title[0])
-        self.chat.setMinimumSize(QSize(400, 400))
+        if self.chat == 0:
+            self.chat = chat_test.chatRoom(self)
+
+            self.chat.setWindowTitle(title[0])
+            self.chat.setMinimumSize(QSize(400, 400))
 
     def msg_widget_on(self):
         self.mwidget = msget.Invisible(self,self.lecture,self.prof)

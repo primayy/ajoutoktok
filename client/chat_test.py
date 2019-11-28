@@ -231,14 +231,11 @@ class chatRoom(QWidget):
 
         #채팅입력
         chat_enter = QPushButton()
-        #chat_enter.setStyleSheet('background:#F6F6F3;image:url(./ui/chatting_ui/보내기.png); border:0px;')
         chat_enter.setStyleSheet('''
                         QPushButton{image:url(./ui/chatting_ui/보내기.png); border:0px; width:60px; height:80px}        
                         
                         ''')
-        # chat_enter.setMinimumHeight(78)
-        # chat_enter.setIcon(QIcon('./icon/send.png'))
-        # chat_enter.setIconSize(QSize(50,50))
+
         chat_enter.clicked.connect(lambda: self.sendMsg(self.chat_input.text()))
 
         self.chatInputLayout.addWidget(self.chat_input)
@@ -262,14 +259,12 @@ class chatRoom(QWidget):
         self.chatSocket.send(commend.encode('utf-8'))
         #쓰레드 삭제
         self.t.quit()
-        # self.close()
+        self.parent.chat = 0
         self.hide()
 
     def category_changed(self):
         self.tab.currentWidget().clear()
         self.history = self.getChatHistory()
-        # if len(self.history) != 0:
-        #     self.history.pop()
         self.showQuestions()
 
     def getCategory(self):

@@ -39,32 +39,7 @@ class alarm(QWidget):
         self.showAlarms()
 
         item = QListWidgetItem(self.viewer)
-        # custom_widget = lecture_group('add', studid, QApplication.activeWindow())
-        # item.setSizeHint(custom_widget.sizeHint())
-        # self.viewer.setItemWidget(item, custom_widget)
-        # commend = "Alarm " + self.stuid
-        # self.clientSocket.send(commend.encode('utf-8'))
-        # result = self.clientSocket.recv(1024).decode('utf-8')
-        # print(str(result))
-        # alarmList = result.split("/")
-        # chatAlarm = alarmList[0] #게시글에 댓글 달림
-        # replyAlarm = alarmList[1] #댓글이 채택됨
-        # print(alarmList)
-        # print(chatAlarm)
-        # print(replyAlarm)
-        # chatAlarm = chatAlarm.split(".")[:-1] # 끝에 생성되는 [''] 삭제
-        # replyAlarm = replyAlarm.split(".")[:-1] # 끝에 생성되는 [''] 삭제
-        # print(chatAlarm)
-        # print(replyAlarm)
-        # for i in range(len(chatAlarm)):
-        #         chattyAlarm = chatAlarm[i].split(",")
-        #         viewer.addItem(str("[강의: "+chattyAlarm[0]+"]에 게시한 글 '"+chattyAlarm[1]+"'에 "+chattyAlarm[2]+"개의 댓글이 추가되었습니다."))#게시글 관련 알림 추가
-        
-        
-        # for i in range(len(replyAlarm)):
-        #         replylyAlarm = replyAlarm[i].split(",")
-        #         viewer.addItem(str("[강의: "+replylyAlarm[0]+"]에 작성한 댓글'"+replylyAlarm[1]+"'이 채택되었습니다.")) #댓글 관련 알림 추가
-        
+
         self.viewer.addItem(item) #혹시 몰라서 삭제 안함
         self.title.addWidget(group)
         self.title.addWidget(btn_remove_all,alignment=QtCore.Qt.AlignRight)
@@ -103,11 +78,10 @@ class alarm_group(QWidget):
         super().__init__()
         self.parent = parent
         course = courses.split('#&$@')
-        # print(course)
+
         self.mainLayout = QVBoxLayout()
         self.mainLayout.setContentsMargins(1,3,1,3)
         #그룹 그리기
-        # self.mainWidget = lecture(course, parent.studid, w, parent.viewer, parent.lecId)
         self.mainWidget = lecture(self.parent, course, w, chatORreply)
 
         self.mainLayout.addWidget(self.mainWidget)
@@ -154,7 +128,6 @@ class lecture(QWidget):
         self.mainWidget.setLayout(self.layout)
         self.setLayout(self.mainLayout)
 
-
     def mousePressEvent(self, QMouseEvent):
         title = self.course
         # self.chat = chat.chatRoom(title,self.stuid,self.w)
@@ -162,31 +135,37 @@ class lecture(QWidget):
 
         self.chat.setWindowTitle(title[0])
         self.chat.setMinimumSize(QSize(400, 400))
-        print(self.chatName)
+
+        #질문 목록 닫기
+        self.chat.chatWidget.close()
+        # 메시지 전송 타입 답글로 변경
+        self.chat.sendType = False
 
         commend = "AlarmToReply " + self.LecID + " " + self.chatName + " " + self.chatComm
         self.clientSocket.send(commend.encode('utf-8'))
         self.coursep = self.clientSocket.recv(1024).decode('utf-8')
         self.coursep = self.coursep.split("/")
         self.coursep = self.coursep[0]
-        self.reply = reply.Reply(self)
+
+        #댓글 위젯 생성
+        self.reply = reply.Reply(self.chat)
         self.coursep = self.coursep.split("#$%#")
         self.chat.comment_info = self.coursep
-        # self.reply = self.chat.reply
+
         self.reply.widgetTmp = self.chat.chatWidget
         self.reply.clientSocket = self.clientSocket
 
+        self.chat.chatWidget = self.reply
 
-        
-        #리플 위젯 화면 뿌려주기
-        self.reply.comment_info = self.coursep
-        self.reply.replyList = self.reply.getReply()
-        self.reply.showReply()
+        # 리플 위젯 화면 뿌려주기
+        self.chat.chatWidget.comment_info = self.coursep
+        self.chat.chatWidget.replyList = self.chat.chatWidget.getReply()
+        self.chat.chatWidget.showReply()
+        self.chat.chatContentLayout.addWidget(self.chat.chatWidget)
 
         self.reply.setWindowTitle(title[0])
         self.reply.setMinimumSize(QSize(400, 400))
         self.reply.show()
-        
 
 
 

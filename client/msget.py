@@ -19,7 +19,7 @@ class update_listener(QThread):
 
     def run(self):
         while self.go:
-            time.sleep(1)  # 클라이언트 처리 과부하 방지
+            time.sleep(2)  # 클라이언트 처리 과부하 방지
 
             self.countUpdate.emit()
 
@@ -69,7 +69,11 @@ class Invisible(QWidget):
 
     def count_update(self):
         num_new_msg = int(self.howManyChat())
-        self.l.setText(str(num_new_msg-self.origin_num))
+        if self.parent.chat == 0:
+            self.l.setText(str(num_new_msg-self.origin_num))
+        else:
+            self.origin_num = num_new_msg
+            self.l.setText(str(num_new_msg - self.origin_num))
 
 
     def howManyChat(self):

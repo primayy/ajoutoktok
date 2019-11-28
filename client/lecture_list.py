@@ -332,13 +332,13 @@ class lecture(QWidget):
         title = self.course
 
         if self.chat == 0:
-            self.chat = chat_test.chatRoom(self)
+            self.chat = chat_test.chatRoom(self,0)
 
             self.chat.setWindowTitle(title[0])
             self.chat.setMinimumSize(QSize(400, 400))
 
     def msg_widget_on(self):
-        self.mwidget = msget.Invisible(self,self.lecture,self.prof)
+        self.mwidget = msget.Invisible(self)
         self.mwidget.setMinimumSize(QSize(200, 200))
 
 class lecture_group(QWidget):

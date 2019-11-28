@@ -176,7 +176,7 @@ class lecture(QWidget):
     def mousePressEvent(self, QMouseEvent):
         title = self.course
         # self.chat = chat.chatRoom(title,self.stuid,self.w)
-        self.chat = chat_test.chatRoom(self)
+        self.chat = chat_test.chatRoom(self,0)
 
         self.chat.setWindowTitle(title[0])
         self.chat.setMinimumSize(QSize(400, 400))

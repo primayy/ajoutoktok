@@ -29,7 +29,7 @@ class update_listener(QThread):
 class Invisible(QWidget):
     countStop = pyqtSignal()
 
-    def __init__(self,parent,lecture,code):
+    def __init__(self,parent):
         super().__init__()
         self.__press_pos = QPoint()
         self.mainLayout = QHBoxLayout()
@@ -106,7 +106,7 @@ class Invisible(QWidget):
 
     def mouseDoubleClickEvent(self, QMouseEvent):
         title = self.parent.course
-        self.parent.chat = chat_test.chatRoom(self.parent)
+        self.parent.chat = chat_test.chatRoom(self.parent,1)
         self.parent.chat.setWindowTitle(title[0])
         self.parent.chat.setMinimumSize(QSize(400, 400))
 

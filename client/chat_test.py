@@ -10,6 +10,7 @@ import time
 import reply
 import chat_search
 import chat_mine
+import msget
 
 import calendarW
 
@@ -64,7 +65,7 @@ class update_listener(QThread):
 
 
 class chatRoom(QWidget):
-    def __init__(self,parent):
+    def __init__(self,parent,msgetted):
         super().__init__()
         shadow = QGraphicsDropShadowEffect()
         shadow.setBlurRadius(5)
@@ -73,6 +74,7 @@ class chatRoom(QWidget):
 
         #필수 변수
         self.parent = parent
+        self.msgetted = msgetted
         self.user = parent.w.user
         self.clientSocket = self.parent.w.clientSock
         self.lecId = self.getLecId()
@@ -83,9 +85,9 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.13', 3334))
+        # self.chatSocket.connect(('192.168.0.13', 3334))
         # self.chatSocket.connect(('192.168.43.180', 3334))
-        # self.chatSocket.connect(('192.168.25.22', 3334))
+        self.chatSocket.connect(('192.168.25.28', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
 
         self.history = self.getChatHistory()
@@ -255,12 +257,18 @@ class chatRoom(QWidget):
         self.tab.currentWidget().scrollToBottom()
 
     def quitClicked(self):
+
         commend = 'exit'
         self.chatSocket.send(commend.encode('utf-8'))
         #쓰레드 삭제
         self.t.quit()
         self.parent.chat = 0
         self.hide()
+        print(self.msgetted)
+        if self.msgetted == 1:
+            self.msgetted = 0
+            self.mwidget = msget.Invisible(self.parent)
+            self.mwidget.setMinimumSize(QSize(200, 200))
 
     def category_changed(self):
         self.tab.currentWidget().clear()

@@ -15,7 +15,7 @@ class ServerSocket:
     def __init__(self):
         self.numnum = 0
         try:
-            self.databasent = mdb.connect('localhost', 'root', '0428', 'db_testin')
+            self.databasent = mdb.connect('localhost', 'root', '789521', 'db_testin')
             print("Successfully Connected To DB")
         except mdb.Error as e:
             print('Not Connected Succefully To DB')
@@ -396,7 +396,7 @@ class ServerSocket:
                     #방금 넣은 reply_id 찾기
                     cur.execute("SELECT count(*) FROM reply")
                     reply = cur.fetchall()
-                    reply_id = reply[0][0]-1
+                    reply_id = reply[0][0]
                     #게시글 학생 학번,카테고리 id 찾기
                     cur.execute("SELECT student_id,category_id FROM chatting WHERE no ="+str(chat_id) )
                     chatResult = cur.fetchall()
@@ -470,6 +470,14 @@ class ServerSocket:
                 
                 
                 elif commend == 'ChatSearch':
+                    if len(side) > 3:
+                        searchlen = len(side) - 3
+                        search = " ".join(side[0:1 + searchlen])
+
+                        for i in range(searchlen + 1):
+                            del side[0]
+                        side.insert(0, search)
+                    
                     print(side)
                     cur = self.databasent.cursor()
                     cur.execute("SELECT no FROM category WHERE chatroom_name = '" + str(side[2])+"'")

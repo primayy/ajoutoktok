@@ -111,12 +111,37 @@ class changeNickPop(QDialog):
 
     def changeNickname(self,nick):
         #중복검사 안함 추가해야됨
-        commend = 'changeNick ' + self.parent.studid + " " + nick
+        commend = "OvelapCheck " + nick
         self.clientSocket.send(commend.encode('utf-8'))
-        res = self.clientSocket.recv(1024).decode('utf-8')
+        answer = self.clientSocket.recv(1024).decode('utf-8')
+        if answer == "newone":
+            send_noMark = QMessageBox()
+            send_noMark.setStyleSheet("background-color:#FFFFFF")
+            send_noMark.setText("닉네임 변경완료")
+            send_noMark.exec_()
 
-        self.parent.nickname.setText(nick)
-        self.close()
+            commend = 'changeNick ' + self.parent.studid + " " + nick
+            self.clientSocket.send(commend.encode('utf-8'))
+            res = self.clientSocket.recv(1024).decode('utf-8')
+
+            self.parent.nickname.setText(nick)
+            self.close()
+        elif answer == "noMark":
+            send_noMark = QMessageBox()
+            send_noMark.setStyleSheet("background-color:#FFFFFF")
+            send_noMark.setText("ERROR["+answer+"]: 특수문자 감지")
+            send_noMark.exec_()
+        elif answer == "length":
+            send_length = QMessageBox()
+            send_length.setStyleSheet("background-color:#FFFFFF")
+            send_length.setText("ERROR["+answer+"]: 길이는 4자~8자 한정")
+            send_length.exec_()
+        elif answer == "overlap":
+            send_overlap = QMessageBox()
+            send_overlap.setStyleSheet("background-color:#FFFFFF")
+            send_overlap.setText("ERROR["+answer+"]: 닉네임 중복")
+            send_overlap.exec_()
+
 
     def mousePressEvent(self, event):
         self.oldPos = event.globalPos()

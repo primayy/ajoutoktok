@@ -176,14 +176,12 @@ class lecture(QWidget):
         self.reply.widgetTmp = self.chat.chatWidget
         self.reply.clientSocket = self.clientSocket
 
-        self.chat.chatWidget = self.reply
 
         
         #리플 위젯 화면 뿌려주기
-        self.chat.chatWidget.comment_info = self.coursep
-        self.chat.chatWidget.replyList = self.chat.chatWidget.getReply()
-        self.chat.chatWidget.showReply()
-        self.chat.chatContentLayout.addWidget(self.chat.chatWidget)
+        self.reply.comment_info = self.coursep
+        self.reply.replyList = self.reply.getReply()
+        self.reply.showReply()
 
         self.reply.setWindowTitle(title[0])
         self.reply.setMinimumSize(QSize(400, 400))

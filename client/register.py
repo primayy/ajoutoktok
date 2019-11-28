@@ -282,9 +282,19 @@ class Register(QWidget):
             self.overlap_button_toggle()
         elif answer == "overlap":
             self.regi_qual=2
+        elif answer == "length":
+            self.regi_qual=3
+        elif answer == "noMark":
+            self.regi_qual=4
 
     def register(self,nick,department):
         if self.regi_qual == 1 :#새로운 아이디일때 (밑으로는 모두 한단계 indendation이 되었다.)
+            
+            send_newone = QMessageBox()
+            send_newone.setStyleSheet("background-color:#FFFFFF")
+            send_newone.setText("닉네임 사용가능")
+            send_newone.exec_()
+
             commend = 'register '+nick+" "+department+" "+self.studName+" "+self.studId
             self.clientSocket.send(commend.encode('utf-8'))
 
@@ -309,10 +319,30 @@ class Register(QWidget):
                 self.afterLogin = after_login.App(mainW, self.studId, self.studName, lectureId)
                 mainW.setCentralWidget(self.afterLogin)
                 self.close()
+
         elif self.regi_qual == 0 :
-            print("중복검사 하세요")
+            send_noMark = QMessageBox()
+            send_noMark.setStyleSheet("background-color:#FFFFFF")
+            send_noMark.setText("ERROR[검사X]: 중복검사 필요")
+            send_noMark.exec_()
         elif self.regi_qual == 2 :
-            print("아이디 중복")
+            send_overlap = QMessageBox()
+            send_overlap.setStyleSheet("background-color:#FFFFFF")
+            send_overlap.setText("ERROR[overlap]: 닉네임 중복")
+            send_overlap.exec_()
+        elif self.regi_qual == 3 :
+            send_overlap = QMessageBox()
+            send_overlap.setStyleSheet("background-color:#FFFFFF")
+            send_overlap.setText("ERROR[length]: 길이 4자~8자")
+            send_overlap.exec_()
+        elif self.regi_qual == 4 :
+            send_overlap = QMessageBox()
+            send_overlap.setStyleSheet("background-color:#FFFFFF")
+            send_overlap.setText("ERROR[noMark]: 특수문자 감지")
+            send_overlap.exec_()
+            
+            
+          
             
     #움직이지 못하게 만듬
     def mousePressEvent(self, event):

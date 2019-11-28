@@ -124,7 +124,7 @@ class Reply(QWidget):
                                 QPushButton{border:0px}''')
         self.btnLike.setIconSize(QSize(23, 23))
         self.btnLike.setMaximumWidth(35)
-        # self.btnLike.clicked.connect(self.likeClicked)
+        self.btnLike.clicked.connect(self.likeClicked)
 
         self.question_title_bottom.addWidget(self.dateLabel)
         self.question_title_bottom.addWidget(self.btnLike)
@@ -171,6 +171,15 @@ class Reply(QWidget):
         self.question_reply.scrollToBottom()
 
         # self.question_reply.update()
+
+    def likeClicked(self):
+        commend = 'like_update '+ self.parent.comment_info[6] + " " + self.parent.parent.stuid#학번 + msg
+        self.clientSocket.send(commend.encode('utf-8'))
+        # print(commend)
+        result = self.clientSocket.recv(1024)
+        result = result.decode('utf-8')
+
+        self.btnLike.setText(result)
 
     #뒤로가기 버튼 눌렀을시
     def returnToChat(self):
@@ -244,14 +253,6 @@ class replyWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        # BtnLike = QPushButton()
-        # BtnLike.setIcon(QIcon('./ui/chatting_ui/champion.png'))
-        # BtnLike.setStyleSheet('''
-        #                         QPushButton{border:0px}''')
-        # BtnLike.setIconSize(QSize(40, 40))
-        # BtnLike.setMaximumWidth(40)
-        # BtnLike.clicked.connect(self.likeClicked)
-        
         adopt_medal = QLabel()
         adopt_medal_img = QPixmap('./ui/chatting_ui/champion.png')
         adopt_medal_img = adopt_medal_img.scaled(45,45)

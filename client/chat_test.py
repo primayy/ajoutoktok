@@ -83,7 +83,7 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.31', 3334))
+        self.chatSocket.connect(('192.168.0.13', 3334))
         # self.chatSocket.connect(('192.168.43.180', 3334))
         # self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
@@ -317,12 +317,12 @@ class chatRoom(QWidget):
 
         self.mine.setWindowTitle("Mine")
         self.mine.setMinimumSize(QSize(400, 400))
-    
+
     
     def getChatHistory(self):
         commend = 'chat_history '+ self.lecId + " " + self.tab.tabText(self.tab.currentIndex())
         self.clientSocket.send(commend.encode('utf-8'))
-        result = self.clientSocket.recv(2048)
+        result = self.clientSocket.recv(4096)
         print(len(result))
         result = result.decode('utf-8')
 

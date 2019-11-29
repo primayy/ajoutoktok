@@ -28,7 +28,7 @@ class SystemTrayIcon(QSystemTrayIcon):
 
 
         #트레이 기본 설정
-        self.setIcon(QIcon('./icon/add.png'))
+        self.setIcon(QIcon('./icon/똑.png'))
         self.setToolTip('아주똑똑')
 
         self.setContextMenu(trayIconMenu)

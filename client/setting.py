@@ -29,6 +29,7 @@ class setting(QWidget):
                                         ''')
 
         alarm_groupbox = QGroupBox('알림')
+        alarm_groupbox.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
         alarm_groupbox.setMinimumSize(300,300)
 
 
@@ -44,8 +45,10 @@ class setting(QWidget):
         horizon_line.setAlignment(Qt.AlignTop)
 
         alarm_widget_label = QLabel('알림 위젯')
+        alarm_widget_label.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
 
         alarm_sound_label = QLabel('소리 기능')
+        alarm_sound_label.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
         alarm_sound_label.setAlignment(Qt.AlignLeft)
 
         # 위젯 on/off 버튼
@@ -73,7 +76,7 @@ class setting(QWidget):
 
 
         self.title.addWidget(setting_label)
-        self.title.addWidget(logoutbtn)
+        #self.title.addWidget(logoutbtn)
 
         self.line.addWidget(alarm_widget_label)
         self.line.addWidget(self.widget_on_off_button,alignment=(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop))

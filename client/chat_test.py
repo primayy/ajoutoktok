@@ -78,7 +78,7 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.41', 3334))
+        self.chatSocket.connect(('192.168.0.49', 3334))
         # self.chatSocket.connect(('192.168.43.180', 3334))
         # self.chatSocket.connect(('192.168.0.49',3334))
         #self.chatSocket.connect(('192.168.25.28', 3334))

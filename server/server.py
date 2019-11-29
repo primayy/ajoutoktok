@@ -281,13 +281,13 @@ class ServerSocket:
                         #학생 강의 디비에 추가
                         query = 'INSERT INTO student_course (student_id,lecture_id,lecture_code) Values (%s,%s,%s)'
                         cur.execute(query, (side[1], side[0], lec_code))
+                        self.databasent.commit()
 
                         #이 그룹에 이전에 속해있던 학생인지 확인
                         cur.execute("SELECT * FROM points WHERE Student_id ='" + str(side[1]) + "' AND Lec_id ='" + lec_code + "'")
                         search_result = cur.fetchall()
 
                         if len(search_result) == 0:
-                            print('qeqe')
                             #포인트 디비에 강의 추가
                             query = 'INSERT INTO points (Student_id,Depart,Lec_id,points) Values (%s,%s,%s,%s)'
                             cur.execute(query, (side[1], depart , lec_code, str(0)))
@@ -316,6 +316,17 @@ class ServerSocket:
                             cur.execute(query, (side[1], side[0], lec_code))
 
                             self.databasent.commit()
+
+                            # 이 그룹에 이전에 속해있던 학생인지 확인
+                            cur.execute("SELECT * FROM points WHERE Student_id ='" + str(side[1]) + "' AND Lec_id ='" + lec_code + "'")
+                            search_result = cur.fetchall()
+
+                            if len(search_result) == 0:
+                                # 포인트 디비에 강의 추가
+                                query = 'INSERT INTO points (Student_id,Depart,Lec_id,points) Values (%s,%s,%s,%s)'
+                                cur.execute(query, (side[1], depart, lec_code, str(0)))
+
+                                self.databasent.commit()
                             print('저장 완료')
                             client.send('add_success'.encode('utf-8'))
 

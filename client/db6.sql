@@ -16,11 +16,35 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `category`
+-- Table structure for table `alarm`
 --
 
-CREATE DATABASE db_testin;
-use db_testin;
+DROP TABLE IF EXISTS `alarm`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `alarm` (
+  `no` int(11) NOT NULL AUTO_INCREMENT,
+  `chat_id` int(11) NOT NULL,
+  `chat_student_id` char(9) NOT NULL,
+  `reply_id` int(11) NOT NULL,
+  `reply_student_id` char(9) NOT NULL,
+  `reply_selected` int(1) NOT NULL,
+  PRIMARY KEY (`no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `alarm`
+--
+
+LOCK TABLES `alarm` WRITE;
+/*!40000 ALTER TABLE `alarm` DISABLE KEYS */;
+/*!40000 ALTER TABLE `alarm` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `category`
+--
 
 DROP TABLE IF EXISTS `category`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -143,7 +167,7 @@ CREATE TABLE `points` (
 
 LOCK TABLES `points` WRITE;
 /*!40000 ALTER TABLE `points` DISABLE KEYS */;
-INSERT INTO `points` VALUES ('201620139','소프트웨어학과','F066-1',5),('201620139','소프트웨어학과','F013-1',2),('201620139','소프트웨어학과','F043-1',1),('201423510','소프트웨어학과','H501',7),('201856370','미디어학과','F066-1',9),('201620949','사이버보안학과','F043-1',1),('201620949','사이버보안학과','F066-1',5),('201736985','미디어학과','F013-1',6),('201135421','미디어학과','F043-1',5);
+INSERT INTO `points` VALUES ('201135421','미디어학과','F043-1',5),('201423510','소프트웨어학과','H501',7),('201620139','소프트웨어학과','F013-1',2),('201620139','소프트웨어학과','F043-1',1),('201620139','소프트웨어학과','F066-1',5),('201620949','사이버보안학과','F043-1',1),('201620949','사이버보안학과','F066-1',5),('201736985','미디어학과','F013-1',6),('201856370','미디어학과','F066-1',9);
 /*!40000 ALTER TABLE `points` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -173,31 +197,6 @@ LOCK TABLES `reply` WRITE;
 /*!40000 ALTER TABLE `reply` DISABLE KEYS */;
 /*!40000 ALTER TABLE `reply` ENABLE KEYS */;
 UNLOCK TABLES;
-
-
-DROP TABLE IF EXISTS `alarm`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `alarm` (
-  `no` int(11) NOT NULL AUTO_INCREMENT,
-  `chat_id` int(11) NOT NULL,
-  `chat_student_id` char(9) NOT NULL,
-  `reply_id` int(11) NOT NULL,
-  `reply_student_id` char(9) NOT NULL,
-  `reply_selected` int(1) NOT NULL,
-  PRIMARY KEY (`no`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `alarm`
---
-
-LOCK TABLES `alarm` WRITE;
-/*!40000 ALTER TABLE `alarm` DISABLE KEYS */;
-/*!40000 ALTER TABLE `alarm` ENABLE KEYS */;
-UNLOCK TABLES;
-
 
 --
 -- Table structure for table `student_course`
@@ -231,7 +230,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `student_id`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `student_id`(
+CREATE TABLE `student_id` (
   `no` int(11) NOT NULL AUTO_INCREMENT,
   `student_id` char(9) DEFAULT NULL,
   PRIMARY KEY (`no`)
@@ -244,7 +243,6 @@ CREATE TABLE `student_id`(
 
 LOCK TABLES `student_id` WRITE;
 /*!40000 ALTER TABLE `student_id` DISABLE KEYS */;
-INSERT INTO `student_id` VALUES (0,"NewY");
 /*!40000 ALTER TABLE `student_id` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -268,7 +266,7 @@ CREATE TABLE `user` (
   `widget_on_off` int(1) DEFAULT '0',
   `sound_on_off` int(1) DEFAULT '0',
   PRIMARY KEY (`no`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -277,7 +275,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user`(student_id,name,nickname,department) VALUES (201856370,"한해가","NewY",'미디어학과'),(201620139,"전일건","JRTHP",'소프트웨어학과'),(201423510,"다갔네","훋",'소프트웨어학과'),(201620949,"하루도","DAy",'사이버보안학과'),(201736985,"지났고","하이루염",'미디어학과'),(201135421,"졸립다","Zzz",'미디어학과');
+INSERT INTO `user` VALUES (4,'201856370','한해가','NewY','미디어학과',0,0,0,0,0,0),(5,'201620139','전일건','JRTHP','소프트웨어학과',0,0,0,0,0,0),(6,'201423510','다갔네','훋','소프트웨어학과',0,0,0,0,0,0),(7,'201620949','하루도','DAy','사이버보안학과',0,0,0,0,0,0),(8,'201736985','지났고','하이루염','미디어학과',0,0,0,0,0,0),(9,'201135421','졸립다','Zzz','미디어학과',0,0,0,0,0,0);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -290,4 +288,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-11-21 16:05:48
+-- Dump completed on 2019-11-29 14:11:29

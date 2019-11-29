@@ -222,6 +222,20 @@ class ServerSocket:
                     print('클라이언트로 lecture 정보 전송')
                     client.send(lecture_info.encode('utf-8'))
 
+                
+                elif commend == 'like_status':
+                    cur = self.databasent.cursor()
+                    print(side)
+                    cur.execute("SELECT likes_num FROM likes WHERE chat_id =" + str(side[0]) + " AND student_id = '"+str(side[1])+"'")
+                    allSQLRows = cur.fetchall()
+                    print(allSQLRows)
+                    likes_num = 0
+                    if len(allSQLRows)>0:
+                        likes_num = allSQLRows[0][0]
+
+                    print('클라이언트로 lecture 정보 전송')
+                    client.send(str(likes_num).encode('utf-8'))
+
                 elif commend == 'groupSearch':
                     print('그룹 조회 왔다')
                     print(side)

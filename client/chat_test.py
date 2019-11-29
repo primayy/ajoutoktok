@@ -78,7 +78,7 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.14', 3334))
+        self.chatSocket.connect(('192.168.0.41', 3334))
         # self.chatSocket.connect(('192.168.43.180', 3334))
         # self.chatSocket.connect(('192.168.0.49',3334))
         #self.chatSocket.connect(('192.168.25.28', 3334))
@@ -454,9 +454,18 @@ class chatWidget(QWidget):
 
     def initUI(self):
         if len(self.comments) != 2:
-            self.BtnLike = QPushButton(self.comments[3])
-            self.BtnLike.setIcon(QIcon('./ui/chatting_ui/unchecked_heart.png'))
-            self.BtnLike.setStyleSheet('''
+            commend = 'like_status '+ self.comments[6] + " " + self.grandparent.stuid#학번
+            self.clientSocket.send(commend.encode('utf-8'))
+            # print(commend)
+            result = self.clientSocket.recv(1024)
+            result = result.decode('utf-8')
+            if result == '0':
+                self.BtnLike = QPushButton(self.comments[3])
+                self.BtnLike.setIcon(QIcon('./ui/chatting_ui/unchecked_heart.png'))
+            elif result == '1':
+                self.BtnLike = QPushButton(self.comments[3])
+                self.BtnLike.setIcon(QIcon('./ui/chatting_ui/checked_heart.png'))
+                self.BtnLike.setStyleSheet('''
             QPushButton{border:0px; background-color:#e8f3f4; width:45px}''')
             self.BtnLike.setIconSize(QSize(30,30))
             #BtnLike.setMaximumWidth()
@@ -495,6 +504,11 @@ class chatWidget(QWidget):
         result = result.decode('utf-8')
 
         self.BtnLike.setText(result)
+        if result == '0':
+            self.BtnLike.setIcon(QIcon('./ui/chatting_ui/unchecked_heart.png'))
+        elif result == '1':
+            self.BtnLike.setIcon(QIcon('./ui/chatting_ui/checked_heart.png'))
+
 
     def mousePressEvent(self, QMouseEvent):
         if QMouseEvent.button() == Qt.LeftButton:

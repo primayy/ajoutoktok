@@ -45,14 +45,9 @@ class Invisible(QWidget):
         self.initUI()
 
     def initUI(self):
-        # print(self.origin_num)
-
         self.t = update_listener(parent=self)
         self.t.countUpdate.connect(self.count_update)
         self.t.start()
-
-        # print(self.lecture)
-        # print(self.lecture_code)
 
         self.l = QLabel()
         self.chatcount = 0

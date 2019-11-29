@@ -27,10 +27,8 @@ class update_listener(QThread):
 
             if update_commend == 'update':
                 self.chatUpdate.emit()
-                # print('업데이트 시그널 emit')
             elif update_commend == 'stop':
                 self.go = False
-                print('멈춤')
                 # break
 
 class Reply(QWidget):
@@ -70,8 +68,6 @@ class Reply(QWidget):
         self.questionLayout = QVBoxLayout()
         self.questionWidget.setLayout(self.questionLayout)
         self.questionWidget.setMaximumSize(500,180)
-        
-        # self.questionLayout.setContentsMargins(0,0,0,0)
 
 
         #위젯에 다른 위젯 추가하기 위한 레이아웃 선언
@@ -86,7 +82,6 @@ class Reply(QWidget):
         self.setLayout(self.mainLayout)
         self.setMinimumSize(500, 400)
         self.setStyleSheet('background-color:white')
-        # self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.initUI()
 
     def initUI(self):
@@ -119,7 +114,6 @@ class Reply(QWidget):
         self.dateLabel = QLabel()
         self.dateLabel.setStyleSheet('font:7pt 나눔스퀘어라운드 Regular')
         self.btnLike = QPushButton()
-        # self.btnLike.setText(str(self.comment_info[3]))
         self.btnLike.setIcon(QIcon('./ui/chatting_ui/unchecked_heart.png'))
         self.btnLike.setStyleSheet('''
                                 QPushButton{border:0px}''')
@@ -136,8 +130,6 @@ class Reply(QWidget):
         #질문 목록
         self.question_reply = QListWidget()
         self.question_reply.scrollToBottom()
-        #self.question_reply.setBaseSize(500,)
-        #self.question_reply.setMaximumSize(500,400)
         self.question_reply.setContentsMargins(0,0,0,0)
         self.question_reply.setStyleSheet('''
                         QListWidget:item:hover{background:#95c3cb};
@@ -149,8 +141,7 @@ class Reply(QWidget):
         self.topbar.addStretch(1)
         self.topbar.addWidget(btnRefresh)
         self.widgetLayout.addLayout(self.topbar,1)
-        #self.widgetLayout.setStretchFactor(self.topbar,1)
-        
+
         self.widgetLayout.addWidget(self.questionWidget)
         self.widgetLayout.setStretchFactor(self.questionWidget,2)
         self.widgetLayout.addWidget(self.question_reply)
@@ -159,7 +150,6 @@ class Reply(QWidget):
         # self.show()
 
     def refresh(self):
-        print('aaaa')
         self.question_reply.clear()
         self.replyList = self.getReply()
         for i in range(len(self.replyList)):
@@ -171,12 +161,10 @@ class Reply(QWidget):
             self.question_reply.addItem(item)
         self.question_reply.scrollToBottom()
 
-        # self.question_reply.update()
 
     def likeClicked(self):
         commend = 'like_update '+ self.parent.comment_info[6] + " " + self.parent.parent.stuid#학번 + msg
         self.clientSocket.send(commend.encode('utf-8'))
-        # print(commend)
         result = self.clientSocket.recv(1024)
         result = result.decode('utf-8')
 
@@ -186,14 +174,14 @@ class Reply(QWidget):
     def returnToChat(self):
         self.close()
         self.parent.chatWidget = self.widgetTmp
-        print(self.parent.sendType)
+
         self.parent.sendType = True
         self.widgetTmp.show()
 
     #질문에 대한 답글 읽어옴
     def getReply(self):
         commend = 'replyHistory ' + self.comment_info[6]
-        print(commend)
+
         self.clientSocket.send(commend.encode('utf-8'))
 
         res = self.clientSocket.recv(1024)
@@ -204,7 +192,6 @@ class Reply(QWidget):
 
         else:
             res = res.split('/')
-            print(res)
             res.pop()
             reply = []
 
@@ -269,13 +256,11 @@ class replyWidget(QWidget):
         
         question.setStyleSheet('width:400px;')
 
-        #question.setStyleSheet('width:200px')
         question.setText(self.comments[0])
 
         question2 = QTextBrowser()
         question2.setMaximumWidth(370)
         question2.setMinimumWidth(370)
-        #question2.setMaximumHeight(70)
         question2.setFixedHeight(60)
         question2.setStyleSheet("border:1px;"
                                 "border-color:red;"
@@ -382,7 +367,7 @@ class studentInfo(QDialog):
 
     def mouseMoveEvent(self, event):
         delta = QPoint(event.globalPos() - self.oldPos)
-        # print(delta)
+
         self.move(self.x() + delta.x(), self.y() + delta.y())
         self.oldPos = event.globalPos()
 
@@ -417,13 +402,12 @@ class sendQuestion(QDialog):
 
     def sendToEmail(self):
         self.close()
-        print(self.parent.comments)
         commend = 'reply_select ' + self.parent.comments[3] + " " + self.parent.parent.parent.stuid  # reply_id + 학번
+
         self.parent.parent.clientSocket.send(commend.encode('utf-8'))
-        # print(commend)
         result = self.parent.parent.clientSocket.recv(1024)
         result = result.decode('utf-8')
-        print(result)
+
         if(result == "already"):
             send_already = QMessageBox()
             send_already.setStyleSheet("background-color:#FFFFFF")

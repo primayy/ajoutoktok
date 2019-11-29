@@ -31,12 +31,6 @@ class setting(QWidget):
         alarm_groupbox = QGroupBox('알림')
         alarm_groupbox.setMinimumSize(300,300)
 
-        # setting_label = QLabel('설정')
-        # setting_label.setAlignment(Qt.AlignLeft)
-        # setting_label.setStyleSheet('''font-weight: Bold; font-size: 16pt''')
-
-        # horizon_line = QLabel('─────────────────────')
-        # horizon_line.setAlignment(Qt.AlignCenter)
 
         #강의 목록 그리기
         setting_label = QLabel('개인 설정')
@@ -50,7 +44,6 @@ class setting(QWidget):
         horizon_line.setAlignment(Qt.AlignTop)
 
         alarm_widget_label = QLabel('알림 위젯')
-        # alarm_widget_label.setAlignment(Qt.AlignLeft)
 
         alarm_sound_label = QLabel('소리 기능')
         alarm_sound_label.setAlignment(Qt.AlignLeft)

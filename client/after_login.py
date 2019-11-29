@@ -173,7 +173,6 @@ class App(QWidget):
     def goToBB(self):
         w = QApplication.activeWindow()
         url = w.user['bb_url']
-        print(url)
         webbrowser.open(url)
 
     def profile(self):
@@ -207,9 +206,6 @@ class App(QWidget):
         self.rightSideLayout.addWidget(self.rightSideInfo)
 
     def quitClicked(self):
-        # commend = 'exit'
-        # self.clientSocket.send(commend.encode('utf-8'))
-        # QApplication.quit()
         self.w.hide()
 
 if __name__ == "__main__":

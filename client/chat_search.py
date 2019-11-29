@@ -44,7 +44,6 @@ class Search(QWidget):
         self.questionLayout = QVBoxLayout()
         self.questionWidget.setLayout(self.questionLayout)
         self.questionWidget.setMaximumSize(500,200)
-        # self.questionLayout.setContentsMargins(0,0,0,0)
 
 
         #위젯에 다른 위젯 추가하기 위한 레이아웃 선언
@@ -59,14 +58,13 @@ class Search(QWidget):
         self.setLayout(self.mainLayout)
         self.setMinimumSize(500, 400)
         self.setStyleSheet('background-color:white')
-        # self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+
         self.initUI()
 
     def initUI(self):
         #화면 구성요소
         #위젯은 widgetLayout에 추가하면 됨
 
-    
         self.search_input = QTextEdit()
         self.search_input.setStyleSheet('background:white')
 
@@ -104,20 +102,19 @@ class Search(QWidget):
             self.question_search.addItem(item)
         self.question_search.scrollToBottom()
 
-        # self.question_search.update()
 
     #뒤로가기 버튼 눌렀을시
     def returnToChat(self):
         self.close()
         self.parent.chatWidget = self.widgetTmp
-        print(self.parent.sendType)
+
         self.parent.sendType = True
         self.widgetTmp.show()
 
     #질문에 대한 답글 읽어옴
     def getSearch(self):
         commend = 'ChatSearch ' + self.search_input.toPlainText() +" "+ self.lecture_code +" "+self.tabId
-        print(commend)
+
         self.clientSocket.send(commend.encode('utf-8'))
         
         searched = self.clientSocket.recv(1024)
@@ -128,7 +125,7 @@ class Search(QWidget):
 
         else:
             searched = searched.split('/')
-            print(searched)
+
             searched.pop()
             searchedResult = []
 

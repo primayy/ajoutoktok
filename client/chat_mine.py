@@ -21,6 +21,7 @@ class Mine(QWidget):
         self.student_id = stdid
         self.lecture_code = LeCode
         self.widgetTmp = QWidget()
+
         #효과 설정
         shadow = QGraphicsDropShadowEffect()
         shadow.setBlurRadius(5)
@@ -45,7 +46,6 @@ class Mine(QWidget):
         self.questionLayout = QVBoxLayout()
         self.questionWidget.setLayout(self.questionLayout)
         self.questionWidget.setMaximumSize(500,200)
-        # self.questionLayout.setContentsMargins(0,0,0,0)
 
 
         #위젯에 다른 위젯 추가하기 위한 레이아웃 선언
@@ -60,7 +60,7 @@ class Mine(QWidget):
         self.setLayout(self.mainLayout)
         self.setMinimumSize(500, 400)
         self.setStyleSheet('background-color:white')
-        # self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+
         self.initUI()
 
     def initUI(self):
@@ -97,14 +97,14 @@ class Mine(QWidget):
     def returnToChat(self):
         self.close()
         self.parent.chatWidget = self.widgetTmp
-        print(self.parent.sendType)
+
         self.parent.sendType = True
         self.widgetTmp.show()
 
     #질문에 대한 답글 읽어옴
     def getMine(self):
         commend = 'ChatMine ' + self.student_id +" "+ self.lecture_code+" "+self.tabId
-        print(commend)
+
         self.clientSocket.send(commend.encode('utf-8'))
         
         mine = self.clientSocket.recv(1024)
@@ -115,7 +115,7 @@ class Mine(QWidget):
 
         else:
             mine = mine.split('/')
-            print(mine)
+
             mine.pop()
             mineResult = []
 

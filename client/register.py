@@ -51,8 +51,6 @@ class Register(QWidget):
         init_register_word = QPixmap('./ui/register_ui/초기등록2.png')
         init_register_word = init_register_word.scaled(277,53,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
         init_register_label.setPixmap(init_register_word)
-        #init_register_label.setAlignment(Qt.AlignTop)
-        #init_register_label.setStyleSheet('''font-weight: Bold; font-size: 16pt''')
 
         #구분선
         horizon_line = QLabel()
@@ -77,19 +75,13 @@ class Register(QWidget):
         #학번
         student_id_label = QLabel(' 학번')
         student_id_label.setStyleSheet("font: 9pt 나눔바른펜")
-        # student_id_img = QPixmap('./ui/register_ui/학번.png')
-        # student_id_img = student_id_img.scaled(75,47,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
-        # student_id_label.setPixmap(student_id_img)
         student_id =  QLabel(self.studId)
         student_id.setStyleSheet("font: 9pt 나눔바른펜")
 
         #학과
         department_label = QLabel('학과')
         department_label.setStyleSheet("font: 9pt 나눔바른펜")
-        # department_img = QPixmap('./ui/register_ui/학과.png')
-        # department_img = department_img.scaled(75,47,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
-        # department_label.setPixmap(department_img)
-        
+
         department_comboBox = QComboBox(self)
         department_comboBox.setStyleSheet('''
                 QListWidget:item:{background:white};
@@ -97,8 +89,6 @@ class Register(QWidget):
                 QListWidget:item{padding:0px; width:100px; height:23}
                 ''')
         if 1==1:
-        #if department_label_upper == '공과대학' :
-            #department_comboBox.clear()
             department_comboBox.addItem('기계학과')
             department_comboBox.addItem('산업공학과')
             department_comboBox.addItem('화학공학과')
@@ -109,65 +99,44 @@ class Register(QWidget):
             department_comboBox.addItem('건축학과')
             department_comboBox.addItem('융합시스템공학과')
 
-        #elif department_label_upper == '정보통신대학' :
-            #department_comboBox.clear()
             department_comboBox.addItem('전자공학과')
             department_comboBox.addItem('미디어학과')
             department_comboBox.addItem('사이버보안학과')
             department_comboBox.addItem('소프트웨어학과')
             department_comboBox.addItem('국방디지털융합학과')
-            
-        #elif department_label_upper == '자연과학대학' :
-            #department_comboBox.clear()
+
             department_comboBox.addItem('수학과')
             department_comboBox.addItem('화학과')
             department_comboBox.addItem('물리학과')
             department_comboBox.addItem('생명과학과')
-            
-        #elif department_label_upper == '경영대학' :
-            #department_comboBox.clear()
+
             department_comboBox.addItem('경영학과')
             department_comboBox.addItem('금융공학과')
             department_comboBox.addItem('e-비즈니스학과')
             department_comboBox.addItem('글로벌경영학과')
-            
-        #elif department_label_upper == '인문대학' :
-            #department_comboBox.clear()
+
             department_comboBox.addItem('국어국문학과')
             department_comboBox.addItem('불어불문학과')
             department_comboBox.addItem('문화콘텐츠학과')
             department_comboBox.addItem('영어영문학과')
             department_comboBox.addItem('사학과')
-            
-        #elif department_label_upper == '사회과학대학' :
-            #department_comboBox.clear()
+
             department_comboBox.addItem('경제학과')
             department_comboBox.addItem('심리학과')
             department_comboBox.addItem('정치외교학과')
             department_comboBox.addItem('행정학과')
             department_comboBox.addItem('사회학과')
             department_comboBox.addItem('스포츠레저학과')
-            
-        #elif department_label_upper == '의과대학' :
-            #department_comboBox.clear()
-            department_comboBox.addItem('의학과')
-            
-        #elif department_label_upper == '간호대학' :
-            #department_comboBox.clear()
-            department_comboBox.addItem('간호학과')
-            
-        #elif department_label_upper == '약학대학' :
-            #department_comboBox.clear()
-            department_comboBox.addItem('약학대학')
-            
-        #elif department_label_upper == '다산학부대학' :
-            #department_comboBox.clear()
-            department_comboBox.addItem('다산학부대학')
-            
-        #elif department_label_upper == '국제학부' :
-            #department_comboBox.clear()
-            department_comboBox.addItem('국제학부')
 
+            department_comboBox.addItem('의학과')
+
+            department_comboBox.addItem('간호학과')
+
+            department_comboBox.addItem('약학대학')
+
+            department_comboBox.addItem('다산학부대학')
+
+            department_comboBox.addItem('국제학부')
 
 
         #닉네임
@@ -212,9 +181,7 @@ class Register(QWidget):
 
         self.widgetLayout.addStretch(2)
         self.widgetLayout.addLayout(self.title)
-        #self.widgetLayout.addWidget(horizon_line,alignment=Qt.AlignTop)
         self.widgetLayout.addWidget(explanation_label)
-        #self.widgetLayout.addStretch(1)
         self.widgetLayout.addLayout(self.name)
         self.widgetLayout.addLayout(self.id)
         self.widgetLayout.addLayout(self.department)
@@ -250,7 +217,6 @@ class Register(QWidget):
                                   '')
 
             for course in courses:
-                print(course.text)
                 if course.text == "Blackboard Learn 소개하기 (학습자용)":
                     continue
                 else:
@@ -267,14 +233,13 @@ class Register(QWidget):
                 course_code = temp.split('(')[1].split(')')[0]
                 res += course_name+','+course_code+'/'
 
-            # print(res)
             return res
 
     def nickname_overlap_check(self):
         commend = "OvelapCheck "
         commend += self.nickname_textbox.text()
         self.clientSocket.send(commend.encode('utf-8'))
-        print("중복확인")
+
         answer = self.clientSocket.recv(1024).decode('utf-8')
         if answer == "newone":
             send_newone = QMessageBox()
@@ -301,20 +266,17 @@ class Register(QWidget):
             send_noMark.exec_()
 
     def register(self,nick,department):
-        print(self.regi_qual)
         if self.regi_qual == 1 :#새로운 아이디일때 (밑으로는 모두 한단계 indendation이 되었다.)
 
             commend = 'register '+nick+" "+department+" "+self.studName+" "+self.studId
             self.clientSocket.send(commend.encode('utf-8'))
 
-            print("등록완료")
             res = self.clientSocket.recv(1024)
             if res.decode('utf-8') == 'registered':
                 commend = 'courses_create '+self.studId + " " + self.courses
                 self.clientSocket.send(commend.encode('utf-8'))
 
                 course_res = self.clientSocket.recv(1024).decode('utf-8')
-                # print(course_res)
 
                 commend = 'login ' + self.studId
                 self.clientSocket.send(commend.encode('utf-8'))

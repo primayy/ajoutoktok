@@ -15,11 +15,11 @@ class alarm(QWidget):
         self.stuid = studId
         self.clientSocket = parent.clientSocket
         self.title = QHBoxLayout()
+
         #강의 목록 그리기
         group = QLabel('알림')
         group.setStyleSheet("font: 16pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a")
-        #horizon_line = QLabel('─────────────────────')
-            #구분선
+
         horizon_line = QLabel()
         horizon_img = QPixmap('./ui/afterlogin_ui/horizon_line.png')
         horizon_img = horizon_img.scaled(310,12,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
@@ -51,7 +51,6 @@ class alarm(QWidget):
         self.title.addWidget(btn_remove_all,alignment=(QtCore.Qt.AlignBottom)) #alignment=(QtCore.Qt.AlignRight)
         self.mainLayout.addLayout(self.title)
         self.mainLayout.addWidget(horizon_line)
-        #self.mainLayout.addWidget(btn_remove_all,alignment=(QtCore.Qt.AlignRight))
         self.mainLayout.addWidget(self.viewer)
         self.setLayout(self.mainLayout)
     
@@ -68,16 +67,12 @@ class alarm(QWidget):
                 replylyId += self.replyIDs[i] + ";;;"
 
 
-        
-
         commend = "RemoveAlarm " + chattyId + " " + replylyId
         self.clientSocket.send(commend.encode('utf-8'))
         result = self.clientSocket.recv(1024).decode('utf-8')
         self.viewer.clear()
 
 
-        
-    
     def showAlarms(self):
         for i in range(len(self.alarm_list)):
             for ii in range(len(self.alarm_list[i])):
@@ -103,8 +98,7 @@ class alarm(QWidget):
 
         chatAlarm = chatAlarm.split("*&^%")[:-1] # 끝에 생성되는 [''] 삭제
         replyAlarm = replyAlarm.split("*&^%")[:-1] # 끝에 생성되는 [''] 삭제
-        # print(chatAlarm)
-        # print(replyAlarm)
+
         return [chatAlarm,replyAlarm]
 
 class alarm_group(QWidget):
@@ -151,17 +145,16 @@ class lecture(QWidget):
             layoutout = QVBoxLayout()
             Qlabel1 = QLabel(str("[강의: "+course[0]+"]에 게시한 글 '"+course[1]+"'에 "+course[2]+"개의 댓글이 추가되었습니다."))
             dateAtime = str(course[-4])
-            print(dateAtime)
+
             layoutout.addWidget(Qlabel1)
             if(len(dateAtime)>0):
                 dateBtime = dateAtime.split("(")[3].split(")")[0]
-                print(dateBtime)
+
                 datetime = dateBtime.split(",")
-                print(datetime)
+
                 date = ".".join(datetime[0:3])
                 time = ":".join(datetime[3:6])
-                print(date)
-                print(time)
+
                 Qlabel2 = QLabel(str(date)+" "+str(time))
                 layoutout.addWidget(Qlabel2)
             self.alarm.setLayout(layoutout)
@@ -171,8 +164,6 @@ class lecture(QWidget):
         self.chatName = course[-2]
         self.LecID = course[-3]
         self.alarm.setStyleSheet('font: 10pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a')
-            #font: 20pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a
-            # print(course)
         self.layout_middle.addWidget(self.alarm)
 
         self.layout.addLayout(self.layout_middle)
@@ -181,7 +172,6 @@ class lecture(QWidget):
 
     def mousePressEvent(self, QMouseEvent):
         title = self.course
-        # self.chat = chat.chatRoom(title,self.stuid,self.w)
         self.chat = chat_test.chatRoom(self,0)
 
         self.chat.setWindowTitle(title[0])
@@ -189,6 +179,7 @@ class lecture(QWidget):
 
         #질문 목록 닫기
         self.chat.chatWidget.close()
+
         # 메시지 전송 타입 답글로 변경
         self.chat.sendType = False
 

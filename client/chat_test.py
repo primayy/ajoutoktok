@@ -34,7 +34,6 @@ class update_listener(QThread):
             if len(update_commend) != 1:
                 if update_commend[0] == 'update':
                     tmp = []
-                    # print(update_commend)
                     if len(update_commend) == 8:
                         for i in range(1, len(update_commend)):
                             tmp.append(update_commend[i])
@@ -45,23 +44,17 @@ class update_listener(QThread):
                         for i in range(msglen + 1):
                             del update_commend[3]
                         update_commend.insert(3, msg)
-                        # print(update_commend)
 
                         for i in range(1, len(update_commend)):
                             tmp.append(update_commend[i])
-                        # print(tmp)
 
                     self.chatUpdate.emit(tmp)
-                    # print('업데이트 시그널 emit')
                 elif update_commend[0] == 'stop':
                     self.go = False
-                    # print('멈춤')
 
             else:
                 if update_commend =='stop':
                     self.go = False
-                    # print('멈춤')
-                    # break
 
 
 class chatRoom(QWidget):
@@ -266,7 +259,7 @@ class chatRoom(QWidget):
         self.t.quit()
         self.parent.chat = 0
         self.hide()
-        print(self.msgetted)
+
         if self.msgetted == 1:
             self.msgetted = 0
             self.mwidget = msget.Invisible(self.parent)
@@ -283,7 +276,6 @@ class chatRoom(QWidget):
 
         category = self.clientSocket.recv(1024)
         category = category.decode('utf-8')
-        # print(category)
 
         category = category.split(',')
         category.pop()
@@ -296,7 +288,6 @@ class chatRoom(QWidget):
         self.dlg.show()
 
     def showQuestions(self):
-        print(self.history)
         for i in range(len(self.history)):
             item = QListWidgetItem(self.tab.currentWidget())
 
@@ -333,7 +324,7 @@ class chatRoom(QWidget):
         commend = 'chat_history '+ self.lecId + " " + self.tab.tabText(self.tab.currentIndex())
         self.clientSocket.send(commend.encode('utf-8'))
         result = self.clientSocket.recv(4096)
-        print(len(result))
+
         result = result.decode('utf-8')
 
         if result == 'x':
@@ -369,7 +360,7 @@ class chatRoom(QWidget):
 
     def mouseMoveEvent(self, event):
         delta = QPoint(event.globalPos() - self.oldPos)
-        # print(delta)
+
         self.move(self.x() + delta.x(), self.y() + delta.y())
         self.oldPos = event.globalPos()
 
@@ -377,13 +368,13 @@ class chatRoom(QWidget):
         self.chat_input.setText('')
         if self.sendType == False:
             commend = 'sendReplyMsg ' + self.comment_info[6] + " " + self.parent.stuid + " " + msg
-            # print(commend)
+
 
             # main server에 알림
             self.clientSocket.send(commend.encode('utf-8'))
 
             tmp = self.clientSocket.recv(1024)
-            # print(tmp)
+
             self.chatWidget.refresh()
             # chat server에 전송 -> 모두에게 뿌리기 위해
             # self.chatSocket.send('chat_update'.encode('utf-8'))
@@ -434,14 +425,12 @@ class category_create(QDialog):
 
     def mouseMoveEvent(self, event):
         delta = QPoint(event.globalPos() - self.oldPos)
-        # print(delta)
         self.move(self.x() + delta.x(), self.y() + delta.y())
         self.oldPos = event.globalPos()
 
     def create_category(self, name):
         #db로 보내서 등록하고 탭 늘려야됨
         commend = 'category_create ' + self.parent.lecId + " " + name
-        # print(commend)
         self.clientSocket.send(commend.encode('utf-8'))
 
         new_tab = QListWidget(self)
@@ -499,10 +488,9 @@ class chatWidget(QWidget):
         self.mainLayout.addStretch(1)
 
     def likeClicked(self):
-        # print(self.comments)
         commend = 'like_update '+ self.comments[6] + " " + self.grandparent.stuid#학번 + msg
         self.clientSocket.send(commend.encode('utf-8'))
-        # print(commend)
+
         result = self.clientSocket.recv(1024)
         result = result.decode('utf-8')
 
@@ -544,7 +532,6 @@ class studentInfo(QDialog):
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.initUi()
 
-        print(self.parent.comments)
 
     def initUi(self):
         head = QLabel('정보')
@@ -596,7 +583,7 @@ class studentInfo(QDialog):
 
     def mouseMoveEvent(self, event):
         delta = QPoint(event.globalPos() - self.oldPos)
-        # print(delta)
+
         self.move(self.x() + delta.x(), self.y() + delta.y())
         self.oldPos = event.globalPos()
 
@@ -698,7 +685,7 @@ class sendQuestion(QWidget):
 
     def mouseMoveEvent(self, event):
         delta = QPoint(event.globalPos() - self.oldPos)
-        # print(delta)
+
         self.move(self.x() + delta.x(), self.y() + delta.y())
         self.oldPos = event.globalPos()
 

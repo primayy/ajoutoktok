@@ -109,7 +109,6 @@ class login(QWidget):
             self.goToBB = True
         else:
             self.goToBB = False
-        # print(self.goToBB)
 
     def btn_login_clicked(self):
         # 교수용
@@ -125,9 +124,8 @@ class login(QWidget):
 
                 result = self.clientSocket.recv(1024)
                 result = result.decode('utf-8')
-                print(result)
+
                 if result == 'first':
-                    print('bb')
                     mainW = QApplication.activeWindow()
                     self.register = register.Register(self, mainW, '교수님', '000000000')
                     mainW.setCentralWidget(self.register)
@@ -176,7 +174,6 @@ class login(QWidget):
                 result = result.decode('utf-8')
 
                 if result == 'first':
-                    print('aaaa')
                     mainW = QApplication.activeWindow()
                     self.register = register.Register(self, mainW, studentName, studentId)
                     mainW.setCentralWidget(self.register)
@@ -199,7 +196,6 @@ class login(QWidget):
 
             # 로그인 실패
             else:
-                print("Error")
                 msg = QMessageBox()
                 msg.setStyleSheet("background-color:#FFFFFF")
                 msg.setText("Error: Login Error")

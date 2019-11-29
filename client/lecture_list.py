@@ -40,18 +40,6 @@ class lecture_list(QWidget):
                 ''')
         self.lecture_list = self.getLectureList()
         self.showLectures()
-        # for i in range(len(lecture_list)):
-        #     item = QListWidgetItem(self.viewer)
-        #     custom_widget = lecture_group(lecture_list[i], QApplication.activeWindow(),self)
-        #     item.setSizeHint(custom_widget.sizeHint())
-        #     self.viewer.setItemWidget(item, custom_widget)
-        #     self.viewer.addItem(item)
-        #
-        # item = QListWidgetItem(self.viewer)
-        # custom_widget = lecture_group('add', QApplication.activeWindow(),self)
-        # item.setSizeHint(custom_widget.sizeHint())
-        # self.viewer.setItemWidget(item, custom_widget)
-        # self.viewer.addItem(item)
 
         # 메인 레이아웃 그리기
         self.title.addWidget(group)
@@ -61,7 +49,6 @@ class lecture_list(QWidget):
         self.setLayout(self.mainLayout)
         self.setWindowTitle('test')
         self.setStyleSheet("background-color:white")
-        # self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 
     def showLectures(self):
         for i in range(len(self.lecture_list)):
@@ -123,6 +110,8 @@ class group_search_dialog(QDialog):
 
         self.mainLayout.addWidget(groupSearchBar)
         self.mainLayout.addLayout(self.btnLayout)
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+
         self.setLayout(self.mainLayout)
 
     def group_search(self,lecture_code):
@@ -132,7 +121,6 @@ class group_search_dialog(QDialog):
         recv = self.clientSocket.recv(1024)
 
         result_parse = recv.decode('utf-8').split(',')
-        print(result_parse)
         self.group_add(result_parse)
 
 
@@ -144,7 +132,8 @@ class group_search_dialog(QDialog):
             msg.setText(result_parse[1] + " " + result_parse[2])
             group_add = msg.addButton('추가', QMessageBox.YesRole)
             group_cancel = msg.addButton('취소', QMessageBox.NoRole)
-            msg.setWindowTitle("그룹 조회")
+            msg.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+
             msg.exec_()
             # 그룹 추가
             if msg.clickedButton() == group_add:
@@ -155,7 +144,12 @@ class group_search_dialog(QDialog):
                 result = self.clientSocket.recv(1024)
                 result = result.decode('utf-8')
                 if result == 'already':
-                    print('이미 있다')
+                    msg = QMessageBox()
+                    msg.setStyleSheet("background-color:#FFFFFF")
+                    msg.setText("그룹에 이미 속해있습니다.")
+                    msg.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+                    msg.exec_()
+
                 else:
                     self.lecId.append(result_parse[0])
                     self.viewer.clear()
@@ -177,8 +171,10 @@ class group_search_dialog(QDialog):
             msg = QMessageBox()
             msg.setStyleSheet("background-color:#FFFFFF")
             msg.setText("그룹이 존재하지 않습니다.")
-            msg.setWindowTitle("그룹 조회")
+            msg.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+
             msg.exec_()
+
 
     def getLectureList(self):
         if self.lecId == 'x':
@@ -249,7 +245,7 @@ class lecture(QWidget):
             self.lecture = QLabel(course[0])
             self.lecture.setStyleSheet('font: 10pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a')
             #font: 20pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a
-            # print(course)
+
             self.layout_middle.addWidget(self.lecture)
             self.layout_middle.addWidget(self.btExit, alignment=(QtCore.Qt.AlignTop | QtCore.Qt.AlignRight))
 
@@ -321,11 +317,11 @@ class lecture_group(QWidget):
         super().__init__()
         self.parent = parent
         course = courses.split(',')
-        # print(course)
+
         self.mainLayout = QVBoxLayout()
         self.mainLayout.setContentsMargins(5,5,5,5)
+
         #그룹 그리기
-        # self.mainWidget = lecture(course, parent.studid, w, parent.viewer, parent.lecId)
         self.mainWidget = lecture(self.parent, course, w)
 
         self.mainLayout.addWidget(self.mainWidget)

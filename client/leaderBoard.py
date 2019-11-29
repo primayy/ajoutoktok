@@ -36,8 +36,8 @@ class LeaderBoard(QWidget):
         group = QLabel('리더보드')
         group.setStyleSheet("font: 16pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a")
         group.setAlignment(QtCore.Qt.AlignTop)
-        #horizon_line = QLabel('─────────────────────')
-            #구분선
+
+        #구분선
         horizon_line = QLabel()
         horizon_img = QPixmap('./ui/afterlogin_ui/horizon_line.png')
         horizon_img = horizon_img.scaled(310,12,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
@@ -67,7 +67,7 @@ class LeaderBoard(QWidget):
         commend += "1 " + self.studId
         self.clientSocket.send(commend.encode('utf-8'))
         result = self.clientSocket.recv(1024).decode('utf-8')
-        # print(str(result))
+
         UnivRank = str(result).split(" ")
         myRank = UnivRank.pop()
         myRank = str(myRank[0]) + " 등!"
@@ -111,8 +111,7 @@ class LeaderBoard(QWidget):
         self.mainLayout.addWidget(myPoint,alignment=(QtCore.Qt.AlignCenter))
         self.mainLayout.addWidget(empty)
         self.mainLayout.addStretch(1)
-        #self.mainLayout.addLayout(self.myRankLayout)
-        #self.mainLayout.addStretch(1)
+
         self.mainLayout.addWidget(self.tab)
         self.mainLayout.addWidget(empty)
         self.mainLayout.addWidget(empty)
@@ -139,18 +138,13 @@ class LeaderBoard(QWidget):
             commend += "1 " + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
             result = self.clientSocket.recv(1024).decode('utf-8')
-            # print(str(result))
+
             #등수 추가
             UnivRank = str(result).split(" ")
             myRank = UnivRank.pop()
             myRank = str(myRank[0]) +" 등!"
             self.myRank.setText(myRank)
 
-            # for i in range(len(UnivRank)):
-            #     if len(UnivRank[i])>0:#있을 때만, index out of range 오류 피하기
-            #         allRank = UnivRank[i].split(",")
-            #         if len(allRank)>0:#있을 때만, index out of range 오류 피하기
-            #             self.show_all.addItem(str("Points: "+allRank[0]+" / 아이디: "+allRank[1]))
             for i in range(len(UnivRank)):
                 if len(UnivRank[i])>0:
                     allRank = UnivRank[i].split(",")
@@ -174,17 +168,17 @@ class LeaderBoard(QWidget):
             commend += "2 " + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
             result = self.clientSocket.recv(1024).decode('utf-8')
-            # print(str(result))
+
             #등수 추가
             inDeptRank = result.split(" ")
             myRank = inDeptRank.pop()
             myRank = str(myRank[0]) +" 등!"
             self.myRank.setText(myRank)
-            # print(inDeptRank)
+
             for i in range(len(inDeptRank)):
                 if len(inDeptRank[i])>0:#있을 때만, index out of range 오류 피하기
                     inDepartRank = inDeptRank[i].split(",")
-                    # print(inDepartRank)
+
                     if len(inDepartRank)>0:#있을 때만, index out of range 오류 피하기
                         if i<3:
                             item = QListWidgetItem(self.show_inDepart)
@@ -196,7 +190,6 @@ class LeaderBoard(QWidget):
 
                     else:
                         self.show_inDepart.addItem("    "+str(str(i+1)+"등  "+inDepartRank[1]+"     " +inDepartRank[0]+"Pt"))
-                        #self.show_inDepart.addItem(str("Points: "+inDepartRank[0]+" / 아이디: "+inDepartRank[1]))
 
 
         elif self.tab.tabText(self.tab.currentIndex()) == '학과별':
@@ -205,7 +198,6 @@ class LeaderBoard(QWidget):
             commend += "3 " + self.studId
             self.clientSocket.send(commend.encode('utf-8'))
             result = self.clientSocket.recv(1024).decode('utf-8')
-            # print(str(result))
 
             DeptRank = result.split(" ")
             myRank = DeptRank.pop()
@@ -226,7 +218,6 @@ class LeaderBoard(QWidget):
 
                         else:
                             self.show_compDepart.addItem("  "+str(str(i+1)+"등  "+compDepartRank[1]+"       " +compDepartRank[0]+"Pt"))                       
-                            #self.show_compDepart.addItem(str("Points: "+compDepartRank[0]+" / 학과: "+compDepartRank[1]))
 
 class medalWidget(QWidget):
     def __init__(self, info,idx):
@@ -235,11 +226,6 @@ class medalWidget(QWidget):
         medal_layout = QHBoxLayout()
         medal_info_layout = QVBoxLayout()
         medal_img = QLabel()
-
-        # logo = QLabel()
-        # ajoutoktok = QPixmap('./ui/login_ui/toktok_logo.png')
-        # ajoutoktok= ajoutoktok.scaled(200,400,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
-        # logo.setPixmap(ajoutoktok)
 
         if idx==0:
             medal_img_file = QPixmap('./ui/board_ui/first.png')
@@ -272,8 +258,6 @@ class medalWidget(QWidget):
         medal_layout.setStretchFactor(medal_info_layout,4)
         medal_layout.setSpacing(5)
         self.setLayout(medal_layout)
-
-
 
 
 if __name__ == "__main__":

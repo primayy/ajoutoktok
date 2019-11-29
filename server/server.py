@@ -15,7 +15,7 @@ class ServerSocket:
     def __init__(self):
         self.numnum = 0
         try:
-            self.databasent = mdb.connect('localhost', 'root', '789521', 'db_testin')
+            self.databasent = mdb.connect('localhost', 'root', '0428', 'db_testin')
             print("Successfully Connected To DB")
         except mdb.Error as e:
             print('Not Connected Succefully To DB')
@@ -352,7 +352,6 @@ class ServerSocket:
                     #카테고리 정보 가져오기
                     cur.execute("SELECT no FROM category WHERE chatroom_name ='" + str(category_name) + "'"+ "AND lecture_id = '"+ str(lecid)+"'")
                     category_id = cur.fetchall()
-                    # print(category_id)
 
                     #채팅 저장
                     cur.execute(query, (category_id, msg, nick,stuid))
@@ -366,8 +365,13 @@ class ServerSocket:
                     self.databasent.commit()
 
                     #질문한 학생 정보 업데이트
-                    cur.execute("UPDATE user SET point = point + 5 WHERE student_id='"+str(stuid) + "'")
-                    cur.execute("UPDATE user SET quest = quest + 1 WHERE student_id='"+str(stuid) + "'")
+                    cur.execute("SELECT sum(points) From points WHERE Student_id ='" + str(stuid) +"'")
+                    myPoint = str(cur.fetchall()[0][0])
+                    cur.execute("UPDATE user SET point ='" + myPoint + "'WHERE student_id='"+str(stuid) + "'")
+                    cur.execute("SELECT count(*) From chatting WHERE Student_id ='" + str(stuid) +"'")
+                    myQuest = str(cur.fetchall()[0][0])
+                    cur.execute("UPDATE user SET quest ='" + myQuest +  "'WHERE student_id='"+str(stuid) + "'")
+
                     self.databasent.commit()
 
 
@@ -418,9 +422,13 @@ class ServerSocket:
                     self.databasent.commit()
 
                     #답글 작성한 유저 정보 업데이트
-                    cur.execute("UPDATE user SET point = point + 5 WHERE student_id='"+str(stuid) + "'")
-                    cur.execute("UPDATE user SET answer = answer + 1 WHERE student_id='"+str(stuid) + "'")
+                    cur.execute("SELECT sum(points) From points WHERE Student_id ='" + str(stuid) + "'")
+                    myPoint = str(cur.fetchall()[0][0])
+                    cur.execute("UPDATE user SET point ='" + myPoint + "'WHERE student_id='" + str(stuid) + "'")
 
+                    cur.execute("SELECT count(*) From reply WHERE student_id ='" + str(stuid) + "'")
+                    myReply = str(cur.fetchall()[0][0])
+                    cur.execute("UPDATE user SET answer ='" + myReply + "'WHERE student_id='"+str(stuid) + "'")
 
                     client.send('o'.encode('utf-8'))
 

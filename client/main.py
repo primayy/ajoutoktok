@@ -16,7 +16,9 @@ class Window(QMainWindow):
         # self.clientSock.connect(('34.84.112.149', port))
         # self.clientSock.connect(('192.168.0.13', port))
         # self.clientSock.connect(('192.168.43.180', port))
-        self.clientSock.connect(('192.168.25.28', port))
+        #self.clientSock.connect(('192.168.25.28', port))
+        self.clientSock.connect(('192.168.0.49', port))
+           
 
         #트레이 아이콘 생성
         self.tray = systemTray.SystemTrayIcon(self)

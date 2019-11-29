@@ -88,6 +88,7 @@ class App(QWidget):
         btnList = QPushButton()
         btnList.setMaximumHeight(200)
         btnList.setMaximumWidth(200)
+        btnList.setFocusPolicy(Qt.NoFocus)
         btnList.setStyleSheet('''
                         QPushButton{image:url(./ui/afterlogin_ui/list.png); border:0px; width:32px; height:32px}        
                         QPushButton:hover{background:#e9e9e2; border:0px}
@@ -102,19 +103,22 @@ class App(QWidget):
                         QPushButton{image:url(./ui/afterlogin_ui/alarm.png); border:0px; width:36px; height:36px}        
                         QPushButton:hover{image:url(./icon/bell2.png); background:#e9e9e2; border:0px}
                         ''')
+        btnAlram.setFocusPolicy(Qt.NoFocus)
         btnAlram.setToolTip('알림')
         btnAlram.clicked.connect(self.showAlarm)
 
         btnLeaderBoard = QPushButton()
         btnLeaderBoard.setToolTip('리더보드')
+        btnLeaderBoard.setFocusPolicy(Qt.NoFocus)
         btnLeaderBoard.setStyleSheet('''
                 QPushButton{image:url(./ui/afterlogin_ui/trophy.png); border:0px; width:40px; height:40px}        
-                QPushButton:hover{background:#e9e9e2; border:0px}
+                QPushButton:hover{image:url(./ui/afterlogin_ui/trophy (3).png);background:#e9e9e2; border:0px}
                 ''')
         btnLeaderBoard.clicked.connect(self.showLeader)
 
         btnMore = QPushButton()
         btnMore.setToolTip('설정')
+        btnMore.setFocusPolicy(Qt.NoFocus)
         btnMore.setStyleSheet('''
                         QPushButton{image:url(./ui/afterlogin_ui/setting.png); border:0px; width:32px; height:32px}        
                         QPushButton:hover{background:#e9e9e2; border:0px}

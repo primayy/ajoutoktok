@@ -71,12 +71,25 @@ class LeaderBoard(QWidget):
         UnivRank = str(result).split(" ")
         myRank = UnivRank.pop()
         myRank = str(myRank[0]) + " 등!"
+
+
         self.myRank.setText(myRank)
         for i in range(len(UnivRank)):
             if len(UnivRank[i])>0:
                 allRank = UnivRank[i].split(",")
+
                 if len(allRank)>0:
-                    self.show_all.addItem(str("Points: "+allRank[0]+" / 아이디: "+allRank[1]))
+                    if i<3:
+                        item = QListWidgetItem(self.show_all)
+                        custom_widget = medalWidget(allRank,i)
+                        item.setSizeHint(custom_widget.sizeHint())
+                        self.show_all.setItemWidget(item, custom_widget)
+                        self.show_all.addItem(item)
+                        self.show_all.update()
+
+                    else:
+                        self.show_all.addItem(str(str(i+1)+"등- "+allRank[1]+" / " +allRank[0]+"Pt"))
+                    #self.show_all.addItem(medal1_info_id)
             #########여기까지가 그 코드
 
 
@@ -133,11 +146,26 @@ class LeaderBoard(QWidget):
             myRank = str(myRank[0]) +" 등!"
             self.myRank.setText(myRank)
 
+            # for i in range(len(UnivRank)):
+            #     if len(UnivRank[i])>0:#있을 때만, index out of range 오류 피하기
+            #         allRank = UnivRank[i].split(",")
+            #         if len(allRank)>0:#있을 때만, index out of range 오류 피하기
+            #             self.show_all.addItem(str("Points: "+allRank[0]+" / 아이디: "+allRank[1]))
             for i in range(len(UnivRank)):
-                if len(UnivRank[i])>0:#있을 때만, index out of range 오류 피하기
+                if len(UnivRank[i])>0:
                     allRank = UnivRank[i].split(",")
-                    if len(allRank)>0:#있을 때만, index out of range 오류 피하기
-                        self.show_all.addItem(str("Points: "+allRank[0]+" / 아이디: "+allRank[1]))
+
+                    if len(allRank)>0:
+                        if i<3:
+                            item = QListWidgetItem(self.show_all)
+                            custom_widget = medalWidget(allRank,i)
+                            item.setSizeHint(custom_widget.sizeHint())
+                            self.show_all.setItemWidget(item, custom_widget)
+                            self.show_all.addItem(item)
+                            self.show_all.update()
+
+                        else:
+                            self.show_all.addItem(" "+str(str(i+1)+"등  "+allRank[1]+"      " +allRank[0]+"Pt"))
 
 
         elif self.tab.tabText(self.tab.currentIndex()) == '학과내':
@@ -158,7 +186,17 @@ class LeaderBoard(QWidget):
                     inDepartRank = inDeptRank[i].split(",")
                     # print(inDepartRank)
                     if len(inDepartRank)>0:#있을 때만, index out of range 오류 피하기
-                        self.show_inDepart.addItem(str("Points: "+inDepartRank[0]+" / 아이디: "+inDepartRank[1]))
+                        if i<3:
+                            item = QListWidgetItem(self.show_inDepart)
+                            custom_widget = medalWidget(inDepartRank,i)
+                            item.setSizeHint(custom_widget.sizeHint())
+                            self.show_inDepart.setItemWidget(item, custom_widget)
+                            self.show_inDepart.addItem(item)
+                            self.show_inDepart.update()
+
+                    else:
+                        self.show_inDepart.addItem("    "+str(str(i+1)+"등  "+inDepartRank[1]+"     " +inDepartRank[0]+"Pt"))
+                        #self.show_inDepart.addItem(str("Points: "+inDepartRank[0]+" / 아이디: "+inDepartRank[1]))
 
 
         elif self.tab.tabText(self.tab.currentIndex()) == '학과별':
@@ -174,12 +212,66 @@ class LeaderBoard(QWidget):
             myRank = str(myRank[0]) +" 등!"
             self.myRank.setText(myRank)
 
-            # print(DeptRank)
             for i in range(len(DeptRank)):
                 if len(DeptRank[i])>0:#있을 때만, index out of range 오류 피하기
                     compDepartRank = DeptRank[i].split(",")
                     if len(compDepartRank)>0:#있을 때만, index out of range 오류 피하기
-                        self.show_compDepart.addItem(str("Points: "+compDepartRank[0]+" / 학과: "+compDepartRank[1]))
+                        if i<3:
+                            item = QListWidgetItem(self.show_compDepart)
+                            custom_widget = medalWidget(compDepartRank,i)
+                            item.setSizeHint(custom_widget.sizeHint())
+                            self.show_compDepart.setItemWidget(item, custom_widget)
+                            self.show_compDepart.addItem(item)
+                            self.show_compDepart.update()
+
+                        else:
+                            self.show_compDepart.addItem("  "+str(str(i+1)+"등  "+compDepartRank[1]+"       " +compDepartRank[0]+"Pt"))                       
+                            #self.show_compDepart.addItem(str("Points: "+compDepartRank[0]+" / 학과: "+compDepartRank[1]))
+
+class medalWidget(QWidget):
+    def __init__(self, info,idx):
+        super().__init__()
+
+        medal_layout = QHBoxLayout()
+        medal_info_layout = QVBoxLayout()
+        medal_img = QLabel()
+
+        # logo = QLabel()
+        # ajoutoktok = QPixmap('./ui/login_ui/toktok_logo.png')
+        # ajoutoktok= ajoutoktok.scaled(200,400,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+        # logo.setPixmap(ajoutoktok)
+
+        if idx==0:
+            medal_img_file = QPixmap('./ui/board_ui/first.png')
+            medal_img_file= medal_img_file.scaled(50,50,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+            medal_img.setPixmap(medal_img_file)
+
+        elif idx==1:
+            medal_img_file = QPixmap('./ui/board_ui/second.png')
+            medal_img_file= medal_img_file.scaled(50,50,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+            medal_img.setPixmap(medal_img_file)
+
+        elif idx==2:
+            medal_img_file = QPixmap('./ui/board_ui/third.png')
+            medal_img_file= medal_img_file.scaled(50,50,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+            medal_img.setPixmap(medal_img_file)
+
+        medal_id = QLabel(info[1])
+        medal_id.setStyleSheet('font:11pt 나눔스퀘어라운드 Regular;')
+        medal_id.setAlignment(QtCore.Qt.AlignBottom)
+        medal_point = QLabel(info[0]+'Pt')
+        medal_point.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
+
+        medal_info_layout.addWidget(medal_id)
+        medal_info_layout.addWidget(medal_point)
+        medal_info_layout.setSpacing(0)
+
+        medal_layout.addWidget(medal_img)
+        medal_layout.setStretchFactor(medal_img,1)
+        medal_layout.addLayout(medal_info_layout)
+        medal_layout.setStretchFactor(medal_info_layout,4)
+        medal_layout.setSpacing(5)
+        self.setLayout(medal_layout)
 
 
 

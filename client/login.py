@@ -106,6 +106,7 @@ class login(QWidget):
         self.subLayer.addWidget(BtLogin)
 
         checkgoToBB = QCheckBox('black board 이동하기')
+        checkgoToBB.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
         checkgoToBB.stateChanged.connect(self.checkGoToBB)
 
         self.subLayer.addWidget(checkgoToBB)

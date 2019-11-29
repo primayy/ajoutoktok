@@ -87,7 +87,8 @@ class chatRoom(QWidget):
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
         # self.chatSocket.connect(('192.168.0.13', 3334))
         # self.chatSocket.connect(('192.168.43.180', 3334))
-        self.chatSocket.connect(('192.168.25.28', 3334))
+        self.chatSocket.connect(('192.168.0.49',3334))
+        #self.chatSocket.connect(('192.168.25.28', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
 
         self.history = self.getChatHistory()

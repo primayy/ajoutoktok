@@ -26,9 +26,13 @@ class alarm(QWidget):
         horizon_line.setPixmap(horizon_img)
         horizon_line.setAlignment(Qt.AlignTop)
 
-        btn_remove_all = QPushButton('모두 삭제')
-        btn_remove_all.clicked.connect(self.remove_it_all)
+        btn_remove_all = QPushButton()
+        btn_remove_all.setStyleSheet('''
+                        QPushButton{image:url(./ui/afterlogin_ui/모두삭제4.png); border:0px; width:100px; height:40px}        
+                        ''')
         
+        btn_remove_all.clicked.connect(self.remove_it_all)
+
         self.viewer = QListWidget(self)
 
         self.viewer.setMinimumSize(300, 500)
@@ -43,9 +47,11 @@ class alarm(QWidget):
 
         self.viewer.addItem(item) #혹시 몰라서 삭제 안함
         self.title.addWidget(group)
-        self.title.addWidget(btn_remove_all,alignment=QtCore.Qt.AlignRight)
+        self.title.addStretch(1)
+        self.title.addWidget(btn_remove_all,alignment=(QtCore.Qt.AlignBottom)) #alignment=(QtCore.Qt.AlignRight)
         self.mainLayout.addLayout(self.title)
         self.mainLayout.addWidget(horizon_line)
+        #self.mainLayout.addWidget(btn_remove_all,alignment=(QtCore.Qt.AlignRight))
         self.mainLayout.addWidget(self.viewer)
         self.setLayout(self.mainLayout)
     

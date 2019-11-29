@@ -70,7 +70,7 @@ class setting(QWidget):
         self.sound_on_off_button = QPushButton()
         self.sound_on_off_button.setMinimumHeight(50)
         self.sound_on_off_button.setMinimumWidth(50)
-        slef.sound_on_off_button.setFocusPolicy(Qt.NoFocus)
+        self.sound_on_off_button.setFocusPolicy(Qt.NoFocus)
         self.sound_on_off_button.setStyleSheet('''
                                 QPushButton{image:url(./icon/alarm_on.png); border:0px; width:50px; height:50px;}
                                 ''')

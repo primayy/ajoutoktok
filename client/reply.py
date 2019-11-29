@@ -244,6 +244,7 @@ class replyWidget(QWidget):
     def __init__(self,comments, parent):
         super().__init__()
         self.parent = parent
+        self.clientSocket = self.parent.clientSocket
         self.comments = comments
 
         self.replyLayout = QVBoxLayout()
@@ -296,19 +297,89 @@ class replyWidget(QWidget):
         self.mainLayout.addStretch(1)
         self.mainLayout.setSpacing(0)
 
-    def likeClicked(self):
-        print(self.comments)
-        
-
     def mousePressEvent(self, QMouseEvent):
-        if QMouseEvent.button() == Qt.LeftButton:
-            print(self.comments)
-            print("Left Button Clicked")
+        if QMouseEvent.button() == Qt.RightButton:
+            msg = QMessageBox()
 
-        elif QMouseEvent.button() == Qt.RightButton:
-            print("Right Button Clicked")
-            dlg = sendQuestion(self)
-            dlg.exec_()
+            msg.setWindowTitle('옵션')
+            msg.setText('어떤 작업을 수행하시겠습니까?')
+            msg.addButton(QPushButton('채택'), 0)
+            msg.addButton(QPushButton('취소'), 1)
+            msg.addButton(QPushButton('정보'), 2)
+
+            msg.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+
+            result = msg.exec_()
+
+            if result == 0:
+                dlg = sendQuestion(self)
+                dlg.exec_()
+
+            elif result == 2:
+                dlg = studentInfo(self)
+                dlg.exec_()
+
+
+class studentInfo(QDialog):
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+        self.mainLayout = QVBoxLayout()
+        self.btnLayout = QHBoxLayout()
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.initUi()
+
+        print(self.parent.comments)
+
+    def initUi(self):
+        head = QLabel('정보')
+        head.setStyleSheet('font-weight:bold; font-size:13pt')
+
+        # 학생 정보
+        self.name = QLabel('이름')
+        self.depart = QLabel('소속')
+        self.student_id = QLabel('학번')
+
+        # 버튼
+        check = QPushButton('확인')
+        check.clicked.connect(self.close)
+
+        self.btnLayout.addWidget(check)
+
+        self.mainLayout.addStretch(1)
+        self.mainLayout.addWidget(head)
+        self.mainLayout.addWidget(self.name)
+        self.mainLayout.addWidget(self.depart)
+        self.mainLayout.addWidget(self.student_id)
+        self.mainLayout.addLayout(self.btnLayout)
+        self.mainLayout.addStretch(1)
+
+        self.student_info()
+
+        self.setFixedSize(200, 150)
+        self.setLayout(self.mainLayout)
+
+    def student_info(self):
+        commend = 'getProfile ' + self.parent.comments[1]
+        self.parent.clientSocket.send(commend.encode('utf-8'))
+
+        info = self.parent.clientSocket.recv(1024).decode('utf-8')
+        info = info.split(',')
+
+        self.name.setText('이름: '+info[5])
+        self.depart.setText('학과: '+info[1])
+        self.student_id.setText('학번: '+self.parent.comments[1])
+
+
+
+    def mousePressEvent(self, event):
+        self.oldPos = event.globalPos()
+
+    def mouseMoveEvent(self, event):
+        delta = QPoint(event.globalPos() - self.oldPos)
+        # print(delta)
+        self.move(self.x() + delta.x(), self.y() + delta.y())
+        self.oldPos = event.globalPos()
 
 class sendQuestion(QDialog):
     def __init__(self,parent):

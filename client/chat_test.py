@@ -502,11 +502,12 @@ class chatWidget(QWidget):
 
         result = self.clientSocket.recv(1024)
         result = result.decode('utf-8')
+        result = result.split("!@!")
 
-        self.BtnLike.setText(result)
-        if result == '0':
+        self.BtnLike.setText(result[0])
+        if result[1] == '0':
             self.BtnLike.setIcon(QIcon('./ui/chatting_ui/unchecked_heart.png'))
-        elif result == '1':
+        elif result[1] == '1':
             self.BtnLike.setIcon(QIcon('./ui/chatting_ui/checked_heart.png'))
 
 

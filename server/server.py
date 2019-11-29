@@ -1107,6 +1107,7 @@ class ServerSocket:
                             cur.execute("UPDATE likes SET likes_num = 1 WHERE student_id='" + str(
                                 side[1]) + "' AND chat_id = " + str(chat_id) + "")
                             self.databasent.commit()
+                            likes_num = 1
                             # 점수 +
                             cur.execute("UPDATE points SET points = points + 1 WHERE Student_id='" + str(
                                 side[1]) + "' AND Lec_id = '" + str(lec_id) + "'")
@@ -1124,6 +1125,7 @@ class ServerSocket:
                             cur.execute("UPDATE likes SET likes_num = 0 WHERE student_id='" + str(
                                 side[1]) + "' AND chat_id = " + str(chat_id) + "")
                             self.databasent.commit()
+                            likes_num = 0
                             # 점수 -
                             cur.execute("UPDATE points SET points = points - 1 WHERE Student_id='" + str(
                                 side[1]) + "' AND Lec_id = '" + str(lec_id) + "'")
@@ -1138,6 +1140,7 @@ class ServerSocket:
                             "INSERT INTO likes(chat_id,student_id,likes_num) VALUES (" + str(chat_id) + ",'" + str(
                                 side[1]) + "',1)")
                         self.databasent.commit()
+                        likes_num = 1
                         cur.execute("UPDATE chatting SET likes = likes+1 WHERE no =" + str(chat_id) + "")
                         self.databasent.commit()
                         # 점수+
@@ -1151,7 +1154,7 @@ class ServerSocket:
                     cur = self.databasent.cursor()
                     cur.execute("SELECT likes FROM chatting WHERE no = '" + str(side[0]) + "'")
                     likeCount = cur.fetchall()
-                    likeCount = str(likeCount[0][0])
+                    likeCount = str(likeCount[0][0]) + "!@!" + str(likes_num)
 
                     print('좋아요 업데이트')
                     client.send(likeCount.encode('utf-8'))

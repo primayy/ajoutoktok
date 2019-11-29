@@ -140,7 +140,6 @@ class chatRoom(QWidget):
         #메인 레이아웃 설정
         self.mainLayout.setContentsMargins(0,0,0,0)
         self.mainLayout.addWidget(self.titleWidget)
-        # self.mainLayout.addWidget(self.chatWidget)
         self.mainLayout.addLayout(self.chatContentLayout)
 
         self.mainLayout.addWidget(self.chatLayoutWidget)
@@ -220,11 +219,13 @@ class chatRoom(QWidget):
         question_layout = QVBoxLayout()
         question_layout.setContentsMargins(10,10,10,10)
 
-        btn_category_add = QToolButton()
-        self.tab.setCornerWidget(btn_category_add, Qt.TopLeftCorner)  # 버튼 위치
-        btn_category_add.setAutoRaise(True)  # 마우스가 올라오면 올라옴
-        btn_category_add.clicked.connect(self.add_new_tab)
-        btn_category_add.setIcon(QIcon("./icon/add.png"))
+        if self.user['is_prof'] == 1:
+            btn_category_add = QToolButton()
+            self.tab.setCornerWidget(btn_category_add, Qt.TopLeftCorner)  # 버튼 위치
+            btn_category_add.setAutoRaise(True)  # 마우스가 올라오면 올라옴
+            btn_category_add.clicked.connect(self.add_new_tab)
+            btn_category_add.setIcon(QIcon("./icon/add.png"))
+
         question_layout.addWidget(self.tab)
 
         self.showQuestions()
@@ -451,8 +452,8 @@ class chatWidget(QWidget):
     def __init__(self,parent,comments,grandparent):
         super().__init__()
         self.parent = parent
+        self.user = self.parent.user
         self.grandparent = grandparent
-
         self.mainLayout = QHBoxLayout()
         self.questLayoutinMain = QVBoxLayout()
         self.setLayout(self.mainLayout)
@@ -531,9 +532,8 @@ class chatWidget(QWidget):
             self.parent.chatContentLayout.addWidget(self.parent.chatWidget)
         
         elif QMouseEvent.button() == Qt.RightButton:
-            print("Right Button Clicked")
-            dlg = studentInfo(self)
-            dlg.exec_()
+                dlg = studentInfo(self)
+                dlg.exec_()
 
 class studentInfo(QDialog):
     def __init__(self, parent):
@@ -581,10 +581,14 @@ class studentInfo(QDialog):
         info = self.parent.clientSocket.recv(1024).decode('utf-8')
         info = info.split(',')
 
-        self.name.setText('이름: '+info[5])
-        self.depart.setText('학과: '+info[1])
-        self.student_id.setText('학번: '+self.parent.comments[0])
-
+        if self.parent.user['is_prof'] == 1:
+            self.name.setText('이름: '+info[5])
+            self.depart.setText('학과: '+info[1])
+            self.student_id.setText('학번: '+self.parent.comments[0])
+        else:
+            self.name.setText('닉네임: ' + info[0])
+            self.depart.setText('학과: ' + info[1])
+            self.student_id.setText('포인트: ' + info[4])
 
 
     def mousePressEvent(self, event):

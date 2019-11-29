@@ -116,6 +116,10 @@ class login(QWidget):
         if self.id_input.text() == "a":
             if self.pw_input.text() == "a":
                 # 첫 로그인인지 확인
+                window = QApplication.activeWindow()
+                window.user['email'] = self.id_input.text()
+                window.user['is_prof'] = 1
+
                 commend = "firstLogin " + '000000000'
                 self.clientSocket.send(commend.encode('utf-8'))
 

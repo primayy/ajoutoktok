@@ -24,7 +24,7 @@ class Window(QMainWindow):
         self.tray = systemTray.SystemTrayIcon(self)
 
         # 첫 화면 로그인 설정
-        self.user = {'email':'','bb_url':'',}
+        self.user = {'email':'','bb_url':'','is_prof':''}
         self.login = login.login(self)
 
         self.init_window()

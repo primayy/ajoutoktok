@@ -272,20 +272,31 @@ class lecture(QWidget):
             self.setLayout(self.mainLayout)
 
     def exitLecture(self):
-        commend = "exitLecture " +self.stuid + " " + self.course[1]
+        msg = QMessageBox()
+        msg.setStyleSheet("background-color:#FFFFFF")
+        msg.setText(self.course[1] + ' 그룹을 나가시겠습니까?')
+        exit_lec = msg.addButton('나가기', QMessageBox.YesRole)
+        exit_cancel = msg.addButton('취소', QMessageBox.NoRole)
+        msg.setWindowFlag(QtCore.Qt.FramelessWindowHint)
 
-        self.clientSocket.send(commend.encode('utf-8'))
+        msg.exec_()
 
-        res = self.clientSocket.recv(1024)
-        res = res.decode('utf-8')
+        if msg.clickedButton() == exit_lec:
+            # 그룹 추가
+            commend = "exitLecture " +self.stuid + " " + self.course[1]
 
-        #삭제한 강의id를 강의id 리스트에서 삭제
-        self.lecture_list_Widget.lecId.remove(res)
+            self.clientSocket.send(commend.encode('utf-8'))
 
-        #다시 읽어오는거 필요함
-        self.lecture_list_Widget.viewer.clear()
-        self.lecture_list_Widget.lecture_list = self.lecture_list_Widget.getLectureList()
-        self.lecture_list_Widget.showLectures()
+            res = self.clientSocket.recv(1024)
+            res = res.decode('utf-8')
+
+            #삭제한 강의id를 강의id 리스트에서 삭제
+            self.lecture_list_Widget.lecId.remove(res)
+
+            #다시 읽어오는거 필요함
+            self.lecture_list_Widget.viewer.clear()
+            self.lecture_list_Widget.lecture_list = self.lecture_list_Widget.getLectureList()
+            self.lecture_list_Widget.showLectures()
 
     def group_search_popup(self,w):
         # dlg = group_search_dialog(w,self.stuid,self.viewer,self.lecid)

@@ -38,6 +38,7 @@ class Reply(QWidget):
         super().__init__()
         #변수 설정
         self.parent = parent
+        self.user = self.parent.user
         self.clientSocket = 0
         self.comment_info = 0
         self.replyList = 0
@@ -244,6 +245,7 @@ class replyWidget(QWidget):
     def __init__(self,comments, parent):
         super().__init__()
         self.parent = parent
+        self.user = parent.user
         self.clientSocket = self.parent.clientSocket
         self.comments = comments
 
@@ -324,12 +326,11 @@ class studentInfo(QDialog):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
+        self.user = parent.user
         self.mainLayout = QVBoxLayout()
         self.btnLayout = QHBoxLayout()
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.initUi()
-
-        print(self.parent.comments)
 
     def initUi(self):
         head = QLabel('정보')
@@ -366,10 +367,14 @@ class studentInfo(QDialog):
         info = self.parent.clientSocket.recv(1024).decode('utf-8')
         info = info.split(',')
 
-        self.name.setText('이름: '+info[5])
-        self.depart.setText('학과: '+info[1])
-        self.student_id.setText('학번: '+self.parent.comments[1])
-
+        if self.user['is_prof']:
+            self.name.setText('이름: '+info[5])
+            self.depart.setText('학과: '+info[1])
+            self.student_id.setText('학번: '+self.parent.comments[1])
+        else:
+            self.name.setText('닉네임: ' + info[0])
+            self.depart.setText('학과: ' + info[1])
+            self.student_id.setText('포인트: ' + info[4])
 
 
     def mousePressEvent(self, event):

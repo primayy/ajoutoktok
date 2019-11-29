@@ -260,55 +260,39 @@ class ServerSocket:
 
                     client.send(del_lecId.encode('utf-8'))
 
-
-                elif commend == 'groupInsert':
-                    # print('그룹 생성 왔다')
-                    cur = self.databasent.cursor()
-                    group_info = ""
-                    cur.execute("SELECT no,lecture_name FROM lecture WHERE professor_id ='" + str(
-                        side[1]) + "' AND lecture_name ='" + str(side[0]) + "'")
-                    allSQLRows = cur.fetchall()
-                    print(allSQLRows)
-                    print(len(allSQLRows))
-
-                    result = ""
-                    if len(allSQLRows) == 0:
-                        cur.execute("SELECT professor_name FROM lecture WHERE professor_id ='" + str(side[1]) + "'")
-                        allSQLRows = cur.fetchall()
-                        print(allSQLRows)
-                        cur.execute(
-                            "INSERT INTO lecture(lecture_name,lecture_code,professor_name,professor_id,student_num) VALUES('" + str(
-                                side[0]) + "','A" + str(self.numnum % 10) + "B" + str(self.numnum % 10) + "','" + str(
-                                allSQLRows[0][0]) + "','" + str(side[1]) + "',0)")
-                        self.databasent.commit()
-                        self.numnum += 1
-                        result += "add_success"
-                    else:
-                        result += "already"
-                    client.send(result.encode('utf-8'))
-
                 elif commend == 'group_add':
-                    print(side)
-
                     cur = self.databasent.cursor()
                     result_to_client = False
+
+                    cur.execute("SELECT department FROM user WHERE student_id ='" + str(side[1]) + "'")
+                    depart = str(cur.fetchall()[0][0])
 
                     # 학번으로 어떤 그룹에 속해있는지 검색 -> 그룹id로 나옴
                     cur.execute("SELECT lecture_id FROM student_course WHERE student_id ='" + str(side[1]) + "'")
                     allSQLRows = cur.fetchall()
 
                     if len(allSQLRows) == 0:  # 그룹 0개
-                        print('asd')
                         cur = self.databasent.cursor()
                         cur.execute("SELECT lecture_code FROM lecture WHERE no ='" + str(side[0]) + "'")
                         lec_code = cur.fetchall()
                         lec_code = lec_code[0][0]
                         cur = self.databasent.cursor()
+
+                        #학생 강의 디비에 추가
                         query = 'INSERT INTO student_course (student_id,lecture_id,lecture_code) Values (%s,%s,%s)'
                         cur.execute(query, (side[1], side[0], lec_code))
 
-                        self.databasent.commit()
-                        # print(str(side[1]+", "+str(side[0])))
+                        #이 그룹에 이전에 속해있던 학생인지 확인
+                        cur.execute("SELECT * FROM points WHERE Student_id ='" + str(side[1]) + "' AND Lec_id ='" + lec_code + "'")
+                        search_result = cur.fetchall()
+
+                        if len(search_result) == 0:
+                            print('qeqe')
+                            #포인트 디비에 강의 추가
+                            query = 'INSERT INTO points (Student_id,Depart,Lec_id,points) Values (%s,%s,%s,%s)'
+                            cur.execute(query, (side[1], depart , lec_code, str(0)))
+
+                            self.databasent.commit()
                         print('저장 완료')
                         client.send('add_success'.encode('utf-8'))
 
@@ -332,11 +316,8 @@ class ServerSocket:
                             cur.execute(query, (side[1], side[0], lec_code))
 
                             self.databasent.commit()
-                            # print(str(side[1]+", "+str(side[0])))
                             print('저장 완료')
                             client.send('add_success'.encode('utf-8'))
-
-                    # client.send(group_info.encode('utf-8'))
 
                 elif commend == 'sendMsg':
                     print(side)

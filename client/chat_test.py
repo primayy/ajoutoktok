@@ -78,10 +78,10 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.49', 3334))
+        # self.chatSocket.connect(('192.168.0.49', 3334))
         # self.chatSocket.connect(('192.168.43.180', 3334))
         # self.chatSocket.connect(('192.168.0.49',3334))
-        #self.chatSocket.connect(('192.168.25.28', 3334))
+        self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
 
         self.history = self.getChatHistory()
@@ -326,7 +326,6 @@ class chatRoom(QWidget):
         result = self.clientSocket.recv(4096)
 
         result = result.decode('utf-8')
-
         if result == 'x':
             return []
 
@@ -465,7 +464,7 @@ class chatWidget(QWidget):
             elif result == '1':
                 self.BtnLike = QPushButton(self.comments[3])
                 self.BtnLike.setIcon(QIcon('./ui/chatting_ui/checked_heart.png'))
-                self.BtnLike.setStyleSheet('''
+            self.BtnLike.setStyleSheet('''
             QPushButton{border:0px; background-color:#e8f3f4; width:45px}''')
             self.BtnLike.setIconSize(QSize(30,30))
             #BtnLike.setMaximumWidth()
@@ -504,7 +503,8 @@ class chatWidget(QWidget):
         result = result.decode('utf-8')
         result = result.split("!@!")
 
-        self.BtnLike.setText(result[0])
+        self.BtnLike.setText(str(result[0]))
+        self.comments[3] = str(result[0])
         if result[1] == '0':
             self.BtnLike.setIcon(QIcon('./ui/chatting_ui/unchecked_heart.png'))
         elif result[1] == '1':
@@ -520,11 +520,14 @@ class chatWidget(QWidget):
             self.parent.sendType = False
 
             #리플 위젯 생성 및 변수값 대입
-            replyWidget = reply.Reply(self.parent)
             self.parent.comment_info = self.comments
-            # replyWidget = self.parent.reply
+            self.tmpSocket = self.parent.clientSocket
+            self.parent.clientSocket = self.clientSocket
+            replyWidget = reply.Reply(self.parent)
             replyWidget.widgetTmp = self.parent.chatWidget
             replyWidget.clientSocket = self.clientSocket
+            self.parent.clientSocket = self.tmpSocket
+            # replyWidget = self.parent.reply
 
             self.parent.chatWidget = replyWidget
 

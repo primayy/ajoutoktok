@@ -113,8 +113,20 @@ class Reply(QWidget):
         #질문 타이틀 bottom
         self.dateLabel = QLabel()
         self.dateLabel.setStyleSheet('font:7pt 나눔스퀘어라운드 Regular')
-        self.btnLike = QPushButton()
-        self.btnLike.setIcon(QIcon('./ui/chatting_ui/unchecked_heart.png'))
+
+        commend = 'like_status '+ self.parent.comment_info[6] + " " + self.parent.parent.stuid#학번
+        self.parent.clientSocket.send(commend.encode('utf-8'))
+        # print(commend)
+        result = self.parent.clientSocket.recv(1024)
+        result = result.decode('utf-8')
+        
+        if result == '0':
+            self.btnLike = QPushButton(self.parent.comment_info[3])
+            self.btnLike.setIcon(QIcon('./ui/chatting_ui/unchecked_heart.png'))
+        elif result == '1':
+            self.btnLike = QPushButton(self.parent.comment_info[3])
+            self.btnLike.setIcon(QIcon('./ui/chatting_ui/checked_heart.png'))
+        
         self.btnLike.setStyleSheet('''
                                 QPushButton{border:0px}''')
         self.btnLike.setIconSize(QSize(23, 23))
@@ -167,16 +179,23 @@ class Reply(QWidget):
         self.clientSocket.send(commend.encode('utf-8'))
         result = self.clientSocket.recv(1024)
         result = result.decode('utf-8')
+        result = result.split("!@!")
 
-        self.btnLike.setText(result)
+        self.btnLike.setText(str(result[0]))
+        self.parent.comment_info[3] = str(result[0])
+        if result[1] == '0':
+            self.btnLike.setIcon(QIcon('./ui/chatting_ui/unchecked_heart.png'))
+        elif result[1] == '1':
+            self.btnLike.setIcon(QIcon('./ui/chatting_ui/checked_heart.png'))
 
     #뒤로가기 버튼 눌렀을시
     def returnToChat(self):
         self.close()
+        self.parent.category_changed()
         self.parent.chatWidget = self.widgetTmp
-
         self.parent.sendType = True
         self.widgetTmp.show()
+        
 
     #질문에 대한 답글 읽어옴
     def getReply(self):

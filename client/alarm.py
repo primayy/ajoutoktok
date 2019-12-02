@@ -190,12 +190,18 @@ class lecture(QWidget):
         self.coursep = self.coursep[0]
 
         #댓글 위젯 생성
-        self.reply = reply.Reply(self.chat)
+
+    
+
         self.coursep = self.coursep.split("#$%#")
         self.chat.comment_info = self.coursep
+        self.reply = reply.Reply(self.chat)
 
+        self.tmpSocket = self.chat.clientSocket
+        self.chat.clientSocket = self.clientSocket
         self.reply.widgetTmp = self.chat.chatWidget
         self.reply.clientSocket = self.clientSocket
+        self.chat.clientSocket = self.tmpSocket
 
         self.chat.chatWidget = self.reply
 

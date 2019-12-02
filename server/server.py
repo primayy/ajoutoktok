@@ -16,7 +16,7 @@ class ServerSocket:
     def __init__(self):
         self.numnum = 0
         try:
-            self.databasent = mdb.connect('localhost', 'root', '0428', 'db_testin')
+            self.databasent = mdb.connect('localhost', 'root', '789521', 'db_testin')
             print("Successfully Connected To DB")
         except mdb.Error as e:
             print('Not Connected Succefully To DB')
@@ -414,8 +414,10 @@ class ServerSocket:
                     reply = cur.fetchall()
                     reply_id = reply[0][0]
                     # 게시글 학생 학번,카테고리 id 찾기
+                    print(str(chat_id))
                     cur.execute("SELECT student_id,category_id FROM chatting WHERE no =" + str(chat_id))
                     chatResult = cur.fetchall()
+                    print(chatResult)
                     chat_stuId = chatResult[0][0]
                     category_id = chatResult[0][1]
 

@@ -14,10 +14,10 @@ class Window(QMainWindow):
         port = 3333
         self.clientSock = socket(AF_INET, SOCK_STREAM)
         # self.clientSock.connect(('34.84.112.149', port))
-        self.clientSock.connect(('192.168.0.8', port))
+        #self.clientSock.connect(('192.168.0.8', port))
         # self.clientSock.connect(('192.168.43.180', port))
         #self.clientSock.connect(('192.168.25.22', port))
-        # self.clientSock.connect(('192.168.0.49', port))
+        self.clientSock.connect(('192.168.0.49', port))
         #self.clientSock.connect(('172.30.1.58', port))   
 
         #트레이 아이콘 생성

@@ -38,6 +38,7 @@ class lecture_list(QWidget):
                 QListWidget:item:hover{background:#95c3cb};
                 # QListWidget:item{padding:0px}
                 ''')
+        self.viewer.setFocusPolicy(Qt.NoFocus)
         self.lecture_list = self.getLectureList()
         self.showLectures()
 

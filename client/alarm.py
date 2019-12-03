@@ -34,6 +34,7 @@ class alarm(QWidget):
         btn_remove_all.clicked.connect(self.remove_it_all)
 
         self.viewer = QListWidget(self)
+        self.viewer.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
         self.viewer.setMinimumSize(300, 500)
         self.viewer.setStyleSheet('''
@@ -153,8 +154,9 @@ class lecture(QWidget):
             #텍스트브라우저형식
             alarm_message = QTextBrowser()
             alarm_message.setText(str("[강의: "+course[0]+"]에 게시한 글 '"+course[1]+"'에 "+course[2]+"개의 댓글이 추가되었습니다."))
-            alarm_message.setMaximumHeight(70)
-            alarm_message.setMinimumSize(120,70)
+            alarm_message.setMaximumHeight(90)
+            alarm_message.setMaximumWidth(230)
+            #alarm_message.setMinimumSize(100,90)
             alarm_message.setStyleSheet('background-color:white;border:0px;font:8pt')
 
             #이동 버튼

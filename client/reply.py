@@ -142,6 +142,7 @@ class Reply(QWidget):
         #질문 목록
         self.question_reply = QListWidget()
         self.question_reply.scrollToBottom()
+        self.question_reply.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.question_reply.setContentsMargins(0,0,0,0)
         self.question_reply.setStyleSheet('''
                         QListWidget:item:hover{background:#95c3cb};
@@ -279,16 +280,26 @@ class replyWidget(QWidget):
         question.setText(self.comments[0])
 
         question2 = QTextBrowser()
-        question2.setMaximumWidth(370)
-        question2.setMinimumWidth(370)
-        question2.setFixedHeight(60)
+        question2.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        question2.setMaximumWidth(385)
+        question2.setMinimumWidth(385)
+        #question2.setSizeAdjustPolicy(question2.AdjustToContents)
+        #question2.setFixedHeight(question2.document().size().height())
+        #question2.setSizePolicy
+        
+        #question2.auto
+        
+        print(question2.document())
         question2.setStyleSheet("border:1px;"
                                 "border-color:red;"
-                                "font: 9pt 나눔스퀘어라운드 Regular;")
+                                "font: 9pt 나눔스퀘어라운드 Regular;"
+                                )
         
         question2.setText(self.comments[0])
-
-
+        question2.setSizeAdjustPolicy(question2.AdjustToContents)
+        #question2.setFixedHeight(self.comments[0].size().height())
+        #question2.setFixedHeight(question2.document().size().height())
+        print(question2.document())
         date = QLabel()
         date.setStyleSheet('font:8pt;color:#7f7f7f')
         date.setText(self.comments[2])
@@ -297,9 +308,10 @@ class replyWidget(QWidget):
         self.replyLayout.addWidget(question2)
         self.replyLayout.addWidget(date)
         self.replyLayout.setContentsMargins(0,0,0,0)
+        
         #mainLayout: replyLayout+메달 (수평 레이아웃)
         self.mainLayout.addLayout(self.replyLayout)
-
+        self.mainLayout.setContentsMargins(5,5,5,5)
 
         if self.comments[4] == str(1):
             self.mainLayout.addWidget(adopt_medal,alignment=QtCore.Qt.AlignRight)

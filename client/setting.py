@@ -28,7 +28,7 @@ class setting(QWidget):
                                         QPushButton:hover{background:rgba(0,0,0,0); border:0px}
                                         ''')
 
-        alarm_groupbox = QGroupBox('알림')
+        alarm_groupbox = QGroupBox('안내설명')
         alarm_groupbox.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
         alarm_groupbox.setMinimumSize(300,300)
 
@@ -37,12 +37,40 @@ class setting(QWidget):
         setting_label = QLabel('개인 설정')
         setting_label.setStyleSheet("font: 16pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a")
         #horizon_line = QLabel('─────────────────────')
-            #구분선
+        #구분선
         horizon_line = QLabel()
         horizon_img = QPixmap('./ui/afterlogin_ui/horizon_line.png')
         horizon_img = horizon_img.scaled(310,12,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
         horizon_line.setPixmap(horizon_img)
         horizon_line.setAlignment(Qt.AlignTop)
+
+        #사용 설명
+        #use_explanation = QGridLayout()
+        #useicon_list = QListWidget()
+        
+
+        lecture = QLabel()
+        lecture_img = QPixmap('./ui/afterlogin_ui/list.png')
+        lecture_img = lecture_img.scaled(100,100 , QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
+        lecture.setPixmap(lecture_img)
+        
+
+        alarm = QLabel()
+        alarm_img = QPixmap('./ui/afterlogin_ui/alarm.png')
+        alarm_img = alarm_img.scaled(100, 100, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
+        alarm.setPixmap(alarm_img)
+
+        rank = QLabel()
+        rank_img = QPixmap('./ui/afterlogin_ui/trophy.png')
+        rank_img = rank_img.scaled(100, 100, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
+        rank.setPixmap(rank_img)
+
+        setting = QLabel()
+        setting_img = QPixmap('./ui/afterlogin_ui/setting.png')
+        setting_img = setting_img.scaled(100, 100, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
+        setting.setPixmap(setting_img)
+
+
 
         alarm_widget_label = QLabel('알림 위젯')
         alarm_widget_label.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
@@ -82,6 +110,7 @@ class setting(QWidget):
         self.line.addWidget(self.widget_on_off_button,alignment=(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop))
         self.line.addWidget(alarm_sound_label)
         self.line.addWidget(self.sound_on_off_button,alignment=(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop))
+        #self.line.addWidget(useicon_list)
         self.line.addStretch(1)
 
         alarm_groupbox.setLayout(self.line)

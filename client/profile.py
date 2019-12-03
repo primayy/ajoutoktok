@@ -31,28 +31,30 @@ class profile(QWidget):
         profile_groupbox.setStyleSheet('font:10pt 나눔스퀘어라운드 Regular;')
         profile_groupbox.setLayout(self.body)
         profile_groupbox.setMinimumWidth(300)
+        profile_groupbox.setMaximumHeight(180)
 
 
         self.nickname = QLabel()
+        self.nickname.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
         changeNick = QPushButton("변경")
-        changeNick.setStyleSheet('font:10pt 나눔스퀘어라운드 Regular;')
-        changeNick.setMaximumHeight(100)
-        changeNick.setMaximumWidth(150)
+        changeNick.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
+        changeNick.setMaximumHeight(60)
+        changeNick.setMaximumWidth(90)
         changeNick.clicked.connect(self.changeNicknamePop)
 
         self.Dept = QLabel()
-        self.Dept.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
+        self.Dept.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
         self.Query = QLabel()
-        self.Query.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
+        self.Query.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
         self.Respond = QLabel()
-        self.Respond.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
+        self.Respond.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
         self.Points = QLabel()
-        self.Points.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
+        self.Points.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
 
         self.getProfile()
 
         self.bodypart11.addWidget(self.nickname)
-        self.bodypart11.addWidget(changeNick)
+        #self.bodypart11.addWidget(changeNick)
         self.bodypart22.addWidget(self.Query)
         self.bodypart22.addWidget(self.Respond)
 
@@ -63,6 +65,8 @@ class profile(QWidget):
         self.body.addWidget(self.Dept, alignment=QtCore.Qt.AlignCenter)
         self.body.addWidget(self.bodypart2, alignment=QtCore.Qt.AlignCenter)
         self.body.addWidget(self.Points, alignment=QtCore.Qt.AlignCenter)
+        self.body.addStretch(1)
+        self.body.setSpacing(0)
 
 
         self.mainLayout.addLayout(self.head)

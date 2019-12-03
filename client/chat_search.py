@@ -30,7 +30,7 @@ class Search(QWidget):
 
         #배경색 지정할 위젯 선언
         self.mainWidget = QWidget()
-        self.mainWidget.setStyleSheet('background-color:white')
+        self.mainWidget.setStyleSheet('background-color:#eef5f6')
 
         #질문 타이틀 레이아웃
         self.questionWidget = QWidget()
@@ -51,6 +51,8 @@ class Search(QWidget):
 
         self.mainLayout.addWidget(self.mainWidget)
 
+        #서치 바 레이아웃
+        self.searchbar_layout = QHBoxLayout()
 
         self.setLayout(self.mainLayout)
         self.setMinimumSize(500, 400)
@@ -61,10 +63,13 @@ class Search(QWidget):
     def initUI(self):
         #화면 구성요소
         #위젯은 widgetLayout에 추가하면 됨
+        question_search = QLabel('질문 검색')
+        question_search.setStyleSheet('font:13pt 나눔스퀘어라운드 Regular;color:#42808a;')
 
-        self.search_input = QTextEdit()
+        self.search_input = QLineEdit()
         self.search_input.setStyleSheet('background:white')
-
+        
+        self.search_input.setMinimumWidth(250)
         btnSearch = QPushButton('검색')
         btnSearch.clicked.connect(self.search)
 
@@ -72,8 +77,9 @@ class Search(QWidget):
         #질문 목록
         self.question_search = QListWidget()
         self.question_search.scrollToBottom()
-        self.question_search.setBaseSize(500, 200)
-        self.question_search.setMaximumSize(500,200)
+        #self.question_search.setBaseSize(500, 300)
+        self.question_search.setMaximumSize(480,280)
+        self.question_search.setMinimumSize(480,280)
 
         self.question_search.setStyleSheet('''
                         # QListWidget:item:hover{background:white};
@@ -81,11 +87,19 @@ class Search(QWidget):
                         ''')
 
         #widgetLayout에 추가
-        self.widgetLayout.addWidget(self.search_input)
-        self.widgetLayout.addWidget(btnSearch)
+        
+        self.searchbar_layout.addWidget(self.search_input)
+        self.searchbar_layout.addWidget(btnSearch)
+        # self.widgetLayout.addWidget(self.search_input)
+        # self.widgetLayout.addWidget(btnSearch)
+        self.widgetLayout.addWidget(question_search)
+        self.widgetLayout.addLayout(self.searchbar_layout)
         self.widgetLayout.addWidget(self.question_search)
-
+        self.widgetLayout.addStretch(1)
+        self.widgetLayout.setContentsMargins(30,30,30,30)
+        self.setWindowFlags(Qt.FramelessWindowHint)
         self.show()
+
 
     def search(self):
         self.question_search.clear()
@@ -101,7 +115,7 @@ class Search(QWidget):
 
     #질문에 대한 답글 읽어옴
     def getSearch(self):
-        commend = 'ChatSearch ' + self.search_input.toPlainText() +" "+ self.lecture_code +" "+self.tabId
+        commend = 'ChatSearch ' + self.search_input.text() +" "+ self.lecture_code +" "+self.tabId
 
         self.clientSocket.send(commend.encode('utf-8'))
         
@@ -141,12 +155,16 @@ class searchWidget(QWidget):
         self.initUI()
 
     def initUI(self):
+        searched2 = QTextBrowser()
+        searched2.setMaximumHeight(70)
+        searched2.setMinimumSize(400,70)
+        searched2.setStyleSheet('border:0px solid;background:white;')
+        searched2.setContentsMargins(0,0,0,0)
+        searched2.setText(self.comments[2])
 
-        searched = QLabel()
-        searched.setText(self.comments[2])
-
-        self.searchLayout.addWidget(searched)
+        self.searchLayout.addWidget(searched2)
         self.mainLayout.addLayout(self.searchLayout)
+        self.mainLayout.setContentsMargins(5,5,5,5)
 
     def mousePressEvent(self, QMouseEvent):
         if QMouseEvent.button() == Qt.LeftButton:

@@ -79,7 +79,7 @@ class chatRoom(QWidget):
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
         # self.chatSocket.connect(('192.168.0.6', 3334))
-        self.chatSocket.connect(('192.168.43.180', 3334))
+        self.chatSocket.connect(('192.168.43.36', 3334))
         #self.chatSocket.connect(('192.168.0.8',3334))
         #self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
@@ -612,31 +612,53 @@ class sendQuestion(QWidget):
         super().__init__()
         self.parent = parent
         self.mainLayout = QVBoxLayout()
+        self.mainLayout.setContentsMargins(0,0,0,0)
         self.dateLayout1 = QHBoxLayout()
         self.dateLayout2 = QHBoxLayout()
+        self.topbar = QWidget()
+        self.topbar_layout = QHBoxLayout()
+        #self.topbar_layout.setContentsMargins(0,0,0,0)
+        self.topbar.setLayout(self.topbar_layout)
+        
+        self.topbar.setStyleSheet('background:#a1d2d7')
+        self.topbar.setContentsMargins(0,0,0,0)
 
+        self.botbar = QVBoxLayout()
+        self.botbar.setContentsMargins(10,10,10,10)
+
+        self.oldPos = self.pos()
         self.btnLayout = QHBoxLayout()
+        self.btnLayout.setContentsMargins(10,10,10,10)
+        self.setStyleSheet('background-color:#e8f3f4')
+        self.setMaximumSize(250,250)
+        self.setMinimumSize(250,250)
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.setContentsMargins(0,0,0,0)
         self.initUi()
 
     def initUi(self):
         head = QLabel('질문 전송')
-        head.setStyleSheet('font-weight:bold; font-size:13pt')
-        self.email = QLabel(self.parent.user['email']+'@ajou.ac.kr')
+        head.setStyleSheet('font:13pt 나눔스퀘어라운드 Regular;')
 
+        self.email = QLabel(self.parent.user['email']+'@ajou.ac.kr')
+        self.email.setStyleSheet('font:10pt 나눔스퀘어라운드 Regular;')
         self.startDate = QLabel('시작 날짜: ')
+        self.startDate.setStyleSheet('font:10pt 나눔스퀘어라운드 Regular;')
         self.btnStart = QPushButton('날짜 입력')
-        self.btnStart.setStyleSheet('border:0px')
+        self.btnStart.setStyleSheet('font:10pt 나눔스퀘어라운드 Regular;border:0px;')
         self.btnStart.clicked.connect(lambda : self.openCalendar('start'))
 
         self.finishDate = QLabel('종료 날짜: ')
+        self.finishDate.setStyleSheet('font:10pt 나눔스퀘어라운드 Regular;')
         self.btnFinish = QPushButton('날짜 입력')
-        self.btnFinish.setStyleSheet('border:0px')
+        self.btnFinish.setStyleSheet('font:10pt 나눔스퀘어라운드 Regular;border:0px;')
         self.btnFinish.clicked.connect(lambda : self.openCalendar('finish'))
 
         send = QPushButton('전송')
+        send.setStyleSheet('font:10pt 나눔스퀘어라운드 Regular;')
         send.clicked.connect(self.sendToEmail)
         cancel = QPushButton('취소')
+        cancel.setStyleSheet('font:10pt 나눔스퀘어라운드 Regular;')
         cancel.clicked.connect(self.close)
 
         self.btnLayout.addWidget(send)
@@ -649,16 +671,19 @@ class sendQuestion(QWidget):
         self.dateLayout2.addWidget(self.btnFinish)
 
 
-        self.mainLayout.addStretch(1)
-        self.mainLayout.addWidget(head)
-        self.mainLayout.addWidget(self.email)
-        self.mainLayout.addLayout(self.dateLayout1)
-        self.mainLayout.addLayout(self.dateLayout2)
+        
+        #self.mainLayout.addWidget(head)
+        self.topbar_layout.addWidget(head)
+        self.mainLayout.addWidget(self.topbar)
 
+        self.botbar.addWidget(self.email)
+        self.botbar.addLayout(self.dateLayout1)
+        self.botbar.addLayout(self.dateLayout2)
+        self.mainLayout.addLayout(self.botbar)
         self.mainLayout.addLayout(self.btnLayout)
         self.mainLayout.addStretch(1)
 
-        self.setFixedSize(200,200)
+        #self.setFixedSize(200,200)
         self.setLayout(self.mainLayout)
 
     def openCalendar(self, type):

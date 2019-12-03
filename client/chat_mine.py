@@ -59,29 +59,31 @@ class Mine(QWidget):
 
 
         self.setLayout(self.mainLayout)
-        self.setMinimumSize(500, 400)
-        self.setStyleSheet('background-color:white')
+        self.setMinimumSize(500, 300)
+        self.setMaximumSize(500, 300)
+        self.setStyleSheet('background-color:#eef5f6')
 
         self.initUI()
 
     def initUI(self):
         #화면 구성요소
-
+        myquestion = QLabel('내 질문 모아보기')
+        myquestion.setStyleSheet('font:13pt 나눔스퀘어라운드 Regular;color:#42808a;')
         #질문 목록
         self.question_mine = QListWidget()
         self.question_mine.scrollToBottom()
-        self.question_mine.setBaseSize(500, 200)
-        self.question_mine.setMaximumSize(500,200)
+        #self.question_mine.setBaseSize(500, 200)
+        self.question_mine.setMaximumSize(450,300)
 
         self.question_mine.setStyleSheet('''
-                        # QListWidget:item:hover{background:white};
+                        # QListWidget:item:hover{background:#a1d2d7};
                         # QListWidget:item{padding:0px}
                         ''')
+        self.question_mine.setContentsMargins(0,0,0,0)
         self.question_mine.clear()
         self.mineList = self.getMine()
         for i in range(len(self.mineList)):
             item = QListWidgetItem(self.question_mine)
-
             custom_widget = mineWidget(self.mineList[i],self.parent,self)
             item.setSizeHint(custom_widget.sizeHint())
             self.question_mine.setItemWidget(item, custom_widget)
@@ -89,8 +91,9 @@ class Mine(QWidget):
 
 
         #widgetLayout에 추가
+        self.widgetLayout.addWidget(myquestion)
         self.widgetLayout.addWidget(self.question_mine)
-
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.show()
 
     #질문에 대한 답글 읽어옴
@@ -128,17 +131,23 @@ class mineWidget(QWidget):
         self.replyLayout = QVBoxLayout()
         self.mainLayout = QHBoxLayout()
         self.setLayout(self.mainLayout)
+        self.setStyleSheet('background-color:#eef5f6;')
 
         self.initUI()
 
     def initUI(self):
+        Mined2 = QTextBrowser()
+        Mined2.setMaximumHeight(70)
+        Mined2.setMinimumSize(400,70)
+        Mined2.setStyleSheet('border:0px solid;background:white;')
+        Mined2.setContentsMargins(0,0,0,0)
+        Mined2.setText(self.comments[2])
 
-        Mined = QLabel()
-
-        Mined.setText(self.comments[2])
-
-        self.replyLayout.addWidget(Mined)
+        self.replyLayout.addWidget(Mined2)
+        
         self.mainLayout.addLayout(self.replyLayout)
+        
+        self.mainLayout.setContentsMargins(5,5,5,5)
 
     def mousePressEvent(self, QMouseEvent):
         if QMouseEvent.button() == Qt.LeftButton:

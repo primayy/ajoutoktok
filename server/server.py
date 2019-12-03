@@ -16,7 +16,7 @@ class ServerSocket:
     def __init__(self):
         self.numnum = 0
         try:
-            self.databasent = mdb.connect('localhost', 'root', '0428', 'db_testin')
+            self.databasent = mdb.connect('localhost', 'root', '789521', 'db_testin')
             print("Successfully Connected To DB")
         except mdb.Error as e:
             print('Not Connected Succefully To DB')
@@ -695,7 +695,8 @@ class ServerSocket:
                             result += str(reply[i][2]) + ","  # msg
                             result += str(reply[i][3]) + ","  # stuId
                             result += str(reply[i][4].strftime('%Y.%m.%d.%H.%M')) + ","  # time
-                            result += str(reply[i][0]) + "/"  # replyId
+                            result += str(reply[i][0]) + ","  # replyId
+                            result += str(reply[i][5]) + "/"  # replySelected
 
                         client.sendall(result.encode('utf-8'))
                         print('reply 끝')
@@ -1163,6 +1164,24 @@ class ServerSocket:
 
                 elif commend == 'getProfile':
                     cur = self.databasent.cursor()
+
+                    #포인트 및 질문
+                    cur.execute("SELECT sum(points) From points WHERE Student_id ='" + str(side[0]) + "'")
+                    myPoint = str(cur.fetchall()[0][0])
+                    cur.execute("UPDATE user SET point ='" + myPoint + "'WHERE student_id='" + str(side[0]) + "'")
+                    cur.execute("SELECT count(*) From chatting WHERE Student_id ='" + str(side[0]) + "'")
+                    myQuest = str(cur.fetchall()[0][0])
+                    cur.execute("UPDATE user SET quest ='" + myQuest + "'WHERE student_id='" + str(side[0]) + "'")
+
+                    #답글
+                    cur.execute("SELECT count(*) From reply WHERE student_id ='" + str(side[0]) + "'")
+                    myReply = str(cur.fetchall()[0][0])
+                    cur.execute("UPDATE user SET answer ='" + myReply + "'WHERE student_id='" + str(side[0]) + "'")
+
+
+                    # self.databasent.commit()
+
+
                     cur.execute("SELECT * FROM user WHERE student_id = '" + str(side[0]) + "'")
                     user_info = cur.fetchall()
                     res = ""

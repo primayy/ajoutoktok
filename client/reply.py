@@ -218,11 +218,11 @@ class Reply(QWidget):
                 tmp = res[i].split(',')
                 tmp = [x for x in tmp if x]
 
-                if len(tmp) == 4:
+                if len(tmp) == 5:
                     reply.append(tmp)
 
-                elif len(tmp) > 4:
-                    msglen = len(tmp) - 4
+                elif len(tmp) > 5:
+                    msglen = len(tmp) - 5
                     msg = ",".join(tmp[0:1 + msglen])
 
                     for i in range(msglen + 1):
@@ -298,8 +298,10 @@ class replyWidget(QWidget):
         self.replyLayout.setContentsMargins(0,0,0,0)
         #mainLayout: replyLayout+메달 (수평 레이아웃)
         self.mainLayout.addLayout(self.replyLayout)
-        
-        self.mainLayout.addWidget(adopt_medal,alignment=QtCore.Qt.AlignRight)
+
+
+        if self.comments[4] == str(1):
+            self.mainLayout.addWidget(adopt_medal,alignment=QtCore.Qt.AlignRight)
         self.mainLayout.addStretch(1)
         self.mainLayout.setSpacing(0)
 

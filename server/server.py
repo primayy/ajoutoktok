@@ -1307,11 +1307,10 @@ class ServerSocket:
         self.ip.remove(addr)
         self.clients.remove(client)
 
-        i = 0
         for t in self.threads[:]:
             if not t.isAlive():
-                del (self.threads[i])
-            i += 1
+                tmp = self.threads.index(t)
+                del self.threads[tmp]
 
         self.resourceInfo()
 

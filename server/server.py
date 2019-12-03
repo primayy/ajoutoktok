@@ -16,7 +16,7 @@ class ServerSocket:
     def __init__(self):
         self.numnum = 0
         try:
-            self.databasent = mdb.connect('localhost', 'root', '0428', 'db_testin')
+            self.databasent = mdb.connect('localhost', 'root', '789521', 'db_testin')
             print("Successfully Connected To DB")
         except mdb.Error as e:
             print('Not Connected Succefully To DB')
@@ -569,7 +569,7 @@ class ServerSocket:
                         side[1]) + "' AND chatroom_name = '" + str(side[2]) + "'")
                     cat_id = cur.fetchall()
                     cur = self.databasent.cursor()
-                    cur.execute("SELECT comment FROM chatting WHERE student_id = '" + str(
+                    cur.execute("SELECT * FROM chatting WHERE student_id = '" + str(
                         side[0]) + "' AND category_id = " + str(cat_id[0][0]))
                     chat_log = cur.fetchall()
                     print(chat_log)
@@ -581,7 +581,13 @@ class ServerSocket:
                         else:
                             result = ""
                             for i in range(len(chat_log)):
-                                result += str(chat_log[i][0]) + "/"  # comment
+                                result += str(chat_log[i][4]) + ","  # stuid
+                                result += str(chat_log[i][3]) + ","  # nickname
+                                result += str(chat_log[i][2]) + ","  # comment
+                                result += str(chat_log[i][6]) + ","  # likes
+                                result += str(chat_log[i][1]) + ","  # category_id
+                                result += str(chat_log[i][5]) + ","  # time
+                                result += str(chat_log[i][0]) + "/"  # chatting_id
 
                             client.sendall(result.encode('utf-8'))
                             print('chat_Search 끝')

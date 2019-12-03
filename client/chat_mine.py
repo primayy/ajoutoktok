@@ -5,6 +5,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
+import reply
 from socket import *
 import time
 
@@ -80,9 +81,8 @@ class Mine(QWidget):
         self.mineList = self.getMine()
         for i in range(len(self.mineList)):
             item = QListWidgetItem(self.question_mine)
-            
 
-            custom_widget = mineWidget(self.mineList[i],self.parent)
+            custom_widget = mineWidget(self.mineList[i],self.parent,self)
             item.setSizeHint(custom_widget.sizeHint())
             self.question_mine.setItemWidget(item, custom_widget)
 
@@ -92,14 +92,6 @@ class Mine(QWidget):
         self.widgetLayout.addWidget(self.question_mine)
 
         self.show()
-
-    #뒤로가기 버튼 눌렀을시
-    def returnToChat(self):
-        self.close()
-        self.parent.chatWidget = self.widgetTmp
-
-        self.parent.sendType = True
-        self.widgetTmp.show()
 
     #질문에 대한 답글 읽어옴
     def getMine(self):
@@ -115,22 +107,24 @@ class Mine(QWidget):
 
         else:
             mine = mine.split('/')
-
             mine.pop()
             mineResult = []
 
             for i in range(len(mine)):
                 mineResult.append(mine[i])
-
             return mineResult
 
 
 class mineWidget(QWidget):
-    def __init__(self,comments, parent):
+    def __init__(self,comments, chatParent,parent):
         super().__init__()
+        #질문 위젯
+        self.chatParent = chatParent
+        #내질문 위젯
         self.parent = parent
-        self.comments = comments
 
+        self.comments = comments.split(',')
+        self.clientSocket = chatParent.clientSocket
         self.replyLayout = QVBoxLayout()
         self.mainLayout = QHBoxLayout()
         self.setLayout(self.mainLayout)
@@ -140,11 +134,39 @@ class mineWidget(QWidget):
     def initUI(self):
 
         Mined = QLabel()
-        Mined.setText(self.comments)
+        print(self.comments)
+
+        Mined.setText(self.comments[2])
 
         self.replyLayout.addWidget(Mined)
         self.mainLayout.addLayout(self.replyLayout)
 
+    def mousePressEvent(self, QMouseEvent):
+        if QMouseEvent.button() == Qt.LeftButton:
+            #질문 목록 위젯 닫음
+            self.chatParent.chatWidget.close()
+
+            #메시지 전송 타입 답글로 변경
+            self.chatParent.sendType = False
+            #리플 위젯 생성 및 변수값 대입
+            self.chatParent.comment_info = self.comments
+            self.tmpSocket = self.chatParent.clientSocket
+            self.chatParent.clientSocket = self.clientSocket
+            replyWidget = reply.Reply(self.chatParent)
+            replyWidget.widgetTmp = self.chatParent.chatWidget
+            replyWidget.clientSocket = self.clientSocket
+            self.chatParent.clientSocket = self.tmpSocket
+
+            self.chatParent.chatWidget = replyWidget
+
+            #리플 위젯 화면 뿌려주기
+            self.chatParent.chatWidget.comment_info = self.comments
+            self.chatParent.chatWidget.replyList = self.chatParent.chatWidget.getReply()
+            self.chatParent.chatWidget.showReply()
+            self.chatParent.chatContentLayout.addWidget(self.chatParent.chatWidget)
+
+            # # 내 질문 목록 위젯 닫음
+            self.parent.close()
 
 
 

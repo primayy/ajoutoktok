@@ -1,12 +1,9 @@
 import sys
-from PyQt5.QtGui import *
-from PyQt5 import QtCore
-from PyQt5.QtCore import *
+import reply
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
-from socket import *
-import time
+
 
 
 class Search(QWidget):
@@ -96,20 +93,11 @@ class Search(QWidget):
         for i in range(len(self.searchList)):
             item = QListWidgetItem(self.question_search)
 
-            custom_widget = searchWidget(self.searchList[i],self.parent)
+            custom_widget = searchWidget(self.searchList[i],self.parent, self)
             item.setSizeHint(custom_widget.sizeHint())
             self.question_search.setItemWidget(item, custom_widget)
             self.question_search.addItem(item)
         self.question_search.scrollToBottom()
-
-
-    #뒤로가기 버튼 눌렀을시
-    def returnToChat(self):
-        self.close()
-        self.parent.chatWidget = self.widgetTmp
-
-        self.parent.sendType = True
-        self.widgetTmp.show()
 
     #질문에 대한 답글 읽어옴
     def getSearch(self):
@@ -136,10 +124,15 @@ class Search(QWidget):
 
 
 class searchWidget(QWidget):
-    def __init__(self,comments, parent):
+    def __init__(self, comments, chatParent, parent):
         super().__init__()
+        # 질문 위젯
+        self.chatParent = chatParent
+        # 내질문 위젯
         self.parent = parent
-        self.comments = comments
+
+        self.comments = comments.split(',')
+        self.clientSocket = chatParent.clientSocket
 
         self.searchLayout = QVBoxLayout()
         self.mainLayout = QHBoxLayout()
@@ -150,11 +143,37 @@ class searchWidget(QWidget):
     def initUI(self):
 
         searched = QLabel()
-        searched.setText(self.comments)
+        searched.setText(self.comments[2])
 
         self.searchLayout.addWidget(searched)
         self.mainLayout.addLayout(self.searchLayout)
 
+    def mousePressEvent(self, QMouseEvent):
+        if QMouseEvent.button() == Qt.LeftButton:
+            #질문 목록 위젯 닫음
+            self.chatParent.chatWidget.close()
+
+            #메시지 전송 타입 답글로 변경
+            self.chatParent.sendType = False
+            #리플 위젯 생성 및 변수값 대입
+            self.chatParent.comment_info = self.comments
+            self.tmpSocket = self.chatParent.clientSocket
+            self.chatParent.clientSocket = self.clientSocket
+            replyWidget = reply.Reply(self.chatParent)
+            replyWidget.widgetTmp = self.chatParent.chatWidget
+            replyWidget.clientSocket = self.clientSocket
+            self.chatParent.clientSocket = self.tmpSocket
+
+            self.chatParent.chatWidget = replyWidget
+
+            #리플 위젯 화면 뿌려주기
+            self.chatParent.chatWidget.comment_info = self.comments
+            self.chatParent.chatWidget.replyList = self.chatParent.chatWidget.getReply()
+            self.chatParent.chatWidget.showReply()
+            self.chatParent.chatContentLayout.addWidget(self.chatParent.chatWidget)
+
+            # # 내 질문 목록 위젯 닫음
+            self.parent.close()
 
 
 

@@ -544,7 +544,7 @@ class ServerSocket:
                     cur.execute("SELECT no FROM category WHERE lecture_code = '" + str(
                         side[1]) + "' AND chatroom_name = '" + str(side[2]) + "'")
                     cat_id = cur.fetchall()
-                    cur.execute("SELECT comment FROM chatting WHERE comment LIKE '%" + str(
+                    cur.execute("SELECT * FROM chatting WHERE comment LIKE '%" + str(
                         side[0]) + "%' AND category_id=" + str(cat_id[0][0]))
                     chat_log = cur.fetchall()
                     print(chat_log)
@@ -556,7 +556,13 @@ class ServerSocket:
                         else:
                             result = ""
                             for i in range(len(chat_log)):
-                                result += str(chat_log[i][0]) + "/"  # comment
+                                result += str(chat_log[i][4]) + ","  # stuid
+                                result += str(chat_log[i][3]) + ","  # nickname
+                                result += str(chat_log[i][2]) + ","  # comment
+                                result += str(chat_log[i][6]) + ","  # likes
+                                result += str(chat_log[i][1]) + ","  # category_id
+                                result += str(chat_log[i][5]) + ","  # time
+                                result += str(chat_log[i][0]) + "/"  # chatting_id
 
                             client.sendall(result.encode('utf-8'))
                             print('chat_Search 끝')

@@ -5,7 +5,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
-from socket import *
 import time
 
 
@@ -289,7 +288,6 @@ class replyWidget(QWidget):
         
         #question2.auto
         
-        print(question2.document())
         question2.setStyleSheet("border:1px;"
                                 "border-color:red;"
                                 "font: 9pt 나눔스퀘어라운드 Regular;"
@@ -299,7 +297,6 @@ class replyWidget(QWidget):
         question2.setSizeAdjustPolicy(question2.AdjustToContents)
         #question2.setFixedHeight(self.comments[0].size().height())
         #question2.setFixedHeight(question2.document().size().height())
-        print(question2.document())
         date = QLabel()
         date.setStyleSheet('font:8pt;color:#7f7f7f')
         date.setText(self.comments[2])

@@ -86,7 +86,7 @@ class Mine(QWidget):
             item.setSizeHint(custom_widget.sizeHint())
             self.question_mine.setItemWidget(item, custom_widget)
 
-                        
+
 
         #widgetLayout에 추가
         self.widgetLayout.addWidget(self.question_mine)
@@ -134,7 +134,6 @@ class mineWidget(QWidget):
     def initUI(self):
 
         Mined = QLabel()
-        print(self.comments)
 
         Mined.setText(self.comments[2])
 

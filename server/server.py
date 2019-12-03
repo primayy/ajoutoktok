@@ -462,13 +462,17 @@ class ServerSocket:
                     cur.execute("SELECT count(*),chat_id FROM alarm WHERE reply_student_id != '" + str(
                         side[0]) + "' AND chat_student_id ='" + str(side[0]) + "' GROUP BY chat_id")
                     chatAlarm = cur.fetchall()
-                    cur.execute("SELECT no FROM alarm WHERE reply_student_id != '" + str(
-                        side[0]) + "' AND chat_student_id ='" + str(side[0]) + "'")
+                    cur.execute("SELECT chat_id FROM alarm WHERE reply_student_id != '" + str(
+                        side[0]) + "' AND chat_student_id ='" + str(side[0]) + "' GROUP BY chat_id")
                     chatAlarmIds = cur.fetchall()
                     print(chatAlarmIds)
+                    data_time_array = []
                     if len(chatAlarmIds) > 0:
-                        cur.execute("SELECT data_time FROM reply WHERE no =" + str(chatAlarmIds[-1][0]) + "")
-                        data_time = cur.fetchall()
+                        for i in range(len(chatAlarmIds)):
+                            cur.execute("SELECT data_time FROM reply WHERE chat_id =" + str(chatAlarmIds[i][0]) + " ORDER BY data_time Desc")
+                            data_time = cur.fetchall()
+                            print(data_time)
+                            data_time_array.append(data_time[0][0])
                     # 내가 쓴 댓글의 게시글 id
                     cur.execute("SELECT chat_id FROM alarm WHERE reply_student_id ='" + str(
                         side[0]) + "' AND reply_selected = 1 AND chat_student_id !='" + str(side[0]) + "'")
@@ -501,7 +505,7 @@ class ServerSocket:
                                 "SELECT lecture_name,no FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
                             lecture_name = cur.fetchall()
                             ChatAlarmText += lecture_name[0][0] + "#&$@" + str(cat_id[0][1]) + "#&$@" + str(
-                                chatAlarm[i][0]) + "#&$@" + str(data_time) + "#&$@" + str(
+                                chatAlarm[i][0]) + "#&$@" + str(data_time_array[i]) + "#&$@" + str(
                                 lecture_name[0][1]) + "#&$@" + str(lec_co[0][1]) + "#&$@" + str(
                                 lec_co[0][0]) + "*&^%"  # "강의이름,게시글,댓글 수,강의탭,강의코드"
                         ChatAlarmText = ChatAlarmText.rstrip()

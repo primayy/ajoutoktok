@@ -172,12 +172,16 @@ class lecture(QWidget):
             layoutout.setContentsMargins(0,0,0,0)
             
             if(len(dateAtime)>0):
-                dateBtime = dateAtime.split("(")[3].split(")")[0]
+                print("dateAtime: " + str(dateAtime))
 
-                datetime = dateBtime.split(",")
+                datetimeB = dateAtime.split(" ")
+                date_tmp = datetimeB[0]
+                time_tmp = datetimeB[1]
 
-                date = ".".join(datetime[0:3])
-                time = ":".join(datetime[3:6])
+                date_tmp = date_tmp.split("-")
+
+                date = ".".join(date_tmp[0:3])
+                time = time_tmp
 
                 Qlabel2 = QLabel(str(date)+" "+str(time))
                 Qlabel2.setStyleSheet('background:white')

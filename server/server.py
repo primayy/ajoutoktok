@@ -16,7 +16,7 @@ class ServerSocket:
     def __init__(self):
         self.numnum = 0
         try:
-            self.databasent = mdb.connect('localhost', 'root', '0428', 'db_testin')
+            self.databasent = mdb.connect('localhost', 'root', '789521', 'db_testin')
             print("Successfully Connected To DB")
         except mdb.Error as e:
             print('Not Connected Succefully To DB')
@@ -505,9 +505,8 @@ class ServerSocket:
                                 "SELECT lecture_name,no FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
                             lecture_name = cur.fetchall()
                             ChatAlarmText += lecture_name[0][0] + "#&$@" + str(cat_id[0][1]) + "#&$@" + str(
-                                chatAlarm[i][0]) + "#&$@" + str(data_time_array[i]) + "#&$@" + str(
-                                lecture_name[0][1]) + "#&$@" + str(lec_co[0][1]) + "#&$@" + str(
-                                lec_co[0][0]) + "*&^%"  # "강의이름,게시글,댓글 수,강의탭,강의코드"
+                                chatAlarm[i][0])+ "#&$@" + str(chatAlarm[i][1]) + "#&$@" + str(data_time_array[i]) + "#&$@" + str(
+                                lecture_name[0][1]) + "#&$@" + str(lec_co[0][1]) + "#&$@" + str(lec_co[0][0]) + "*&^%"  # "강의이름,게시글,댓글 수,강의탭,강의코드"
                         ChatAlarmText = ChatAlarmText.rstrip()
 
                     if len(replyAlarm) > 0:
@@ -521,7 +520,7 @@ class ServerSocket:
                             cur.execute(
                                 "SELECT lecture_name,no FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
                             lecture_name = cur.fetchall()
-                            ReplyAlarmText += lecture_name[0][0] + "#&$@" + str(cat_id[0][1]) + "#&$@" + str(
+                            ReplyAlarmText += lecture_name[0][0] + "#&$@" + str(cat_id[0][1])+ "#&$@" + str(replyAlarm[i][0])+ "#&$@" + str(replyAlarm[i][0]) + "#&$@" + str(
                                 lecture_name[0][1]) + "#&$@" + str(lec_co[0][1]) + "#&$@" + str(
                                 lec_co[0][0]) + "*&^%"  # 강의 이름,댓글,강의ID,강의탭,강의코드
                         ReplyAlarmText = ReplyAlarmText.rstrip()
@@ -665,15 +664,13 @@ class ServerSocket:
                 elif commend == 'AlarmToReply':
                     print(side)
                     cur = self.databasent.cursor()
-                    cur.execute(
-                        "SELECT no FROM category WHERE lecture_id ='" + str(side[0]) + "'AND chatroom_name = '" + str(
-                            side[1]) + "'")
+                    cur.execute("SELECT * FROM category ")
                     category_id = cur.fetchall()
                     print(category_id)
                     if len(category_id) != 0:
                         cur = self.databasent.cursor()
-                        cur.execute("SELECT * FROM chatting WHERE category_id ='" + str(
-                            category_id[0][0]) + "' AND comment = '" + str(side[2]) + "'")
+                        cur.execute("SELECT * FROM chatting WHERE no =" + str(
+                            side[0]) + "")
                         chat_log = cur.fetchall()
 
                         if len(chat_log) == 0:

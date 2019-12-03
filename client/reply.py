@@ -113,7 +113,7 @@ class Reply(QWidget):
         self.dateLabel = QLabel()
         self.dateLabel.setStyleSheet('font:7pt 나눔스퀘어라운드 Regular')
 
-        commend = 'like_status '+ self.parent.comment_info[6] + " " + self.parent.parent.stuid#학번
+        commend = 'like_status '+ self.parent.comment_info[-1] + " " + self.parent.parent.stuid#학번
         self.parent.clientSocket.send(commend.encode('utf-8'))
         # print(commend)
         result = self.parent.clientSocket.recv(1024)
@@ -175,7 +175,7 @@ class Reply(QWidget):
 
 
     def likeClicked(self):
-        commend = 'like_update '+ self.parent.comment_info[6] + " " + self.parent.parent.stuid#학번 + msg
+        commend = 'like_update '+ self.parent.comment_info[-1] + " " + self.parent.parent.stuid#학번 + msg
         self.clientSocket.send(commend.encode('utf-8'))
         result = self.clientSocket.recv(1024)
         result = result.decode('utf-8')

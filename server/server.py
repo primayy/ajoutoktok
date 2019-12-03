@@ -895,6 +895,12 @@ class ServerSocket:
                         side[0]) + "'")  # 해당 유저의 학과 ==> '학과내'에 사용
                     point = cur.fetchall()
                     point = str(point[0][0])
+                   
+                    if point == str(None):
+                        cur.execute("UPDATE user SET point ='" + str(0) + "'WHERE student_id='" + str(side[0]) + "'")
+                        point = str(0)
+                    else:
+                        cur.execute("UPDATE user SET point ='" + point + "'WHERE student_id='" + str(side[0]) + "'")
 
                     client.send(point.encode('utf-8'))
 
@@ -1169,7 +1175,11 @@ class ServerSocket:
                     #포인트 및 질문
                     cur.execute("SELECT sum(points) From points WHERE Student_id ='" + str(side[0]) + "'")
                     myPoint = str(cur.fetchall()[0][0])
-                    cur.execute("UPDATE user SET point ='" + myPoint + "'WHERE student_id='" + str(side[0]) + "'")
+                    if myPoint == str(None):
+                        cur.execute("UPDATE user SET point ='" + str(0) + "'WHERE student_id='" + str(side[0]) + "'")
+                    else:
+                        cur.execute("UPDATE user SET point ='" + myPoint + "'WHERE student_id='" + str(side[0]) + "'")
+
                     cur.execute("SELECT count(*) From chatting WHERE Student_id ='" + str(side[0]) + "'")
                     myQuest = str(cur.fetchall()[0][0])
                     cur.execute("UPDATE user SET quest ='" + myQuest + "'WHERE student_id='" + str(side[0]) + "'")

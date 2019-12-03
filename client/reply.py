@@ -167,7 +167,7 @@ class Reply(QWidget):
         for i in range(len(self.replyList)):
             item = QListWidgetItem(self.question_reply)
 
-            custom_widget = replyWidget(self.replyList[i],self.parent)
+            custom_widget = replyWidget(self.replyList[i],self.parent,self)
             item.setSizeHint(custom_widget.sizeHint())
             self.question_reply.setItemWidget(item, custom_widget)
             self.question_reply.addItem(item)
@@ -241,16 +241,17 @@ class Reply(QWidget):
         for i in range(len(self.replyList)):
             item = QListWidgetItem(self.question_reply)
 
-            custom_widget = replyWidget(self.replyList[i],self.parent)
+            custom_widget = replyWidget(self.replyList[i],self.parent,self)
             item.setSizeHint(custom_widget.sizeHint())
             self.question_reply.setItemWidget(item, custom_widget)
             self.question_reply.addItem(item)
 
 
 class replyWidget(QWidget):
-    def __init__(self,comments, parent):
+    def __init__(self,comments, parent,forRefresh):
         super().__init__()
         self.parent = parent
+        self.forRefresh = forRefresh
         self.user = parent.user
         self.clientSocket = self.parent.clientSocket
         self.comments = comments
@@ -322,6 +323,7 @@ class replyWidget(QWidget):
             if result == 0:
                 dlg = sendQuestion(self)
                 dlg.exec_()
+                self.forRefresh.refresh()
 
             elif result == 2:
                 dlg = studentInfo(self)

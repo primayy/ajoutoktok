@@ -30,7 +30,7 @@ class alarm(QWidget):
         btn_remove_all.setStyleSheet('''
                         QPushButton{image:url(./ui/afterlogin_ui/모두삭제4.png); border:0px; width:100px; height:40px}        
                         ''')
-        
+        btn_remove_all.setFocusPolicy(Qt.NoFocus)
         btn_remove_all.clicked.connect(self.remove_it_all)
 
         self.viewer = QListWidget(self)
@@ -108,7 +108,7 @@ class alarm_group(QWidget):
         course = courses.split('#&$@')
 
         self.mainLayout = QVBoxLayout()
-        self.mainLayout.setContentsMargins(1,3,1,3)
+        self.mainLayout.setContentsMargins(0,0,0,0)
         #그룹 그리기
         self.mainWidget = lecture(self.parent, course, w, chatORreply)
 
@@ -124,6 +124,9 @@ class lecture(QWidget):
         self.w = window
         self.clientSocket = self.w.clientSock
         self.viewer = alarm_list_Widget.viewer
+        #self.viewer.setStyleSheet('QListView:item{margin:0 0 0 0}')
+        self.viewer.setSpacing(0)
+        #self.viewer.setContentsMargins(0,0,0,0)
         self.course = course
 
         self.mainLayout = QVBoxLayout()
@@ -142,11 +145,30 @@ class lecture(QWidget):
             # middle
         if chatORreply == 0:
             self.alarm = QWidget()
+            alarm_button_layout = QHBoxLayout()
             layoutout = QVBoxLayout()
             Qlabel1 = QLabel(str("[강의: "+course[0]+"]에 게시한 글 '"+course[1]+"'에 "+course[2]+"개의 댓글이 추가되었습니다."))
             dateAtime = str(course[-4])
 
-            layoutout.addWidget(Qlabel1)
+            #텍스트브라우저형식
+            alarm_message = QTextBrowser()
+            alarm_message.setText(str("[강의: "+course[0]+"]에 게시한 글 '"+course[1]+"'에 "+course[2]+"개의 댓글이 추가되었습니다."))
+            alarm_message.setMaximumHeight(70)
+            alarm_message.setMinimumSize(120,70)
+            alarm_message.setStyleSheet('background-color:white;border:0px;font:8pt')
+
+            #이동 버튼
+            reply_move_button = QPushButton()
+            reply_move_button.setStyleSheet('''
+                        QPushButton{image:url(./ui/afterlogin_ui/이동3.png); border:0px; width:35px;height:105px}        
+                        ''')
+            reply_move_button.setFocusPolicy(Qt.NoFocus)
+            reply_move_button.clicked.connect(self.open_reply)
+
+            #layoutout.addWidget(Qlabel1)
+            layoutout.addWidget(alarm_message)
+            layoutout.setContentsMargins(0,0,0,0)
+            
             if(len(dateAtime)>0):
                 dateBtime = dateAtime.split("(")[3].split(")")[0]
 
@@ -156,19 +178,79 @@ class lecture(QWidget):
                 time = ":".join(datetime[3:6])
 
                 Qlabel2 = QLabel(str(date)+" "+str(time))
-                layoutout.addWidget(Qlabel2)
-            self.alarm.setLayout(layoutout)
+                Qlabel2.setStyleSheet('background:white')
+                
+                layoutout.addWidget(Qlabel2,alignment=(QtCore.Qt.AlignTop))
+                layoutout.setSpacing(0)
+            
+            alarm_button_layout.addLayout(layoutout)
+            alarm_button_layout.addWidget(reply_move_button,alignment=(QtCore.Qt.AlignTop))
+            alarm_button_layout.addStretch(1)
+            alarm_button_layout.setContentsMargins(0,0,0,0)
+
+            self.alarm.setLayout(alarm_button_layout)
+            self.alarm.setContentsMargins(0,0,0,5)
+            #self.alarm.setLayout(layoutout)
+            
         elif chatORreply == 1:
                 self.alarm = QLabel(str("[강의: "+course[0]+"]에 작성한 댓글'"+course[1]+"'이 채택되었습니다."))
         self.chatComm = course[1]
         self.chatName = course[-2]
         self.LecID = course[-3]
-        self.alarm.setStyleSheet('font: 10pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a')
+        self.alarm.setStyleSheet('font: 8pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a')
         self.layout_middle.addWidget(self.alarm)
-
+        #self.layout_middle.setContentsMargins(0,0,0,0)
         self.layout.addLayout(self.layout_middle)
+        self.layout.setContentsMargins(3,3,3,3)
         self.mainWidget.setLayout(self.layout)
         self.setLayout(self.mainLayout)
+
+    def open_reply(self):
+        title = self.course
+        self.chat = chat_test.chatRoom(self,0)
+        self.chat.profName.setText(self.course[-1])
+        self.chat.setWindowTitle(title[0])
+        self.chat.setMinimumSize(QSize(400, 400))
+
+        #질문 목록 닫기
+        self.chat.chatWidget.close()
+
+        # 메시지 전송 타입 답글로 변경
+        self.chat.sendType = False
+
+        commend = "AlarmToReply " + self.LecID + " " + self.chatName + " " + self.chatComm
+        self.clientSocket.send(commend.encode('utf-8'))
+        self.coursep = self.clientSocket.recv(1024).decode('utf-8')
+        self.coursep = self.coursep.split("/")
+        self.coursep = self.coursep[0]
+
+        #댓글 위젯 생성
+
+    
+
+        self.coursep = self.coursep.split("#$%#")
+        self.chat.comment_info = self.coursep
+        self.reply = reply.Reply(self.chat)
+
+        self.tmpSocket = self.chat.clientSocket
+        self.chat.clientSocket = self.clientSocket
+        self.reply.widgetTmp = self.chat.chatWidget
+        self.reply.clientSocket = self.clientSocket
+        self.chat.clientSocket = self.tmpSocket
+
+        self.chat.chatWidget = self.reply
+
+        # 리플 위젯 화면 뿌려주기
+        self.chat.chatWidget.comment_info = self.coursep
+        self.chat.chatWidget.replyList = self.chat.chatWidget.getReply()
+        self.chat.chatWidget.showReply()
+        self.chat.chatContentLayout.addWidget(self.chat.chatWidget)
+        self.reply.setWindowTitle(title[0])
+        self.reply.setMinimumSize(QSize(400, 400))
+        self.reply.show()
+
+
+
 
     def mousePressEvent(self, QMouseEvent):
         title = self.course

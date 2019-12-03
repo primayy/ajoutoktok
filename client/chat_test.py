@@ -78,12 +78,12 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        # self.chatSocket.connect(('192.168.0.49', 3334))
+        #self.chatSocket.connect(('192.168.0.49', 3334))
         # self.chatSocket.connect(('192.168.43.180', 3334))
-        # self.chatSocket.connect(('192.168.0.49',3334))
-        self.chatSocket.connect(('192.168.25.22', 3334))
+        self.chatSocket.connect(('192.168.0.49',3334))
+        #self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
-
+        
         self.history = self.getChatHistory()
         self.tab.currentChanged.connect(self.category_changed)
 
@@ -193,8 +193,8 @@ class chatRoom(QWidget):
         self.titleLayoutMid.addWidget(lecName,alignment=QtCore.Qt.AlignLeft)
 
         #강의 정보
-        profName = QLabel(self.parent.course[1])
-        profName.setStyleSheet('font:10pt 나눔스퀘어라운드 Regular;color:#27565b')
+        self.profName = QLabel(self.parent.course[1])
+        self.profName.setStyleSheet('font:10pt 나눔스퀘어라운드 Regular;color:#27565b')
 
         download = QPushButton()
         download.clicked.connect(self.sendQuestionToEmail)
@@ -202,7 +202,7 @@ class chatRoom(QWidget):
         download.setStyleSheet('border:0px')
         download.setIcon(QIcon('./ui/chatting_ui/download.png'))
         download.setIconSize(QSize(30,30))
-        self.titleLayoutBot.addWidget(profName,alignment=QtCore.Qt.AlignLeft)
+        self.titleLayoutBot.addWidget(self.profName,alignment=QtCore.Qt.AlignLeft)
         self.titleLayoutBot.addStretch(1)
         self.titleLayoutBot.addWidget(BtnMine)
         self.titleLayoutBot.addWidget(BtnSearch)

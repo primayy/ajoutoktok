@@ -145,6 +145,7 @@ class Register(QWidget):
         self.nickname_textbox = QLineEdit()
         self.nickname_textbox.setStyleSheet('height:20; width:90px')
         self.nickname_overlap = QPushButton()
+        self.nickname_overlap.setFocusPolicy(Qt.NoFocus)
         self.nickname_overlap.setStyleSheet('''
                         QPushButton{image:url(./ui/register_ui/중복확인.png); border:0px; width:100px; height:50px}
                         ''')
@@ -156,6 +157,7 @@ class Register(QWidget):
                         QPushButton{image:url(./ui/register_ui/등록.png); border:0px; width:95px; height:45px}        
                         
                         ''')
+        register_button.setFocusPolicy(Qt.NoFocus)
         register_button.clicked.connect(lambda: self.register(self.nickname_textbox.text(),department_comboBox.currentText() ))
         
         self.title.addWidget(init_register_label,alignment=(QtCore.Qt.AlignCenter))

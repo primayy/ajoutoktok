@@ -512,7 +512,7 @@ class ServerSocket:
                             cur.execute(
                                 "SELECT category_id,comment FROM chatting WHERE no =" + str(replyAlarm[i][0]) + "")
                             cat_id = cur.fetchall()
-                            cur.execute("SELECT lecture_code FROM category WHERE no =" + str(cat_id[0][0]) + "")
+                            cur.execute("SELECT lecture_code,chatroom_name FROM category WHERE no =" + str(cat_id[0][0]) + "")
                             lec_co = cur.fetchall()
                             cur.execute(
                                 "SELECT lecture_name,no FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
@@ -963,10 +963,11 @@ class ServerSocket:
                         chat_reply_sel = cur.fetchall()
                         if (chat_reply_sel[0][1] == str(side[1])):
                             if chat_reply_sel[0][0] == 0:
-                                cur.execute(
-                                    "UPDATE chatting SET reply_selected = 1 WHERE no = " + str(chat_id[0][0]) + "")
+                                cur.execute("UPDATE chatting SET reply_selected = 1 WHERE no = " + str(chat_id[0][0]) + "")
                                 cur.execute("UPDATE reply SET reply_selected = 1 WHERE no = " + str(side[0]) + "")
+                                cur.execute("UPDATE alarm SET reply_selected = reply_selected + 1 WHERE reply_id = " + str(side[0]) + " AND reply_student_id ='"+str(chat_id[0][1])+"' AND chat_student_id ='"+str(chat_reply_sel[0][1])+"' AND chat_id = "+str(chat_id[0][0])+"")
                                 self.databasent.commit()
+                                
                                 ANSWER = "update"
                                 print("Update: " + ANSWER)
                             else:

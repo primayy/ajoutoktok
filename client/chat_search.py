@@ -136,6 +136,14 @@ class Search(QWidget):
 
             return searchedResult
 
+    def mousePressEvent(self, event):
+        self.oldPos = event.globalPos()
+
+    def mouseMoveEvent(self, event):
+        delta = QPoint(event.globalPos() - self.oldPos)
+
+        self.move(self.x() + delta.x(), self.y() + delta.y())
+        self.oldPos = event.globalPos()
 
 class searchWidget(QWidget):
     def __init__(self, comments, chatParent, parent):
@@ -155,7 +163,8 @@ class searchWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        searched2 = QTextBrowser()
+        #searched2 = QTextBrowser()
+        searched2 = QLabel()
         searched2.setMaximumHeight(70)
         searched2.setMinimumSize(400,70)
         searched2.setStyleSheet('border:0px solid;background:white;')

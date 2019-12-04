@@ -117,6 +117,15 @@ class Mine(QWidget):
                 mineResult.append(mine[i])
             return mineResult
 
+    def mousePressEvent(self, event):
+        self.oldPos = event.globalPos()
+
+    def mouseMoveEvent(self, event):
+        delta = QPoint(event.globalPos() - self.oldPos)
+
+        self.move(self.x() + delta.x(), self.y() + delta.y())
+        self.oldPos = event.globalPos()
+    
 
 class mineWidget(QWidget):
     def __init__(self,comments, chatParent,parent):
@@ -136,7 +145,8 @@ class mineWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        Mined2 = QTextBrowser()
+        #Mined2 = QTextBrowser()
+        Mined2 = QLabel()
         Mined2.setMaximumHeight(70)
         Mined2.setMinimumSize(400,70)
         Mined2.setStyleSheet('border:0px solid;background:white;')

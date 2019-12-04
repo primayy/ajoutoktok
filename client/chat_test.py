@@ -78,12 +78,13 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.6', 3334))
+        #self.chatSocket.connect(('192.168.0.6', 3334))
         # self.chatSocket.connect(('192.168.43.36', 3334))
         #self.chatSocket.connect(('192.168.0.8',3334))
         #self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
-        
+        self.chatSocket.connect(('172.30.1.21', 3334))
+
         self.history = self.getChatHistory()
         self.tab.currentChanged.connect(self.category_changed)
 
@@ -158,14 +159,14 @@ class chatRoom(QWidget):
         # 최소화
         btMini = QPushButton()
         btMini.setStyleSheet('''border:0px''')
-        btMini.setIcon(QIcon('./icon/minimize.png'))
-        btMini.setIconSize(QSize(15, 15))
+        btMini.setIcon(QIcon('./icon/minimize2.png'))
+        btMini.setIconSize(QSize(17, 17))
         btMini.clicked.connect(lambda: QApplication.activeWindow().showMinimized())
 
         # 종료
         btExit = QPushButton()
         btExit.setStyleSheet('''border:0px''')
-        btExit.setIcon(QIcon('./icon/icons8-close-window-16.png'))
+        btExit.setIcon(QIcon('./icon/close.png'))
         btExit.setIconSize(QSize(15, 15))
         btExit.clicked.connect(self.quitClicked)
 

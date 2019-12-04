@@ -146,15 +146,17 @@ class App(QWidget):
         # 최소화
         btMini = QPushButton()
         btMini.setStyleSheet('''border:0px''')
-        btMini.setIcon(QIcon('./ui/afterlogin_ui/minimize_button.png'))
+        btMini.setIcon(QIcon('./icon/minimize2.png'))
         btMini.setIconSize(QSize(17,17))
+        btMini.setFocusPolicy(Qt.NoFocus)
         btMini.clicked.connect(lambda: QApplication.activeWindow().showMinimized())
 
         # 종료
         btExit = QPushButton()
         btExit.setStyleSheet('''border:0px''')
-        btExit.setIcon(QIcon('./ui/afterlogin_ui/close_button.png'))
-        btExit.setIconSize(QSize(17,17))
+        btExit.setIcon(QIcon('./icon/close.png'))
+        btExit.setIconSize(QSize(15,15))
+        btExit.setFocusPolicy(Qt.NoFocus)
         btExit.clicked.connect(self.quitClicked)
 
         self.rightSideTitle.addStretch(1)

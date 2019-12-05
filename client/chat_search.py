@@ -3,7 +3,11 @@ import reply
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
-
+from PyQt5.QtGui import *
+from PyQt5 import QtCore
+from PyQt5.QtCore import *
+from socket import *
+import time
 
 
 class Search(QWidget):
@@ -71,6 +75,7 @@ class Search(QWidget):
         
         self.search_input.setMinimumWidth(250)
         btnSearch = QPushButton('검색')
+        btnSearch.setStyleSheet('font:10pt 나눔스퀘어라운드 Regular;color:#42808a;')
         btnSearch.clicked.connect(self.search)
 
 
@@ -85,6 +90,13 @@ class Search(QWidget):
                         # QListWidget:item:hover{background:white};
                         # QListWidget:item{padding:0px}
                         ''')
+        # 종료
+        btExit = QPushButton()
+        btExit.setStyleSheet('''border:0px''')
+        btExit.setIcon(QIcon('./icon/close.png'))
+        btExit.setIconSize(QSize(15,15))
+        btExit.setFocusPolicy(Qt.NoFocus)
+        btExit.clicked.connect(self.quitClicked)
 
         #widgetLayout에 추가
         
@@ -92,6 +104,7 @@ class Search(QWidget):
         self.searchbar_layout.addWidget(btnSearch)
         # self.widgetLayout.addWidget(self.search_input)
         # self.widgetLayout.addWidget(btnSearch)
+        self.widgetLayout.addWidget(btExit, alignment=QtCore.Qt.AlignRight)
         self.widgetLayout.addWidget(question_search)
         self.widgetLayout.addLayout(self.searchbar_layout)
         self.widgetLayout.addWidget(self.question_search)
@@ -100,6 +113,8 @@ class Search(QWidget):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.show()
 
+    def quitClicked(self):
+        self.hide()
 
     def search(self):
         self.question_search.clear()
@@ -165,9 +180,9 @@ class searchWidget(QWidget):
     def initUI(self):
         #searched2 = QTextBrowser()
         searched2 = QLabel()
-        searched2.setMaximumHeight(70)
-        searched2.setMinimumSize(400,70)
-        searched2.setStyleSheet('border:0px solid;background:white;')
+        searched2.setMaximumHeight(40)
+        searched2.setMinimumSize(400,40)
+        searched2.setStyleSheet('border:0px solid;background:white;font:9pt 나눔스퀘어라운드 Regular;')
         searched2.setContentsMargins(0,0,0,0)
         searched2.setText(self.comments[2])
 

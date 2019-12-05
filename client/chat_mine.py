@@ -88,13 +88,24 @@ class Mine(QWidget):
             item.setSizeHint(custom_widget.sizeHint())
             self.question_mine.setItemWidget(item, custom_widget)
 
+        # 종료
+        btExit = QPushButton()
+        btExit.setStyleSheet('''border:0px''')
+        btExit.setIcon(QIcon('./icon/close.png'))
+        btExit.setIconSize(QSize(15,15))
+        btExit.setFocusPolicy(Qt.NoFocus)
+        btExit.clicked.connect(self.quitClicked)
 
 
         #widgetLayout에 추가
+        self.widgetLayout.addWidget(btExit, alignment=QtCore.Qt.AlignRight)
         self.widgetLayout.addWidget(myquestion)
         self.widgetLayout.addWidget(self.question_mine)
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.show()
+
+    def quitClicked(self):
+        self.hide()
 
     #질문에 대한 답글 읽어옴
     def getMine(self):
@@ -147,9 +158,9 @@ class mineWidget(QWidget):
     def initUI(self):
         #Mined2 = QTextBrowser()
         Mined2 = QLabel()
-        Mined2.setMaximumHeight(70)
-        Mined2.setMinimumSize(400,70)
-        Mined2.setStyleSheet('border:0px solid;background:white;')
+        Mined2.setMaximumHeight(30)
+        Mined2.setMinimumSize(400,30)
+        Mined2.setStyleSheet('border:0px solid;background:white;font:9pt 나눔스퀘어라운드 Regular;')
         Mined2.setContentsMargins(0,0,0,0)
         Mined2.setText(self.comments[2])
 

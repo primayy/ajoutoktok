@@ -239,7 +239,8 @@ class lecture(QWidget):
             self.btExit = QPushButton()
             self.btExit.setIconSize(QSize(13,13))
             self.btExit.setStyleSheet('''border:0px''')
-            self.btExit.setIcon(QIcon('./icon/x.png'))
+            self.btExit.setIcon(QIcon('./icon/close.png'))
+            self.btExit.setFocusPolicy(Qt.NoFocus)
             self.btExit.clicked.connect(self.exitLecture)
 
             # middle
@@ -257,6 +258,7 @@ class lecture(QWidget):
             self.msg_widget.resize(23, 23)
             self.msg_widget.setStyleSheet('''border:0px''')
             self.msg_widget.setIcon(QIcon('./ui/afterlogin_ui/bubble.png'))
+            self.msg_widget.setFocusPolicy(Qt.NoFocus)
             self.prof = QLabel(course[1])
             self.prof.setStyleSheet('font: 8pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a')
             self.msg_widget.clicked.connect(self.msg_widget_on)

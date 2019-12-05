@@ -35,26 +35,26 @@ class profile(QWidget):
 
 
         self.nickname = QLabel()
-        self.nickname.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
+        self.nickname.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
         changeNick = QPushButton("변경")
-        changeNick.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
+        changeNick.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
         changeNick.setMaximumHeight(60)
         changeNick.setMaximumWidth(90)
         changeNick.clicked.connect(self.changeNicknamePop)
 
         self.Dept = QLabel()
-        self.Dept.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
+        self.Dept.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
         self.Query = QLabel()
-        self.Query.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
+        self.Query.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
         self.Respond = QLabel()
-        self.Respond.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
+        self.Respond.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
         self.Points = QLabel()
-        self.Points.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
+        self.Points.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
 
         self.getProfile()
 
         self.bodypart11.addWidget(self.nickname)
-        #self.bodypart11.addWidget(changeNick)
+        self.bodypart11.addWidget(changeNick)
         self.bodypart22.addWidget(self.Query)
         self.bodypart22.addWidget(self.Respond)
 
@@ -101,12 +101,14 @@ class changeNickPop(QDialog):
         self.btnLayout = QHBoxLayout()
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setMinimumSize(150,150)
+        self.setStyleSheet('background:')
         self.initUi()
 
     def initUi(self):
         nick_input = QLineEdit()
         nick_input.setPlaceholderText('변경할 닉네임')
         change = QPushButton('변경')
+        change.setFocusPolicy(Qt.NoFocus)
         cancel = QPushButton('취소')
 
         cancel.clicked.connect(self.close)
@@ -115,6 +117,7 @@ class changeNickPop(QDialog):
         self.btnLayout.addWidget(change)
         self.btnLayout.addWidget(cancel)
 
+        
         self.mainLayout.addWidget(nick_input)
         self.mainLayout.addLayout(self.btnLayout)
         self.setLayout(self.mainLayout)

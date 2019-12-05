@@ -102,6 +102,7 @@ class Invisible(QWidget):
     def mouseDoubleClickEvent(self, QMouseEvent):
         title = self.parent.course
         self.parent.chat = chat_test.chatRoom(self.parent,1)
+        self.parent.chat.msgWidgetPos = self.pos()
         self.parent.chat.setWindowTitle(title[0])
         self.parent.chat.setMinimumSize(QSize(400, 400))
 

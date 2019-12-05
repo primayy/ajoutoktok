@@ -129,6 +129,8 @@ class lecture(QWidget):
         self.viewer.setSpacing(0)
         #self.viewer.setContentsMargins(0,0,0,0)
         self.course = course
+        #중복 열기 방지
+        self.chat = 0
 
         self.mainLayout = QVBoxLayout()
         self.mainWidget = QWidget()
@@ -213,47 +215,48 @@ class lecture(QWidget):
 
     def open_reply(self):
         title = self.course
-        self.chat = chat_test.chatRoom(self,0)
-        self.chat.profName.setText(self.course[-1])
-        self.chat.setWindowTitle(title[0])
-        self.chat.setMinimumSize(QSize(400, 400))
+        if self.chat == 0:
+            self.chat = chat_test.chatRoom(self,0)
+            self.chat.profName.setText(self.course[-1])
+            self.chat.setWindowTitle(title[0])
+            self.chat.setMinimumSize(QSize(400, 400))
 
-        #질문 목록 닫기
-        self.chat.chatWidget.close()
+            #질문 목록 닫기
+            self.chat.chatWidget.close()
 
-        # 메시지 전송 타입 답글로 변경
-        self.chat.sendType = False
+            # 메시지 전송 타입 답글로 변경
+            self.chat.sendType = False
 
-        commend = "AlarmToReply " + self.course[-5]
-        self.clientSocket.send(commend.encode('utf-8'))
-        self.coursep = self.clientSocket.recv(1024).decode('utf-8')
-        self.coursep = self.coursep.split("/")
-        self.coursep = self.coursep[0]
+            commend = "AlarmToReply " + self.course[-5]
+            self.clientSocket.send(commend.encode('utf-8'))
+            self.coursep = self.clientSocket.recv(1024).decode('utf-8')
+            self.coursep = self.coursep.split("/")
+            self.coursep = self.coursep[0]
 
-        #댓글 위젯 생성
+            #댓글 위젯 생성
 
-    
 
-        self.coursep = self.coursep.split("#$%#")
-        self.chat.comment_info = self.coursep
-        self.reply = reply.Reply(self.chat)
 
-        self.tmpSocket = self.chat.clientSocket
-        self.chat.clientSocket = self.clientSocket
-        self.reply.widgetTmp = self.chat.chatWidget
-        self.reply.clientSocket = self.clientSocket
-        self.chat.clientSocket = self.tmpSocket
+            self.coursep = self.coursep.split("#$%#")
+            self.chat.comment_info = self.coursep
+            self.reply = reply.Reply(self.chat)
 
-        self.chat.chatWidget = self.reply
+            self.tmpSocket = self.chat.clientSocket
+            self.chat.clientSocket = self.clientSocket
+            self.reply.widgetTmp = self.chat.chatWidget
+            self.reply.clientSocket = self.clientSocket
+            self.chat.clientSocket = self.tmpSocket
 
-        # 리플 위젯 화면 뿌려주기
-        self.chat.chatWidget.comment_info = self.coursep
-        self.chat.chatWidget.replyList = self.chat.chatWidget.getReply()
-        self.chat.chatWidget.showReply()
-        self.chat.chatContentLayout.addWidget(self.chat.chatWidget)
-        self.reply.setWindowTitle(title[0])
-        self.reply.setMinimumSize(QSize(400, 400))
-        self.reply.show()
+            self.chat.chatWidget = self.reply
+
+            # 리플 위젯 화면 뿌려주기
+            self.chat.chatWidget.comment_info = self.coursep
+            self.chat.chatWidget.replyList = self.chat.chatWidget.getReply()
+            self.chat.chatWidget.showReply()
+            self.chat.chatContentLayout.addWidget(self.chat.chatWidget)
+            self.reply.setWindowTitle(title[0])
+            self.reply.setMinimumSize(QSize(400, 400))
+            self.reply.show()
 
 
 

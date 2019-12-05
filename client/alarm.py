@@ -75,6 +75,18 @@ class alarm(QWidget):
 
 
     def showAlarms(self):
+        print(self.alarm_list)
+        tmp_list = []
+        for i in range(len(self.alarm_list[0])):
+            tmp = self.alarm_list[0][i].split('#&$@')
+            tmp_list.append(tmp)
+
+        tmp_list = sorted(tmp_list, key = lambda e:e[4],reverse=True)
+
+        for i in range(len(tmp_list)):
+            self.alarm_list[0][i] = '#&$@'.join(tmp_list[i])
+        print(self.alarm_list[0])
+
         for i in range(len(self.alarm_list)):
             for ii in range(len(self.alarm_list[i])):
                 item = QListWidgetItem(self.viewer)

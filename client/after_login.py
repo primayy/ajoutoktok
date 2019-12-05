@@ -7,7 +7,6 @@ from PyQt5.QtWidgets import QApplication
 import lecture_list as lec
 import alarm
 import setting
-import profile
 import leaderBoard as leader
 import webbrowser
 
@@ -23,6 +22,11 @@ class App(QWidget):
         self.setGraphicsEffect(shadow)
 
         self.w = window
+
+        #필수 변수
+        self.menu_lec = None
+        self.menu_alarm = None
+        self.menu_setting = None
 
         #클라이언트 소켓
         self.clientSocket = window.clientSock
@@ -163,7 +167,8 @@ class App(QWidget):
         self.rightSideTitle.addWidget(btMini, alignment=(QtCore.Qt.AlignTop | QtCore.Qt.AlignRight))
         self.rightSideTitle.addWidget(btExit, alignment=(QtCore.Qt.AlignTop | QtCore.Qt.AlignRight))
 
-        self.rightSideInfo = lec.lecture_list(studid,lecid,QApplication.activeWindow())
+        self.menu_lec = lec.lecture_list(studid,lecid,QApplication.activeWindow())
+        self.rightSideInfo = self.menu_lec
         self.rightSideLayout.addWidget(self.rightSideInfo)
 
         # 메인 레이아웃 그리기
@@ -178,33 +183,45 @@ class App(QWidget):
         url = w.user['bb_url']
         webbrowser.open(url)
 
-    def profile(self):
-        self.profile = profile.profile('A', 'A', 'A', 'A', 'A', self.studId)
-
     def showList(self):
         self.rightSideInfo.close()
-        self.rightSideInfo = lec.lecture_list(self.studId,self.lecId,QApplication.activeWindow())
-        self.rightSideInfo.setMinimumSize(300,500)
 
+        if self.menu_lec == None:
+            self.menu_lec = lec.lecture_list(self.studId,self.lecId,QApplication.activeWindow())
+            self.rightSideInfo = self.menu_lec
+        else:
+            self.rightSideInfo = self.menu_lec
+            self.rightSideInfo.show()
+
+        self.rightSideInfo.setMinimumSize(300,500)
         self.rightSideLayout.addWidget(self.rightSideInfo)
 
     def showAlarm(self):
         self.rightSideInfo.close()
-        self.rightSideInfo = alarm.alarm(self,self.studId)#clientSocket이랑 학번이 필요함
-        self.rightSideInfo.setMinimumSize(300,500)
 
+        self.rightSideInfo = alarm.alarm(self, self.studId)  # clientSocket이랑 학번이 필요함
+
+        self.rightSideInfo.setMinimumSize(300, 500)
         self.rightSideLayout.addWidget(self.rightSideInfo)
 
     def showLeader(self):
         self.rightSideInfo.close()
-        self.rightSideInfo = leader.LeaderBoard(self,self.studId)
+
+        self.rightSideInfo = leader.LeaderBoard(self, self.studId)
         self.rightSideInfo.setMinimumSize(300,500)
         self.rightSideLayout.addWidget(self.rightSideInfo)
 
 
     def showSetting(self):
         self.rightSideInfo.close()
-        self.rightSideInfo = setting.setting(self)
+
+        if self.menu_setting == None:
+            self.menu_setting = setting.setting(self)
+            self.rightSideInfo = self.menu_setting
+        else:
+            self.rightSideInfo = self.menu_setting
+            self.rightSideInfo.show()
+
         self.rightSideInfo.setMinimumSize(300,500)
         self.rightSideLayout.addWidget(self.rightSideInfo)
 

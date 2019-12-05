@@ -85,7 +85,7 @@ class chatRoom(QWidget):
         #self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
         #self.chatSocket.connect(('172.30.1.21', 3334))
-        self.chatSocket.connect(('192.168.0.13', 3334))
+        self.chatSocket.connect(('192.168.0.49', 3334))
 
         self.history = self.getChatHistory()
         self.tab.currentChanged.connect(self.category_changed)

@@ -128,6 +128,20 @@ class alarm_group(QWidget):
         self.mainLayout.addWidget(self.mainWidget)
         self.setLayout(self.mainLayout)
 
+class alarm_group(QWidget):
+    def __init__(self, courses,w,parent,chatORreply):
+        super().__init__()
+        self.parent = parent
+        course = courses.split('#&$@')
+
+        self.mainLayout = QVBoxLayout()
+        self.mainLayout.setContentsMargins(0,0,0,0)
+        #그룹 그리기
+        self.mainWidget = lecture(self.parent, course, w, chatORreply)
+
+        self.mainLayout.addWidget(self.mainWidget)
+        self.setLayout(self.mainLayout)
+
 class lecture(QWidget):
     def __init__(self, alarm_list_Widget, course,window,chatORreply):
         super().__init__()
@@ -156,31 +170,32 @@ class lecture(QWidget):
         self.layout_middle = QHBoxLayout()
 
             # top
+        self.alarm = QWidget()
+        alarm_button_layout = QHBoxLayout()
+        layoutout = QVBoxLayout()
+
+        #텍스트브라우저형식
+        alarm_message = QTextBrowser()
+        alarm_message.setMaximumHeight(90)
+        alarm_message.setMaximumWidth(230)
+        alarm_message.setStyleSheet('border:0px')
+        #alarm_message.setMinimumSize(100,90)
+        
+
+        #이동 버튼
+        reply_move_button = QPushButton()
+        reply_move_button.setStyleSheet('''
+                    QPushButton{image:url(./ui/afterlogin_ui/이동3.png); border:0px; width:35px;height:105px}        
+                    ''')
+        reply_move_button.setFocusPolicy(Qt.NoFocus)
+        reply_move_button.clicked.connect(self.open_reply)
 
             # middle
         if chatORreply == 0:
-            self.alarm = QWidget()
-            alarm_button_layout = QHBoxLayout()
-            layoutout = QVBoxLayout()
-            Qlabel1 = QLabel(str("[강의: "+course[0]+"]에 게시한 글 '"+course[1]+"'에 "+course[2]+"개의 댓글이 추가되었습니다."))
-            dateAtime = str(course[-4])
-
-            #텍스트브라우저형식
-            alarm_message = QTextBrowser()
             alarm_message.setText(str("[강의: "+course[0]+"]에 게시한 글 '"+course[1]+"'에 "+course[2]+"개의 댓글이 추가되었습니다."))
-            alarm_message.setMaximumHeight(90)
-            alarm_message.setMaximumWidth(230)
-            #alarm_message.setMinimumSize(100,90)
-            alarm_message.setStyleSheet('background-color:white;border:0px;font:8pt')
-
-            #이동 버튼
-            reply_move_button = QPushButton()
-            reply_move_button.setStyleSheet('''
-                        QPushButton{image:url(./ui/afterlogin_ui/이동3.png); border:0px; width:35px;height:105px}        
-                        ''')
-            reply_move_button.setFocusPolicy(Qt.NoFocus)
-            reply_move_button.clicked.connect(self.open_reply)
-
+            
+            #Qlabel1 = QLabel(str("[강의: "+course[0]+"]에 게시한 글 '"+course[1]+"'에 "+course[2]+"개의 댓글이 추가되었습니다."))
+            dateAtime = str(course[-4])
             #layoutout.addWidget(Qlabel1)
             layoutout.addWidget(alarm_message)
             layoutout.setContentsMargins(0,0,0,0)
@@ -198,7 +213,7 @@ class lecture(QWidget):
                 time = time_tmp
 
                 Qlabel2 = QLabel(str(date)+" "+str(time))
-                Qlabel2.setStyleSheet('background:white')
+                Qlabel2.setStyleSheet('background:#eef5f6')
                 
                 layoutout.addWidget(Qlabel2,alignment=(QtCore.Qt.AlignTop))
                 layoutout.setSpacing(0)
@@ -213,7 +228,41 @@ class lecture(QWidget):
             #self.alarm.setLayout(layoutout)
             
         elif chatORreply == 1:
-                self.alarm = QLabel(str("[강의: "+course[0]+"]에 작성한 댓글'"+course[1]+"'이 채택되었습니다."))
+            #self.alarm = QLabel(str("[강의: "+course[0]+"]에 작성한 댓글'"+course[1]+"'이 채택되었습니다."))
+            alarm_message.setText(str("[강의: "+course[0]+"]에 작성한 댓글'"+course[1]+"'이 채택되었습니다."))
+            #Qlabel1 = QLabel(str("[강의: "+course[0]+"]에 게시한 글 '"+course[1]+"'에 "+course[2]+"개의 댓글이 추가되었습니다."))
+            dateAtime = str(course[-4])
+            #layoutout.addWidget(Qlabel1)
+            layoutout.addWidget(alarm_message)
+            layoutout.setContentsMargins(0,0,0,0)
+            
+            if(len(dateAtime)>0):
+                print("dateAtime: " + str(dateAtime))
+
+                datetimeB = dateAtime.split(" ")
+                date_tmp = datetimeB[0]
+                time_tmp = datetimeB[1]
+
+                date_tmp = date_tmp.split("-")
+
+                date = ".".join(date_tmp[0:3])
+                time = time_tmp
+
+                Qlabel2 = QLabel(str(date)+" "+str(time))
+                Qlabel2.setStyleSheet('background:#eef5f6')
+                
+                layoutout.addWidget(Qlabel2,alignment=(QtCore.Qt.AlignTop))
+                layoutout.setSpacing(0)
+            
+            alarm_button_layout.addLayout(layoutout)
+            alarm_button_layout.addWidget(reply_move_button,alignment=(QtCore.Qt.AlignTop))
+            alarm_button_layout.addStretch(1)
+            alarm_button_layout.setContentsMargins(0,0,0,0)
+
+            self.alarm.setLayout(alarm_button_layout)
+            self.alarm.setContentsMargins(0,0,0,5)
+            #self.alarm.setLayout(layoutout)
+        
         self.chatComm = course[1]
         self.chatName = course[-2]
         self.LecID = course[-3]
@@ -224,6 +273,7 @@ class lecture(QWidget):
         self.layout.setContentsMargins(3,3,3,3)
         self.mainWidget.setLayout(self.layout)
         self.setLayout(self.mainLayout)
+
 
     def open_reply(self):
         title = self.course

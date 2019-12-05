@@ -68,7 +68,7 @@ class alarm(QWidget):
                 replylyId += self.replyIDs[i] + ";;;"
 
 
-        commend = "RemoveAlarm " + chattyId + " " + replylyId
+        commend = "RemoveAlarm " + chattyId + " " + replylyId + " " + self.stuid
         self.clientSocket.send(commend.encode('utf-8'))
         result = self.clientSocket.recv(1024).decode('utf-8')
         self.viewer.clear()

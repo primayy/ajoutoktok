@@ -131,6 +131,8 @@ class ServerSocket:
                     cur.execute("SELECT * FROM chatting WHERE no =" + str(side[0]) + "")
                     chat_info = cur.fetchall()
 
+                    cur.execute("SELECT point FROM user WHERE student_id =" + str(chat_info[0][4]) + "")
+                    user_point = str(cur.fetchall()[0][0])
                     result = ""
                     result += str(chat_info[0][4]) + ","  # stuid
                     result += str(chat_info[0][3]) + ","  # nickname
@@ -138,7 +140,9 @@ class ServerSocket:
                     result += str(chat_info[0][6]) + ","  # likes
                     result += str(chat_info[0][1]) + ","  # category_id
                     result += str(chat_info[0][5]) + ","  # time
-                    result += str(chat_info[0][0])  # chatting_id
+                    result += str(chat_info[0][0]) + "," # chatting_id
+                    result += user_point # point
+
                     # 채팅방에 들어와 있는 애들만 어떻게 선정?
                     # print(self.clients)
                     data += result
@@ -266,10 +270,18 @@ class ServerSocket:
                     del_lecId = cur.fetchall()
                     del_lecId = str(del_lecId[0][0])
                     print(del_lecId)
+                    cur.execute("SELECT no FROM category WHERE lecture_id = "+del_lecId[0][0]+"")
+                    del_catId = cur.fetchall()
+                    cur.execute("SELECT no FROM chatting WHERE category_id = "+str(del_catId[0][0])+"")
+                    del_chatId = cur.fetchall()
 
                     cur.execute(
                         "delete FROM student_course WHERE student_id ='" + str(side[0]) + "' AND lecture_code ='" + str(
                             side[1]) + "'")
+                    if(len(del_chatId)>0):
+                        for i in range(len(del_chatId)):
+                            cur.execute("delete FROM alarm WHERE chat_student_id ='" + str(side[0]) + "' AND chat_id ="+str(del_chatId[i][0]))
+                            cur.execute("delete FROM alarm WHERE reply_student_id ='" + str(side[0]) + "'AND reply_selected = 1 AND chat_id ="+str(del_chatId[i][0]))
                     self.databasent.commit()
 
                     client.send(del_lecId.encode('utf-8'))
@@ -460,10 +472,10 @@ class ServerSocket:
                     cur = self.databasent.cursor()
                     # 내가 쓴 게시글의 댓글 개수(count(*))와 게시글 id
                     cur.execute("SELECT count(*),chat_id FROM alarm WHERE reply_student_id != '" + str(
-                        side[0]) + "' AND chat_student_id ='" + str(side[0]) + "' GROUP BY chat_id")
+                        side[0]) + "'AND reply_selected = 0 AND chat_student_id ='" + str(side[0]) + "' GROUP BY chat_id")
                     chatAlarm = cur.fetchall()
                     cur.execute("SELECT chat_id FROM alarm WHERE reply_student_id != '" + str(
-                        side[0]) + "' AND chat_student_id ='" + str(side[0]) + "' GROUP BY chat_id")
+                        side[0]) + "'AND reply_selected = 0 AND chat_student_id ='" + str(side[0]) + "' GROUP BY chat_id")
                     chatAlarmIds = cur.fetchall()
                     print(chatAlarmIds)
                     data_time_array_chat = []
@@ -536,7 +548,6 @@ class ServerSocket:
                         ReplyAlarmText = ReplyAlarmText.rstrip()
                     AlarmText = ChatAlarmText + chatAlId + "$#%^" + ReplyAlarmText + replyAlId
                     client.send(AlarmText.encode('utf-8'))
-
 
 
                 elif commend == 'ChatSearch':
@@ -623,12 +634,12 @@ class ServerSocket:
                     if len(chatIds) > 0:
                         for i in range(len(chatIds)):
                             cur = self.databasent.cursor()
-                            cur.execute("DELETE FROM alarm WHERE no =" + str(chatIds[i]))
+                            cur.execute("DELETE FROM alarm WHERE chat_id =" + str(chatIds[i]) + " AND chat_student_id ='"+side[2]+"' AND reply_selected = 0")
                             self.databasent.commit()
                     if len(replyIds) > 0:
                         for i in range(len(replyIds)):
                             cur = self.databasent.cursor()
-                            cur.execute("DELETE FROM alarm WHERE no =" + str(replyIds[i]))
+                            cur.execute("DELETE FROM alarm WHERE reply_id =" + str(replyIds[i])+" AND reply_selected = 1 AND reply_student_id ='"+side[2]+"'")
                             self.databasent.commit()
                     client.send("끄트냐암".encode('utf-8'))
 
@@ -654,13 +665,23 @@ class ServerSocket:
                         else:
                             result = ""
                             for i in range(len(chat_log)):
+                                # result += str(chat_log[i][4]) + ","  # stuid
+                                # result += str(chat_log[i][3]) + ","  # nickname
+                                # result += str(chat_log[i][2]) + ","  # comment
+                                # result += str(chat_log[i][6]) + ","  # likes
+                                # result += str(chat_log[i][1]) + ","  # category_id
+                                # result += str(chat_log[i][5]) + ","  # time
+                                # result += str(chat_log[i][0]) + "/"  # chatting_id
+                                cur.execute("SELECT point FROM user WHERE student_id ='" + str(chat_log[i][4]) + "'")
+                                user_point = str(cur.fetchall()[0][0])
                                 result += str(chat_log[i][4]) + ","  # stuid
                                 result += str(chat_log[i][3]) + ","  # nickname
                                 result += str(chat_log[i][2]) + ","  # comment
                                 result += str(chat_log[i][6]) + ","  # likes
                                 result += str(chat_log[i][1]) + ","  # category_id
                                 result += str(chat_log[i][5]) + ","  # time
-                                result += str(chat_log[i][0]) + "/"  # chatting_id
+                                result += str(chat_log[i][0]) + ","  # chatting_id
+                                result += user_point + "/"  # chatting_id
 
                             client.sendall(result.encode('utf-8'))
                             print('chat_history 끝')
@@ -994,7 +1015,8 @@ class ServerSocket:
                             if chat_reply_sel[0][0] == 0:
                                 cur.execute("UPDATE chatting SET reply_selected = 1 WHERE no = " + str(chat_id[0][0]) + "")
                                 cur.execute("UPDATE reply SET reply_selected = 1 WHERE no = " + str(side[0]) + "")
-                                cur.execute("UPDATE alarm SET reply_selected = reply_selected + 1 WHERE reply_id = " + str(side[0]) + " AND reply_student_id ='"+str(chat_id[0][1])+"' AND chat_student_id ='"+str(chat_reply_sel[0][1])+"' AND chat_id = "+str(chat_id[0][0])+"")
+                                cur.execute("INSERT INTO alarm(chat_id,chat_student_id,reply_id,reply_student_id,reply_selected) VALUES ("+str(chat_id[0][0])+",'"+str(chat_reply_sel[0][1])+"',"+str(side[0])+",'"+str(chat_id[0][1])+"',1)")
+                                
                                 self.databasent.commit()
                                 
                                 ANSWER = "update"

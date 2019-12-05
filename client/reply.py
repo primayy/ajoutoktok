@@ -282,6 +282,7 @@ class replyWidget(QWidget):
         question2.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         question2.setMaximumWidth(385)
         question2.setMinimumWidth(385)
+        question2.setFixedHeight(90)
         #question2.setSizeAdjustPolicy(question2.AdjustToContents)
         #question2.setFixedHeight(question2.document().size().height())
         #question2.setSizePolicy

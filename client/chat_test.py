@@ -34,11 +34,11 @@ class update_listener(QThread):
             if len(update_commend) != 1:
                 if update_commend[0] == 'update':
                     tmp = []
-                    if len(update_commend) == 8:
+                    if len(update_commend) == 9:
                         for i in range(1, len(update_commend)):
                             tmp.append(update_commend[i])
-                    elif len(update_commend) > 8:
-                        msglen = len(update_commend) - 8
+                    elif len(update_commend) > 9:
+                        msglen = len(update_commend) - 9
                         msg = ",".join(update_commend[3:4 + msglen])
 
                         for i in range(msglen + 1):
@@ -55,7 +55,6 @@ class update_listener(QThread):
             else:
                 if update_commend =='stop':
                     self.go = False
-
 
 class chatRoom(QWidget):
     def __init__(self,parent,msgetted):
@@ -75,6 +74,7 @@ class chatRoom(QWidget):
         self.sendType = True
         self.comment_info = 0
         self.tab = QTabWidget()
+        
         self.getCategory()
 
         #chat server와 연결
@@ -85,7 +85,7 @@ class chatRoom(QWidget):
         #self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
         #self.chatSocket.connect(('172.30.1.21', 3334))
-        self.chatSocket.connect(('192.168.0.13', 3334))
+        self.chatSocket.connect(('192.168.0.31', 3334))
 
         self.history = self.getChatHistory()
         self.tab.currentChanged.connect(self.category_changed)
@@ -244,6 +244,7 @@ class chatRoom(QWidget):
         self.show()
 
     def chat_Update(self,msg):
+        self.tab.currentWidget().setStyleSheet('QListWidget:item:hover{background:#e8f3f4};')
         #새로 업데이트된 메시지만 위젯에 추가함
         item = QListWidgetItem(self.tab.currentWidget())
 
@@ -251,7 +252,7 @@ class chatRoom(QWidget):
         item.setSizeHint(custom_widget.sizeHint())
         self.tab.currentWidget().setItemWidget(item, custom_widget)
         self.tab.currentWidget().addItem(item)
-        #self.tab.currentWidget().setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        #self.tab.currentWidget().setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.tab.update()
         self.tab.currentWidget().scrollToBottom()
 
@@ -294,6 +295,9 @@ class chatRoom(QWidget):
 
     def showQuestions(self):
         self.tab.currentWidget().setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.tab.currentWidget().setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.tab.currentWidget().setStyleSheet('QListWidget:item:hover{background:#a1d2d7};')
+
         for i in range(len(self.history)):
             item = QListWidgetItem(self.tab.currentWidget())
 
@@ -343,11 +347,11 @@ class chatRoom(QWidget):
                 tmp = result[i].split(',')
                 tmp = [x for x in tmp if x]
 
-                if len(tmp) == 7:
+                if len(tmp) == 8:
                     question.append(tmp)
 
-                elif len(tmp) > 7:
-                    msglen = len(tmp) - 7
+                elif len(tmp) > 8:
+                    msglen = len(tmp) - 8
                     msg = ",".join(tmp[2:3+msglen])
 
                     for i in range(msglen+1):
@@ -452,6 +456,8 @@ class chatWidget(QWidget):
         self.questLayoutinMain = QVBoxLayout()
         self.setLayout(self.mainLayout)
         self.clientSocket = parent.clientSocket
+        self.user_identity = QVBoxLayout() #등급아이콘 + "you" [수직]
+        self.like_reply = QVBoxLayout() #좋아요/개수 + 댓글/개수
 
         #comments 참조 순서 studid,name,comment,like,category_id,time,chat_id
         self.comments = comments
@@ -461,9 +467,11 @@ class chatWidget(QWidget):
         if len(self.comments) != 2:
             commend = 'like_status '+ self.comments[6] + " " + self.grandparent.stuid#학번
             self.clientSocket.send(commend.encode('utf-8'))
-            # print(commend)
             result = self.clientSocket.recv(1024)
             result = result.decode('utf-8')
+
+
+            #하트아이콘
             if result == '0':
                 self.BtnLike = QPushButton(self.comments[3])
                 self.BtnLike.setIcon(QIcon('./ui/chatting_ui/unchecked_heart.png'))
@@ -471,10 +479,22 @@ class chatWidget(QWidget):
                 self.BtnLike = QPushButton(self.comments[3])
                 self.BtnLike.setIcon(QIcon('./ui/chatting_ui/checked_heart.png'))
             self.BtnLike.setStyleSheet('''
-            QPushButton{border:0px; background-color:#e8f3f4; width:45px}''')
-            self.BtnLike.setIconSize(QSize(30,30))
+            QPushButton{border:0px; background-color:#e8f3f4; width:45px;padding:5px}''')
+            self.BtnLike.setFixedSize(60,40)
+            self.BtnLike.setIconSize(QSize(27,27))
             #BtnLike.setMaximumWidth()
             self.BtnLike.clicked.connect(self.likeClicked)
+
+            #댓글 아이콘
+            self.BtnReply = QPushButton()
+            
+            self.BtnReply.setIcon(QIcon('./ui/chatting_ui/reply.png'))
+            self.BtnReply.setStyleSheet('''
+            QPushButton{border:0px; background-color:#e8f3f4; width:50px;height:40px;padding:20px}''')
+            self.BtnReply.setIconSize(QSize(30,30))
+            self.BtnReply.setFixedSize(60,40)
+            self.BtnReply.setText('99')
+            self.BtnReply.setStyleSheet('font:9pt')
 
             question = QLabel()
             #42939c#24565b
@@ -486,24 +506,74 @@ class chatWidget(QWidget):
                                "border-color: #42939c;"
                                "font:10pt 나눔스퀘어라운드 Regular;"
                                )
-            question.setFixedHeight(38)
-            question.setFixedWidth(360)
+            question.setFixedHeight(50)
+            question.setFixedWidth(320)
+            
 
             date = QLabel()
             date.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular')
+            date.setFixedSize(320,30)
             date.setText(self.comments[5])
 
         self.mainLayout.setContentsMargins(5,5,5,5)
-        self.mainLayout.addStretch(1)
+        
+
+
+        user_icon = QPushButton()
+        user_icon.setIconSize(QSize(35,35))
+        #아이콘 등급
+        if int(self.comments[-1])<10:
+            user_icon.setIcon(QIcon('./ui/rank_icon/1.png'))
+
+        elif int(self.comments[-1])<20:
+            user_icon.setIcon(QIcon('./ui/rank_icon/2.png'))
+
+        elif int(self.comments[-1])<30:
+            user_icon.setIcon(QIcon('./ui/rank_icon/3.png'))
+
+        elif int(self.comments[-1])<40:
+            user_icon.setIcon(QIcon('./ui/rank_icon/4.png'))
+
+        elif int(self.comments[-1])<50:
+            user_icon.setIcon(QIcon('./ui/rank_icon/5.png'))
+
+        else :
+            user_icon.setIcon(QIcon('./ui/rank_icon/6.png'))
+        
+        user_icon.setStyleSheet('padding:5px')
+        self.user_identity.addWidget(user_icon)
+        
+        
+        self.like_reply.addWidget(self.BtnLike)
+        self.like_reply.addWidget(self.BtnReply)
         # 내가 쓴 질문이면
         if self.comments[0] == self.grandparent.stuid:
-            you = QLabel('you')
-            self.mainLayout.addWidget(you)
+            you = QLabel('Me')
+            you.setStyleSheet('padding:5px; font:9pt 나눔스퀘어라운드 Regular;')
+            #self.mainLayout.addWidget(you)
+            self.user_identity.addWidget(you)
+        else :
+            notyou = QLabel()
+            notyou.setStyleSheet('padding:5px')
+            self.user_identity.addWidget(notyou)
 
+        self.user_identity.setSpacing(0)
+        self.like_reply.setSpacing(0)
+        self.like_reply.setContentsMargins(0,0,0,0)
+        self.mainLayout.addLayout(self.user_identity)
+
+        self.questLayoutinMain.addStretch(1)
         self.questLayoutinMain.addWidget(question)
         self.questLayoutinMain.addWidget(date)
+        self.questLayoutinMain.addStretch(1)
+        self.questLayoutinMain.setSpacing(0)
+
+
         self.mainLayout.addLayout(self.questLayoutinMain)
-        self.mainLayout.addWidget(self.BtnLike)
+        self.mainLayout.addLayout(self.like_reply)
+        #self.mainLayout.addWidget(self.BtnLike)
+        self.mainLayout.setSpacing(0)
+    
         self.mainLayout.addStretch(1)
 
     def likeClicked(self):
@@ -515,6 +585,7 @@ class chatWidget(QWidget):
         result = result.split("!@!")
 
         self.BtnLike.setText(str(result[0]))
+        #self.BtnLike.setText('99')
         self.comments[3] = str(result[0])
         if result[1] == '0':
             self.BtnLike.setIcon(QIcon('./ui/chatting_ui/unchecked_heart.png'))

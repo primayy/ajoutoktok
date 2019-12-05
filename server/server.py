@@ -477,16 +477,19 @@ class ServerSocket:
                     cur.execute("SELECT chat_id FROM alarm WHERE reply_student_id ='" + str(
                         side[0]) + "' AND reply_selected = 1 AND chat_student_id !='" + str(side[0]) + "'")
                     replyAlarm = cur.fetchall()
-                    cur.execute("SELECT no FROM alarm WHERE reply_student_id ='" + str(
+                    cur.execute("SELECT reply_id FROM alarm WHERE reply_student_id ='" + str(
                         side[0]) + "' AND reply_selected = 1 AND chat_student_id !='" + str(side[0]) + "'")
                     replyAlarmIds = cur.fetchall()
                     data_time_array_reply = []
+                    comment_array_reply = []
                     if len(replyAlarmIds) > 0:
                         for i in range(len(replyAlarmIds)):
-                            cur.execute("SELECT data_time FROM reply WHERE no =" + str(replyAlarmIds[i][0]) + " ORDER BY data_time Desc")
+                            cur.execute("SELECT data_time,reply_comment FROM reply WHERE no =" + str(replyAlarmIds[i][0]) + " ORDER BY data_time Desc")
                             data_time = cur.fetchall()
                             print(data_time)
                             data_time_array_reply.append(data_time[0][0])
+                            comment_array_reply.append(data_time[0][1])
+                            
 
                     chatAlId = "!@#@!"
                     replyAlId = "!@#@!"
@@ -520,14 +523,14 @@ class ServerSocket:
                         for i in range(len(replyAlarm)):
                             # 위와 동일
                             cur.execute(
-                                "SELECT category_id,comment FROM chatting WHERE no =" + str(replyAlarm[i][0]) + "")
+                                "SELECT category_id FROM chatting WHERE no =" + str(replyAlarm[i][0]) + "")
                             cat_id = cur.fetchall()
                             cur.execute("SELECT lecture_code,chatroom_name FROM category WHERE no =" + str(cat_id[0][0]) + "")
                             lec_co = cur.fetchall()
                             cur.execute(
                                 "SELECT lecture_name,no FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
                             lecture_name = cur.fetchall()
-                            ReplyAlarmText += lecture_name[0][0] + "#&$@" + str(cat_id[0][1])+ "#&$@" + str(replyAlarm[i][0])+ "#&$@" + str(data_time_array_reply[i]) + "#&$@" + str(
+                            ReplyAlarmText += lecture_name[0][0] + "#&$@" + str(comment_array_reply[i])+ "#&$@" + str(replyAlarm[i][0])+ "#&$@" + str(data_time_array_reply[i]) + "#&$@" + str(
                                 lecture_name[0][1]) + "#&$@" + str(lec_co[0][1]) + "#&$@" + str(
                                 lec_co[0][0]) + "*&^%"  # 강의 이름,댓글,강의ID,강의탭,강의코드
                         ReplyAlarmText = ReplyAlarmText.rstrip()

@@ -85,7 +85,7 @@ class chatRoom(QWidget):
         #self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('34.84.112.149', 3334))
         #self.chatSocket.connect(('172.30.1.21', 3334))
-        self.chatSocket.connect(('192.168.0.49', 3334))
+        self.chatSocket.connect(('192.168.0.13', 3334))
 
         self.history = self.getChatHistory()
         self.tab.currentChanged.connect(self.category_changed)
@@ -495,6 +495,11 @@ class chatWidget(QWidget):
 
         self.mainLayout.setContentsMargins(5,5,5,5)
         self.mainLayout.addStretch(1)
+        # 내가 쓴 질문이면
+        if self.comments[0] == self.grandparent.stuid:
+            you = QLabel('you')
+            self.mainLayout.addWidget(you)
+
         self.questLayoutinMain.addWidget(question)
         self.questLayoutinMain.addWidget(date)
         self.mainLayout.addLayout(self.questLayoutinMain)

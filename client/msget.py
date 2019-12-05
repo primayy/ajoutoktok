@@ -85,7 +85,7 @@ class Invisible(QWidget):
         elif event.button() == Qt.RightButton:
             self.countStop.emit()
             self.t.quit()
-            self.close()
+            self.hide()
               
 
     def mouseReleaseEvent(self, event):

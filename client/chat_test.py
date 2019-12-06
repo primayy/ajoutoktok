@@ -30,7 +30,7 @@ class update_listener(QThread):
             update_commend = self.chatSocket.recv(30000)
             update_commend = update_commend.decode('utf-8')
             update_commend = update_commend.split(',')
-
+            print(update_commend)
             if len(update_commend) != 1:
                 if update_commend[0] == 'update':
                     tmp = []
@@ -53,8 +53,11 @@ class update_listener(QThread):
                     self.go = False
 
             else:
-                if update_commend =='stop':
+                if update_commend[0] =='stop':
                     self.go = False
+                elif update_commend[0] =='connection_success':
+                    print("QQQ")
+
 
 class chatRoom(QWidget):
     def __init__(self,parent,msgetted):
@@ -79,14 +82,15 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        #self.chatSocket.connect(('192.168.0.6', 3334))
+        self.chatSocket.connect(('192.168.0.17', 3334))
         # self.chatSocket.connect(('192.168.43.36', 3334))
         #self.chatSocket.connect(('192.168.0.8',3334))
         #self.chatSocket.connect(('192.168.25.22', 3334))
-        self.chatSocket.connect(('35.200.112.11', 3334))
+        # self.chatSocket.connect(('35.200.112.11', 3334))
         #self.chatSocket.connect(('172.30.1.21', 3334))
         # self.chatSocket.connect(('192.168.0.17', 3334))
 
+        
         self.history = self.getChatHistory()
         self.tab.currentChanged.connect(self.category_changed)
 
@@ -240,7 +244,8 @@ class chatRoom(QWidget):
 
         self.chatInputLayout.addWidget(self.chat_input)
         self.chatInputLayout.addWidget(chat_enter)
-
+        commend ="chat_client " + str(self.parent.course[1]) +" "+ str(self.tab.tabText(self.tab.currentIndex()))#과목코드 + 카테고리명
+        self.chatSocket.send(commend.encode('utf-8'))
         self.show()
 
     def chat_Update(self,msg):
@@ -273,6 +278,9 @@ class chatRoom(QWidget):
     def category_changed(self):
         self.tab.currentWidget().clear()
         self.history = self.getChatHistory()
+
+        commend = 'category_change '+ self.parent.course[1] + ' ' + self.tab.tabText(self.tab.currentIndex())
+        self.chatSocket.send(commend.encode('utf-8'))
         self.showQuestions()
 
     def getCategory(self):
@@ -293,7 +301,7 @@ class chatRoom(QWidget):
         self.dlg.show()
 
     def showQuestions(self):
-        self.tab.currentWidget().setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        # self.tab.currentWidget().setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.tab.currentWidget().setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.tab.currentWidget().setStyleSheet('QListWidget:item:hover{background:#a1d2d7};')
 
@@ -397,7 +405,7 @@ class chatRoom(QWidget):
 
             chat_id = tmp.split(' ')
             #chat server에 전송 -> 모두에게 뿌리기 위해
-            data = 'chat_update '+chat_id[1] +" "  + self.parent.stuid
+            data = 'chat_update '+chat_id[1] +" "  + self.parent.stuid+" "+self.parent.course[1]+" "+self.tab.tabText(self.tab.currentIndex())
             self.chatSocket.send(data.encode('utf-8'))
 
 class category_create(QDialog):

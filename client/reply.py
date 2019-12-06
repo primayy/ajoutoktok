@@ -190,6 +190,7 @@ class Reply(QWidget):
     #뒤로가기 버튼 눌렀을시
     def returnToChat(self):
         self.close()
+        self.parent.category_changed()
         self.parent.chatWidget = self.widgetTmp
         self.parent.sendType = True
 

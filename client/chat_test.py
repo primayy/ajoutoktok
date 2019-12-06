@@ -25,20 +25,20 @@ class update_listener(QThread):
 
     def run(self):
         while self.go:
-            time.sleep(1)  # 클라이언트 처리 과부하 방지
+            time.sleep(0.3)  # 클라이언트 처리 과부하 방지
 
-            update_commend = self.chatSocket.recv(1024)
+            update_commend = self.chatSocket.recv(30000)
             update_commend = update_commend.decode('utf-8')
             update_commend = update_commend.split(',')
 
             if len(update_commend) != 1:
                 if update_commend[0] == 'update':
                     tmp = []
-                    if len(update_commend) == 9:
+                    if len(update_commend) == 10:
                         for i in range(1, len(update_commend)):
                             tmp.append(update_commend[i])
-                    elif len(update_commend) > 9:
-                        msglen = len(update_commend) - 9
+                    elif len(update_commend) > 10:
+                        msglen = len(update_commend) - 10
                         msg = ",".join(update_commend[3:4 + msglen])
 
                         for i in range(msglen + 1):
@@ -74,7 +74,7 @@ class chatRoom(QWidget):
         self.sendType = True
         self.comment_info = 0
         self.tab = QTabWidget()
-        
+
         self.getCategory()
 
         #chat server와 연결
@@ -83,9 +83,9 @@ class chatRoom(QWidget):
         # self.chatSocket.connect(('192.168.43.36', 3334))
         #self.chatSocket.connect(('192.168.0.8',3334))
         #self.chatSocket.connect(('192.168.25.22', 3334))
-        # self.chatSocket.connect(('34.84.112.149', 3334))
+        self.chatSocket.connect(('35.200.112.11', 3334))
         #self.chatSocket.connect(('172.30.1.21', 3334))
-        self.chatSocket.connect(('192.168.0.31', 3334))
+        # self.chatSocket.connect(('192.168.0.17', 3334))
 
         self.history = self.getChatHistory()
         self.tab.currentChanged.connect(self.category_changed)
@@ -177,7 +177,7 @@ class chatRoom(QWidget):
         BtnSearch.setIcon(QIcon('./ui/chatting_ui/find.png'))
         BtnSearch.setIconSize(QSize(30,30))
         BtnSearch.clicked.connect(self.searchClicked)
-        
+
         BtnMine  = QPushButton()
         BtnMine.setStyleSheet('''border:0px''')
         BtnMine.setIcon(QIcon('./ui/chatting_ui/내질문3.png'))
@@ -247,7 +247,6 @@ class chatRoom(QWidget):
         self.tab.currentWidget().setStyleSheet('QListWidget:item:hover{background:#e8f3f4};')
         #새로 업데이트된 메시지만 위젯에 추가함
         item = QListWidgetItem(self.tab.currentWidget())
-
         custom_widget = chatWidget(self,msg,self.parent)
         item.setSizeHint(custom_widget.sizeHint())
         self.tab.currentWidget().setItemWidget(item, custom_widget)
@@ -280,7 +279,7 @@ class chatRoom(QWidget):
         commend = "getCategory " + self.lecId
         self.clientSocket.send(commend.encode('utf-8'))
 
-        category = self.clientSocket.recv(1024)
+        category = self.clientSocket.recv(30000)
         category = category.decode('utf-8')
 
         category = category.split(',')
@@ -312,11 +311,11 @@ class chatRoom(QWidget):
         commend = "get_lecture_id "+self.parent.course[-1]
 
         self.clientSocket.send(commend.encode('utf-8'))
-        result = self.clientSocket.recv(1024)
+        result = self.clientSocket.recv(30000)
 
         return result.decode('utf-8')
 
-    
+
     def searchClicked(self):
         self.search = chat_search.Search(self,self.parent.course[-1],self.tab.tabText(self.tab.currentIndex()))
 
@@ -329,11 +328,11 @@ class chatRoom(QWidget):
         self.mine.setWindowTitle("Mine")
         self.mine.setMinimumSize(QSize(400, 400))
 
-    
+
     def getChatHistory(self):
-        commend = 'chat_history '+ self.lecId + " " + self.tab.tabText(self.tab.currentIndex())
+        commend = 'chat_history '+ self.lecId + " " + self.tab.tabText(self.tab.currentIndex()) +" " + self.parent.stuid
         self.clientSocket.send(commend.encode('utf-8'))
-        result = self.clientSocket.recv(4096)
+        result = self.clientSocket.recv(30000)
 
         result = result.decode('utf-8')
         if result == 'x':
@@ -347,11 +346,11 @@ class chatRoom(QWidget):
                 tmp = result[i].split(',')
                 tmp = [x for x in tmp if x]
 
-                if len(tmp) == 8:
+                if len(tmp) == 9:
                     question.append(tmp)
 
-                elif len(tmp) > 8:
-                    msglen = len(tmp) - 8
+                elif len(tmp) > 9:
+                    msglen = len(tmp) - 9
                     msg = ",".join(tmp[2:3+msglen])
 
                     for i in range(msglen+1):
@@ -382,7 +381,7 @@ class chatRoom(QWidget):
             # main server에 알림
             self.clientSocket.send(commend.encode('utf-8'))
 
-            tmp = self.clientSocket.recv(1024)
+            tmp = self.clientSocket.recv(30000)
 
             self.chatWidget.refresh()
             # chat server에 전송 -> 모두에게 뿌리기 위해
@@ -393,12 +392,12 @@ class chatRoom(QWidget):
             #main server에 알림
             self.clientSocket.send(commend.encode('utf-8'))
 
-            tmp = self.clientSocket.recv(1024)
+            tmp = self.clientSocket.recv(30000)
             tmp = tmp.decode('utf-8')
 
             chat_id = tmp.split(' ')
             #chat server에 전송 -> 모두에게 뿌리기 위해
-            data = 'chat_update '+chat_id[1]
+            data = 'chat_update '+chat_id[1] +" "  + self.parent.stuid
             self.chatSocket.send(data.encode('utf-8'))
 
 class category_create(QDialog):
@@ -465,17 +464,16 @@ class chatWidget(QWidget):
 
     def initUI(self):
         if len(self.comments) != 2:
-            commend = 'like_status '+ self.comments[6] + " " + self.grandparent.stuid#학번
-            self.clientSocket.send(commend.encode('utf-8'))
-            result = self.clientSocket.recv(1024)
-            result = result.decode('utf-8')
-
+            # commend = 'like_status '+ self.comments[6] + " " + self.grandparent.stuid#학번
+            # self.clientSocket.send(commend.encode('utf-8'))
+            # result = self.clientSocket.recv(30000)
+            # result = result.decode('utf-8')
 
             #하트아이콘
-            if result == '0':
+            if self.comments[-1] == str(0):
                 self.BtnLike = QPushButton(self.comments[3])
                 self.BtnLike.setIcon(QIcon('./ui/chatting_ui/unchecked_heart.png'))
-            elif result == '1':
+            elif self.comments[-1] == str(1):
                 self.BtnLike = QPushButton(self.comments[3])
                 self.BtnLike.setIcon(QIcon('./ui/chatting_ui/checked_heart.png'))
             self.BtnLike.setStyleSheet('''
@@ -487,14 +485,14 @@ class chatWidget(QWidget):
 
             #댓글 아이콘
             self.BtnReply = QPushButton()
-            
+
             self.BtnReply.setIcon(QIcon('./ui/chatting_ui/reply.png'))
             self.BtnReply.setStyleSheet('''
             QPushButton{border:0px; background-color:#e8f3f4; width:50px;height:40px;padding:20px}''')
             self.BtnReply.setIconSize(QSize(30,30))
             self.BtnReply.setFixedSize(60,40)
-            self.BtnReply.setText('99')
-            self.BtnReply.setStyleSheet('font:9pt')
+            self.BtnReply.setText('0')
+            self.BtnReply.setStyleSheet('font:7pt')
 
             question = QLabel()
             #42939c#24565b
@@ -508,7 +506,7 @@ class chatWidget(QWidget):
                                )
             question.setFixedHeight(50)
             question.setFixedWidth(320)
-            
+
 
             date = QLabel()
             date.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular')
@@ -516,34 +514,34 @@ class chatWidget(QWidget):
             date.setText(self.comments[5])
 
         self.mainLayout.setContentsMargins(5,5,5,5)
-        
+
 
 
         user_icon = QPushButton()
         user_icon.setIconSize(QSize(35,35))
         #아이콘 등급
-        if int(self.comments[-1])<10:
+        if int(self.comments[-2])<10:
             user_icon.setIcon(QIcon('./ui/rank_icon/1.png'))
 
-        elif int(self.comments[-1])<20:
+        elif int(self.comments[-2])<20:
             user_icon.setIcon(QIcon('./ui/rank_icon/2.png'))
 
-        elif int(self.comments[-1])<30:
+        elif int(self.comments[-2])<30:
             user_icon.setIcon(QIcon('./ui/rank_icon/3.png'))
 
-        elif int(self.comments[-1])<40:
+        elif int(self.comments[-2])<40:
             user_icon.setIcon(QIcon('./ui/rank_icon/4.png'))
 
-        elif int(self.comments[-1])<50:
+        elif int(self.comments[-2])<50:
             user_icon.setIcon(QIcon('./ui/rank_icon/5.png'))
 
         else :
             user_icon.setIcon(QIcon('./ui/rank_icon/6.png'))
-        
+
         user_icon.setStyleSheet('padding:5px')
         self.user_identity.addWidget(user_icon)
-        
-        
+
+
         self.like_reply.addWidget(self.BtnLike)
         self.like_reply.addWidget(self.BtnReply)
         # 내가 쓴 질문이면
@@ -573,14 +571,14 @@ class chatWidget(QWidget):
         self.mainLayout.addLayout(self.like_reply)
         #self.mainLayout.addWidget(self.BtnLike)
         self.mainLayout.setSpacing(0)
-    
+
         self.mainLayout.addStretch(1)
 
     def likeClicked(self):
         commend = 'like_update '+ self.comments[6] + " " + self.grandparent.stuid#학번 + msg
         self.clientSocket.send(commend.encode('utf-8'))
 
-        result = self.clientSocket.recv(1024)
+        result = self.clientSocket.recv(30000)
         result = result.decode('utf-8')
         result = result.split("!@!")
 
@@ -618,7 +616,7 @@ class chatWidget(QWidget):
             self.parent.chatWidget.replyList = self.parent.chatWidget.getReply()
             self.parent.chatWidget.showReply()
             self.parent.chatContentLayout.addWidget(self.parent.chatWidget)
-        
+
         elif QMouseEvent.button() == Qt.RightButton:
                 dlg = studentInfo(self)
                 dlg.exec_()
@@ -665,7 +663,7 @@ class studentInfo(QDialog):
         commend = 'getProfile ' + self.parent.comments[0]
         self.parent.clientSocket.send(commend.encode('utf-8'))
 
-        info = self.parent.clientSocket.recv(1024).decode('utf-8')
+        info = self.parent.clientSocket.recv(30000).decode('utf-8')
         info = info.split(',')
 
         if self.parent.user['is_prof'] == 1:
@@ -699,7 +697,7 @@ class sendQuestion(QWidget):
         self.topbar_layout = QHBoxLayout()
         #self.topbar_layout.setContentsMargins(0,0,0,0)
         self.topbar.setLayout(self.topbar_layout)
-        
+
         self.topbar.setStyleSheet('background:#a1d2d7')
         self.topbar.setContentsMargins(0,0,0,0)
 
@@ -751,7 +749,7 @@ class sendQuestion(QWidget):
         self.dateLayout2.addWidget(self.btnFinish)
 
 
-        
+
         #self.mainLayout.addWidget(head)
         self.topbar_layout.addWidget(head)
         self.mainLayout.addWidget(self.topbar)
@@ -790,7 +788,7 @@ class sendQuestion(QWidget):
 
             self.parent.clientSocket.send(commend.encode('utf-8'))
 
-            res = self.parent.clientSocket.recv(1024).decode('utf-8')
+            res = self.parent.clientSocket.recv(30000).decode('utf-8')
 
             if res == 'success':
                 self.close()

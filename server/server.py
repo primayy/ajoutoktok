@@ -16,10 +16,12 @@ class ServerSocket:
     def __init__(self):
         self.numnum = 0
         try:
-            self.databasent = mdb.connect('localhost', 'root', '0428', 'db_testin')
+            self.databasent = mdb.connect('localhost', 'root', '', 'db_testin')
             print("Successfully Connected To DB")
         except mdb.Error as e:
             print('Not Connected Succefully To DB')
+
+        self.lock = Lock()
 
         self.bListen = False
         self.clients = []
@@ -118,13 +120,20 @@ class ServerSocket:
                 print('3334: ' + commend)
 
                 if commend == 'exit':
+                    self.lock.acquire()
+
                     self.chat_ip.remove(addr)
                     self.chat_clients.remove(client)
 
                     client.send('stop'.encode('utf-8'))
+                    self.lock.release()
+
                     break
 
+
                 elif commend == 'chat_update':
+                    self.lock.acquire()
+
                     data = 'update,'
 
                     cur = self.databasent.cursor()
@@ -133,6 +142,13 @@ class ServerSocket:
 
                     cur.execute("SELECT point FROM user WHERE student_id =" + str(chat_info[0][4]) + "")
                     user_point = str(cur.fetchall()[0][0])
+
+                    cur.execute("SELECT likes_num FROM likes WHERE chat_id =" + str(chat_info[0][0]) + " AND student_id = '" + str(side[1]) + "'")
+                    like_status = cur.fetchall()
+                    likes_num = str(0)
+                    if len(like_status) > 0:
+                        likes_num = str(like_status[0][0])
+
                     result = ""
                     result += str(chat_info[0][4]) + ","  # stuid
                     result += str(chat_info[0][3]) + ","  # nickname
@@ -141,7 +157,9 @@ class ServerSocket:
                     result += str(chat_info[0][1]) + ","  # category_id
                     result += str(chat_info[0][5]) + ","  # time
                     result += str(chat_info[0][0]) + "," # chatting_id
-                    result += user_point # point
+                    result += user_point + "," # point
+                    result += likes_num  # point
+
 
                     # 채팅방에 들어와 있는 애들만 어떻게 선정?
                     # print(self.clients)
@@ -151,6 +169,7 @@ class ServerSocket:
                         print(c)
                         print(data)
                         c.send(data.encode('utf-8'))
+                    self.lock.release()
 
     def receive(self, addr, client):
         while True:
@@ -178,6 +197,7 @@ class ServerSocket:
                 print('3333: ' + commend)
 
                 if commend == 'login':
+                    self.lock.acquire()
                     cur = self.databasent.cursor()
                     cur.execute("SELECT * FROM student_id ")
                     allSQLRows = cur.fetchall()
@@ -210,8 +230,11 @@ class ServerSocket:
                             lectureId = "x"
                             # print(lectureId)
                             client.send(lectureId.encode('utf-8'))
+                        self.lock.release()
+
 
                 elif commend == 'lecture':
+                    self.lock.acquire()
                     cur = self.databasent.cursor()
                     lecture_info = ""
                     print(side)
@@ -225,9 +248,11 @@ class ServerSocket:
 
                     print('클라이언트로 lecture 정보 전송')
                     client.send(lecture_info.encode('utf-8'))
+                    self.lock.release()
 
-                
+
                 elif commend == 'like_status':
+                    self.lock.acquire()
                     cur = self.databasent.cursor()
                     print(side)
                     cur.execute("SELECT likes_num FROM likes WHERE chat_id =" + str(side[0]) + " AND student_id = '"+str(side[1])+"'")
@@ -239,8 +264,10 @@ class ServerSocket:
 
                     print('클라이언트로 lecture 정보 전송')
                     client.send(str(likes_num).encode('utf-8'))
+                    self.lock.release()
 
                 elif commend == 'groupSearch':
+                    self.lock.acquire()
                     print('그룹 조회 왔다')
                     print(side)
                     cur = self.databasent.cursor()
@@ -259,8 +286,10 @@ class ServerSocket:
                         group_info += str(allSQLRows[0][2])
 
                     client.send(group_info.encode('utf-8'))
+                    self.lock.release()
 
                 elif commend == 'exitLecture':
+                    self.lock.acquire()
                     print('그룹 나가기 들어옴')
                     print(side)
 
@@ -285,8 +314,11 @@ class ServerSocket:
                     self.databasent.commit()
 
                     client.send(del_lecId.encode('utf-8'))
+                    self.lock.release()
 
                 elif commend == 'group_add':
+                    self.lock.acquire()
+
                     cur = self.databasent.cursor()
                     result_to_client = False
 
@@ -355,8 +387,11 @@ class ServerSocket:
                                 self.databasent.commit()
                             print('저장 완료')
                             client.send('add_success'.encode('utf-8'))
+                    self.lock.release()
 
                 elif commend == 'sendMsg':
+                    self.lock.acquire()
+
                     print(side)
                     cur = self.databasent.cursor()
 
@@ -407,8 +442,11 @@ class ServerSocket:
                     s = 'o ' + str(res[-1][0])
                     client.send(s.encode('utf-8'))
                     print('sendmsg끝')
+                    self.lock.release()
 
                 elif commend == 'sendReplyMsg':
+                    self.lock.acquire()
+
                     cur = self.databasent.cursor()
 
                     # 답글 디비에 저장
@@ -462,9 +500,12 @@ class ServerSocket:
                     client.send('o'.encode('utf-8'))
 
                     print('답글 저장완료')
+                    self.lock.release()
 
 
                 elif commend == 'Alarm':  # 알림용
+                    self.lock.acquire()
+
                     print(side)
                     ChatAlarmText = ""
                     ReplyAlarmText = ""
@@ -501,7 +542,7 @@ class ServerSocket:
                             print(data_time)
                             data_time_array_reply.append(data_time[0][0])
                             comment_array_reply.append(data_time[0][1])
-                            
+
 
                     chatAlId = "!@#@!"
                     replyAlId = "!@#@!"
@@ -548,9 +589,12 @@ class ServerSocket:
                         ReplyAlarmText = ReplyAlarmText.rstrip()
                     AlarmText = ChatAlarmText + chatAlId + "$#%^" + ReplyAlarmText + replyAlId
                     client.send(AlarmText.encode('utf-8'))
+                    self.lock.release()
 
 
                 elif commend == 'ChatSearch':
+                    self.lock.acquire()
+
                     if len(side) > 3:
                         searchlen = len(side) - 3
                         search = " ".join(side[0:1 + searchlen])
@@ -590,9 +634,12 @@ class ServerSocket:
                         print('Search읽기 오류')
                         result = 'x'
                         client.send(result.encode('utf-8'))
+                    self.lock.release()
 
 
                 elif commend == 'ChatMine':
+                    self.lock.acquire()
+
                     print(side)
                     cur = self.databasent.cursor()
                     cur.execute("SELECT no FROM category WHERE lecture_code = '" + str(
@@ -625,9 +672,12 @@ class ServerSocket:
                         print('Search읽기 오류')
                         result = 'x'
                         client.send(result.encode('utf-8'))
+                    self.lock.release()
 
 
                 elif commend == 'RemoveAlarm':
+                    self.lock.acquire()
+
                     print(side)
                     chatIds = side[0].split(';;;')[:-1]
                     replyIds = side[1].split(';;;')[:-1]
@@ -642,11 +692,14 @@ class ServerSocket:
                             cur.execute("DELETE FROM alarm WHERE reply_id =" + str(replyIds[i])+" AND reply_selected = 1 AND reply_student_id ='"+side[2]+"'")
                             self.databasent.commit()
                     client.send("끄트냐암".encode('utf-8'))
+                    self.lock.release()
 
 
 
 
                 elif commend == 'chat_history':
+                    self.lock.acquire()
+
                     print(side)
                     cur = self.databasent.cursor()
                     cur.execute(
@@ -674,6 +727,13 @@ class ServerSocket:
                                 # result += str(chat_log[i][0]) + "/"  # chatting_id
                                 cur.execute("SELECT point FROM user WHERE student_id ='" + str(chat_log[i][4]) + "'")
                                 user_point = str(cur.fetchall()[0][0])
+
+                                cur.execute("SELECT likes_num FROM likes WHERE chat_id =" + str(chat_log[i][0]) + " AND student_id = '" + str(side[2]) + "'")
+                                like_status = cur.fetchall()
+                                likes_num = str(0)
+                                if len(like_status) > 0:
+                                    likes_num = str(like_status[0][0])
+
                                 result += str(chat_log[i][4]) + ","  # stuid
                                 result += str(chat_log[i][3]) + ","  # nickname
                                 result += str(chat_log[i][2]) + ","  # comment
@@ -681,7 +741,8 @@ class ServerSocket:
                                 result += str(chat_log[i][1]) + ","  # category_id
                                 result += str(chat_log[i][5]) + ","  # time
                                 result += str(chat_log[i][0]) + ","  # chatting_id
-                                result += user_point + "/"  # chatting_id
+                                result += user_point + ","  # point
+                                result += likes_num + "/"  # point
 
                             client.sendall(result.encode('utf-8'))
                             print('chat_history 끝')
@@ -689,10 +750,13 @@ class ServerSocket:
                         print('history읽기 오류')
                         result = 'x'
                         client.send(result.encode('utf-8'))
+                    self.lock.release()
 
 
 
                 elif commend == 'AlarmToReply':
+                    self.lock.acquire()
+
                     print(side)
                     cur = self.databasent.cursor()
                     cur.execute("SELECT * FROM category ")
@@ -724,9 +788,11 @@ class ServerSocket:
                         print('history읽기 오류')
                         result = 'x'
                         client.send(result.encode('utf-8'))
-
+                    self.lock.release()
 
                 elif commend == 'replyHistory':
+                    self.lock.acquire()
+
                     print(side)
                     cur = self.databasent.cursor()
                     cur.execute("SELECT * FROM reply WHERE chat_id ='" + str(side[0]) + "'")
@@ -747,9 +813,11 @@ class ServerSocket:
                     else:
                         client.send('x'.encode('utf-8'))
                         print('답글 없음')
-
+                    self.lock.release()
 
                 elif commend == 'get_lecture_id':
+                    self.lock.acquire()
+
                     print(side)
                     cur = self.databasent.cursor()
                     cur.execute("SELECT no FROM lecture WHERE lecture_code ='" + str(side[0]) + "'")
@@ -758,9 +826,11 @@ class ServerSocket:
                     lecid = allSQLRows[0][0]
                     lecid = str(lecid)
                     client.send(lecid.encode('utf-8'))
-
+                    self.lock.release()
                 # 아이디 중복 확인
                 elif commend == 'OvelapCheck':
+                    self.lock.acquire()
+
                     print(str(side[0]))
                     Answer = ""
                     kor_begin = 44032
@@ -833,8 +903,10 @@ class ServerSocket:
                             Answer = "newone"  # 없으면 괜찮음
                             client.send(Answer.encode('utf-8'))
                         print(Answer)
-
+                    self.lock.release()
                 elif commend == 'getRank':  # LeaderBoard 순위 가져오기
+                    self.lock.acquire()
+
                     print(side)
                     cur = self.databasent.cursor()
 
@@ -923,6 +995,7 @@ class ServerSocket:
                         print(DeptRank)
                         client.send(str(DeptRank).encode('utf-8'))
 
+                    self.lock.release()
                     # elif side[0] == '4': 강의실 내 포인트 비교... 적용여부미정, 보류
                     #    cur.execute("SELECT Depart,Lec_id,points FROM lecture WHERE Student_id ='" + str(side[1]) + "' AND Lec_id =") 리더보드는 유저 테이블로도 가능하지만 일단 points 테이블로 사용하였다.
                     #    allSQLRows = cur.fetchall()
@@ -932,6 +1005,8 @@ class ServerSocket:
 
                 # 내 점수 얻어오기
                 elif commend == 'getMyPoint':
+                    self.lock.acquire()
+
                     print(side)
                     cur = self.databasent.cursor()
 
@@ -939,7 +1014,7 @@ class ServerSocket:
                         side[0]) + "'")  # 해당 유저의 학과 ==> '학과내'에 사용
                     point = cur.fetchall()
                     point = str(point[0][0])
-                   
+
                     if point == str(None):
                         cur.execute("UPDATE user SET point ='" + str(0) + "'WHERE student_id='" + str(side[0]) + "'")
                         point = str(0)
@@ -947,8 +1022,11 @@ class ServerSocket:
                         cur.execute("UPDATE user SET point ='" + point + "'WHERE student_id='" + str(side[0]) + "'")
 
                     client.send(point.encode('utf-8'))
+                    self.lock.release()
 
                 elif commend == 'getCategory':
+                    self.lock.acquire()
+
                     cur = self.databasent.cursor()
                     cur.execute("SELECT chatroom_name FROM category WHERE lecture_id ='" + str(side[0]) + "'")
                     category = cur.fetchall()
@@ -958,8 +1036,10 @@ class ServerSocket:
                         result += str(category[i][0]) + ","
 
                     client.send(result.encode('utf-8'))
-
+                    self.lock.release()
                 elif commend == 'category_create':
+                    self.lock.acquire()
+
                     print(side)
                     cur = self.databasent.cursor()
                     cur.execute("SELECT lecture_code FROM lecture WHERE no ='" + str(side[0]) + "'")
@@ -970,8 +1050,10 @@ class ServerSocket:
                     cur.execute(query, (lecture_code, side[0], side[1]))
                     self.databasent.commit()
                     print('굿?')
-
+                    self.lock.release()
                 elif commend == 'HowManyChat':
+                    self.lock.acquire()
+
                     cur = self.databasent.cursor()
                     print(msg)
                     print("Finding lecno...")
@@ -989,8 +1071,11 @@ class ServerSocket:
                     # print(str(count))
                     print('클라이언트로 chatCount 전송')
                     client.send(str(count).encode('utf-8'))
+                    self.lock.release()
 
                 elif commend == 'firstLogin':
+                    self.lock.acquire()
+
                     print(side)
                     cur = self.databasent.cursor()
                     cur.execute("SELECT * FROM student_id WHERE student_id =" + str(side[0]) + "")
@@ -1000,9 +1085,12 @@ class ServerSocket:
                         client.send('first'.encode('utf-8'))
                     else:
                         client.send('already_registerd'.encode('utf-8'))
+                    self.lock.release()
 
 
                 elif commend == 'reply_select':
+                    self.lock.acquire()
+
                     print(side)  # reply_id + 학번
                     cur = self.databasent.cursor()
                     cur.execute("SELECT chat_id,student_id FROM reply WHERE no =" + str(side[0]) + "")
@@ -1016,9 +1104,9 @@ class ServerSocket:
                                 cur.execute("UPDATE chatting SET reply_selected = 1 WHERE no = " + str(chat_id[0][0]) + "")
                                 cur.execute("UPDATE reply SET reply_selected = 1 WHERE no = " + str(side[0]) + "")
                                 cur.execute("INSERT INTO alarm(chat_id,chat_student_id,reply_id,reply_student_id,reply_selected) VALUES ("+str(chat_id[0][0])+",'"+str(chat_reply_sel[0][1])+"',"+str(side[0])+",'"+str(chat_id[0][1])+"',1)")
-                                
+
                                 self.databasent.commit()
-                                
+
                                 ANSWER = "update"
                                 print("Update: " + ANSWER)
                             else:
@@ -1032,12 +1120,15 @@ class ServerSocket:
                         print("Same: " + ANSWER)
 
                     client.send(ANSWER.encode('utf-8'))
+                    self.lock.release()
 
 
 
 
 
                 elif commend == 'register':
+                    self.lock.acquire()
+
                     print(side)
                     cur = self.databasent.cursor()
                     if side[3] == '000000000':
@@ -1056,8 +1147,11 @@ class ServerSocket:
                     print(str(side[3]) + '등록 완료')
 
                     client.send('registered'.encode('utf-8'))
+                    self.lock.release()
 
                 elif commend == 'courses_create':
+                    self.lock.acquire()
+
                     cur = self.databasent.cursor()
                     print(side)
                     stuid = str(side[0])
@@ -1128,8 +1222,11 @@ class ServerSocket:
 
                     print('3333: 추가완료')
                     client.send('complete'.encode('utf-8'))
+                    self.lock.release()
 
                 elif commend == 'like_update':
+                    self.lock.acquire()
+
                     chat_id = str(side[0])
                     print("side:")
                     print(side)
@@ -1213,8 +1310,11 @@ class ServerSocket:
 
                     print('좋아요 업데이트')
                     client.send(likeCount.encode('utf-8'))
+                    self.lock.release()
 
                 elif commend == 'getProfile':
+                    self.lock.acquire()
+
                     cur = self.databasent.cursor()
 
                     #포인트 및 질문
@@ -1250,8 +1350,10 @@ class ServerSocket:
 
                     client.send(res.encode('utf-8'))
 
+                    self.lock.release()
 
                 elif commend == 'changeNick':
+                    self.lock.acquire()
 
                     cur = self.databasent.cursor()
                     cur.execute(
@@ -1260,9 +1362,12 @@ class ServerSocket:
 
                     client.send('changed'.encode('utf-8'))
 
+                    self.lock.release()
 
                 # 메일보내기 처리
                 elif commend == 'sendToEmail':
+                    self.lock.acquire()
+
                     print(side)
                     cur = self.databasent.cursor()
 
@@ -1344,11 +1449,16 @@ class ServerSocket:
                             print('error')
                         else:
                             client.send('success'.encode('utf-8'))
+                        self.lock.release()
 
 
                 elif commend == 'exit':
+                    self.lock.acquire()
+
                     self.removeClient(addr, client)
                     break
+                    self.lock.release()
+
 
     def send(self, msg):
         try:

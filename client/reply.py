@@ -41,10 +41,10 @@ class Reply(QWidget):
         self.replyList = 0
         self.widgetTmp = QWidget()
         #효과 설정
-        shadow = QGraphicsDropShadowEffect()
-        shadow.setBlurRadius(5)
-        shadow.setOffset(3)
-        self.setGraphicsEffect(shadow)
+        # shadow = QGraphicsDropShadowEffect()
+        # shadow.setBlurRadius(5)
+        # shadow.setOffset(3)
+        # self.setGraphicsEffect(shadow)
         self.oldPos = self.pos()
         #맨윗줄 톱 바
         self.topbar = QHBoxLayout()
@@ -113,9 +113,8 @@ class Reply(QWidget):
         self.dateLabel = QLabel()
         self.dateLabel.setStyleSheet('font:7pt 나눔스퀘어라운드 Regular')
 
-        commend = 'like_status '+ self.parent.comment_info[-1] + " " + self.parent.parent.stuid#학번
+        commend = 'like_status '+ self.parent.comment_info[-3] + " " + self.parent.parent.stuid#학번
         self.parent.clientSocket.send(commend.encode('utf-8'))
-        # print(commend)
         result = self.parent.clientSocket.recv(1024)
         result = result.decode('utf-8')
         
@@ -175,7 +174,7 @@ class Reply(QWidget):
 
 
     def likeClicked(self):
-        commend = 'like_update '+ self.parent.comment_info[-1] + " " + self.parent.parent.stuid#학번 + msg
+        commend = 'like_update '+ self.parent.comment_info[-3] + " " + self.parent.parent.stuid#학번 + msg
         self.clientSocket.send(commend.encode('utf-8'))
         result = self.clientSocket.recv(1024)
         result = result.decode('utf-8')
@@ -191,9 +190,9 @@ class Reply(QWidget):
     #뒤로가기 버튼 눌렀을시
     def returnToChat(self):
         self.close()
-        self.parent.category_changed()
         self.parent.chatWidget = self.widgetTmp
         self.parent.sendType = True
+
         self.widgetTmp.show()
         
 

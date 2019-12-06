@@ -16,7 +16,7 @@ class ServerSocket:
     def __init__(self):
         self.numnum = 0
         try:
-            self.databasent = mdb.connect('localhost', 'root', '0428', 'db_testin')
+            self.databasent = mdb.connect('localhost', 'root', '', 'db_testin')
             #print("Successfully Connected To DB")
         except mdb.Error as e:
             print('Not Connected Succefully To DB')
@@ -158,7 +158,6 @@ class ServerSocket:
 
                 elif commend == 'chat_update':
                     self.lock.acquire()
-                    print("AAAAAAAAAAAAAAAAAAAAAA")
                     data = 'update,'
 
                     cur = self.databasent.cursor()
@@ -197,7 +196,10 @@ class ServerSocket:
                             if side[3] == c[1]:
                                 print(c)
                                 print(data)
-                                c[2].send(data.encode('utf-8'))
+                                try:
+                                    c[2].send(data.encode('utf-8'))
+                                except Exception as e:
+                                    print(e)
                     self.lock.release()
 
     def receive(self, addr, client):

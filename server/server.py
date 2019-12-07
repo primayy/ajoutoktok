@@ -16,7 +16,7 @@ class ServerSocket:
     def __init__(self):
         self.numnum = 0
         try:
-            self.databasent = mdb.connect('localhost', 'root', '', 'db_testin')
+            self.databasent = mdb.connect('localhost', 'root', '789521', 'db_testin')
             #print("Successfully Connected To DB")
         except mdb.Error as e:
             print('Not Connected Succefully To DB')
@@ -173,6 +173,16 @@ class ServerSocket:
                     if len(like_status) > 0:
                         likes_num = str(like_status[0][0])
 
+                    cur.execute("SELECT count(*) FROM reply WHERE chat_id =" + str(side[0]) + " GROUP BY chat_id ")
+                    reply_num = cur.fetchall()
+                    if len(reply_num) > 0:
+                        print("reply_num: "+str(reply_num[0][0]))
+                        reply_num = str(reply_num[0][0])
+                    else:
+                        reply_num="0"            
+
+                        
+
                     result = ""
                     result += str(chat_info[0][4]) + ","  # stuid
                     result += str(chat_info[0][3]) + ","  # nickname
@@ -182,7 +192,8 @@ class ServerSocket:
                     result += str(chat_info[0][5]) + ","  # time
                     result += str(chat_info[0][0]) + "," # chatting_id
                     result += user_point + "," # point
-                    result += likes_num  # point
+                    result += likes_num  + ","  # likes_num
+                    result += reply_num # reply_num
 
 
                     # 채팅방에 들어와 있는 애들만 어떻게 선정?
@@ -625,7 +636,7 @@ class ServerSocket:
 
                 elif commend == 'ChatSearch':
                     self.lock.acquire()
-
+                    
                     if len(side) > 3:
                         searchlen = len(side) - 3
                         search = " ".join(side[0:1 + searchlen])
@@ -732,6 +743,7 @@ class ServerSocket:
                     self.lock.acquire()
 
                     #print(side)
+                    print("chat_history's side: "+str(side))
                     cur = self.databasent.cursor()
                     cur.execute(
                         "SELECT no FROM category WHERE lecture_id ='" + str(side[0]) + "'AND chatroom_name = '" + str(
@@ -765,6 +777,17 @@ class ServerSocket:
                                 if len(like_status) > 0:
                                     likes_num = str(like_status[0][0])
 
+                                
+                                cur.execute("SELECT count(*) FROM reply WHERE chat_id =" + str(chat_log[i][0]) + " GROUP BY chat_id ")
+                                reply_num = cur.fetchall()
+                                if len(reply_num) > 0:
+                                    print("reply_num: "+str(reply_num[0][0]))
+                                    reply_num = str(reply_num[0][0])
+                                else:
+                                    reply_num="0"
+
+                                
+
                                 result += str(chat_log[i][4]) + ","  # stuid
                                 result += str(chat_log[i][3]) + ","  # nickname
                                 result += str(chat_log[i][2]) + ","  # comment
@@ -772,8 +795,9 @@ class ServerSocket:
                                 result += str(chat_log[i][1]) + ","  # category_id
                                 result += str(chat_log[i][5]) + ","  # time
                                 result += str(chat_log[i][0]) + ","  # chatting_id
-                                result += user_point + ","  # point
-                                result += likes_num + "/"  # point
+                                result += str(user_point) + ","  # point
+                                result += str(likes_num) + ","  # likes_num
+                                result += str(reply_num) + "/"  # reply_num
 
                             client.sendall(result.encode('utf-8'))
                             #print('chat_history 끝')
@@ -787,7 +811,7 @@ class ServerSocket:
 
                 elif commend == 'AlarmToReply':
                     self.lock.acquire()
-
+                    print("AlarmToReply's side: "+str(side))
                     #print(side)
                     cur = self.databasent.cursor()
                     cur.execute("SELECT * FROM category ")
@@ -798,20 +822,41 @@ class ServerSocket:
                         cur.execute("SELECT * FROM chatting WHERE no =" + str(
                             side[0]) + "")
                         chat_log = cur.fetchall()
-
+                        
                         if len(chat_log) == 0:
                             result = 'x'
                             client.send(result.encode('utf-8'))
                         else:
                             result = ""
+                            
                             for i in range(len(chat_log)):
+                                cur.execute("SELECT point FROM user WHERE student_id ='" + str(chat_log[i][4]) + "'")
+                                user_point = str(cur.fetchall()[0][0])
+
+                                cur.execute("SELECT likes_num FROM likes WHERE chat_id =" + str(chat_log[i][0]) + " AND student_id = '" + str(side[2]) + "'")
+                                like_status = cur.fetchall()
+                                likes_num = str(0)
+                                if len(like_status) > 0:
+                                    likes_num = str(like_status[0][0])
+
+                                
+                                cur.execute("SELECT count(*) FROM reply WHERE chat_id =" + str(chat_log[i][0]) + " GROUP BY chat_id ")
+                                reply_num = cur.fetchall()
+                                if len(reply_num) > 0:
+                                    reply_num = str(reply_num[0][0])
+                                else:
+                                    reply_num="0"
+
                                 result += str(chat_log[i][4]) + "#$%#"  # stuid
                                 result += str(chat_log[i][3]) + "#$%#"  # nickname
                                 result += str(chat_log[i][2]) + "#$%#"  # comment
                                 result += str(chat_log[i][6]) + "#$%#"  # likes
                                 result += str(chat_log[i][1]) + "#$%#"  # category_id
                                 result += str(chat_log[i][5]) + "#$%#"  # time
-                                result += str(chat_log[i][0]) + "/"  # chatting_id
+                                result += str(chat_log[i][0]) + "#$%#"  # chatting_id
+                                result += str(user_point) + "#$%#"  # point
+                                result += str(likes_num) + "#$%#"  # likes_num
+                                result += str(reply_num) + "/"  # reply_num
 
                             client.sendall(result.encode('utf-8'))
                             #print('chat_history 끝')
@@ -1257,7 +1302,7 @@ class ServerSocket:
 
                 elif commend == 'like_update':
                     self.lock.acquire()
-
+                    print("'like_update'.side: "+str(side))
                     chat_id = str(side[0])
                     #print("side:")
                     #print(side)

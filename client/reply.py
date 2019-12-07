@@ -112,12 +112,12 @@ class Reply(QWidget):
         #질문 타이틀 bottom
         self.dateLabel = QLabel()
         self.dateLabel.setStyleSheet('font:7pt 나눔스퀘어라운드 Regular')
-
-        commend = 'like_status '+ self.parent.comment_info[-3] + " " + self.parent.parent.stuid#학번
+        print("reply: "+str(self.parent.comment_info)+" / "+str(self.parent.parent.stuid))
+        commend = 'like_status '+ self.parent.comment_info[-4] + " " + self.parent.parent.stuid#학번
         self.parent.clientSocket.send(commend.encode('utf-8'))
         result = self.parent.clientSocket.recv(1024)
         result = result.decode('utf-8')
-        
+        print("Reply's result: "+str(result))
         if result == '0':
             self.btnLike = QPushButton(self.parent.comment_info[3])
             self.btnLike.setIcon(QIcon('./ui/chatting_ui/unchecked_heart.png'))
@@ -174,7 +174,8 @@ class Reply(QWidget):
 
 
     def likeClicked(self):
-        commend = 'like_update '+ self.parent.comment_info[-3] + " " + self.parent.parent.stuid#학번 + msg
+        print("reply's like_update's self.parent.comment_info: "+ str(self.parent.comment_info))
+        commend = 'like_update '+ self.parent.comment_info[-4] + " " + self.parent.parent.stuid#학번 + msg
         self.clientSocket.send(commend.encode('utf-8'))
         result = self.clientSocket.recv(1024)
         result = result.decode('utf-8')
@@ -182,6 +183,7 @@ class Reply(QWidget):
 
         self.btnLike.setText(str(result[0]))
         self.parent.comment_info[3] = str(result[0])
+        print("reply's like_update's result: "+ str(result))
         if result[1] == '0':
             self.btnLike.setIcon(QIcon('./ui/chatting_ui/unchecked_heart.png'))
         elif result[1] == '1':
@@ -217,7 +219,7 @@ class Reply(QWidget):
             for i in range(len(res)):
                 tmp = res[i].split(',')
                 tmp = [x for x in tmp if x]
-
+                print("reply_tmp: "+str(tmp))
                 if len(tmp) == 5:
                     reply.append(tmp)
 

@@ -289,7 +289,7 @@ class lecture(QWidget):
             # 메시지 전송 타입 답글로 변경
             self.chat.sendType = False
 
-            commend = "AlarmToReply " + self.course[-5]
+            commend = "AlarmToReply " + self.course[-5]+ " 공간차지" +" " + self.stuid
             self.clientSocket.send(commend.encode('utf-8'))
             self.coursep = self.clientSocket.recv(1024).decode('utf-8')
             self.coursep = self.coursep.split("/")

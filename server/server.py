@@ -605,13 +605,14 @@ class ServerSocket:
                             cur.execute(
                                 "SELECT lecture_code,chatroom_name FROM category WHERE no =" + str(cat_id[0][0]) + "")
                             lec_co = cur.fetchall()
-                            # 강의코드로 강의이름 얻기
-                            cur.execute(
-                                "SELECT lecture_name,no FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
-                            lecture_name = cur.fetchall()
-                            ChatAlarmText += lecture_name[0][0] + "#&$@" + str(cat_id[0][1]) + "#&$@" + str(
-                                chatAlarm[i][0])+ "#&$@" + str(chatAlarm[i][1]) + "#&$@" + str(data_time_array_chat[i]) + "#&$@" + str(
-                                lecture_name[0][1]) + "#&$@" + str(lec_co[0][1]) + "#&$@" + str(lec_co[0][0]) + "*&^%"  # "강의이름,게시글,댓글 수,강의탭,강의코드"
+                            if len(lec_co) != 0:
+                                # 강의코드로 강의이름 얻기
+                                cur.execute(
+                                    "SELECT lecture_name,no FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
+                                lecture_name = cur.fetchall()
+                                ChatAlarmText += lecture_name[0][0] + "#&$@" + str(cat_id[0][1]) + "#&$@" + str(
+                                    chatAlarm[i][0])+ "#&$@" + str(chatAlarm[i][1]) + "#&$@" + str(data_time_array_chat[i]) + "#&$@" + str(
+                                    lecture_name[0][1]) + "#&$@" + str(lec_co[0][1]) + "#&$@" + str(lec_co[0][0]) + "*&^%"  # "강의이름,게시글,댓글 수,강의탭,강의코드"
                         ChatAlarmText = ChatAlarmText.rstrip()
 
                     if len(replyAlarm) > 0:
@@ -622,12 +623,13 @@ class ServerSocket:
                             cat_id = cur.fetchall()
                             cur.execute("SELECT lecture_code,chatroom_name FROM category WHERE no =" + str(cat_id[0][0]) + "")
                             lec_co = cur.fetchall()
-                            cur.execute(
-                                "SELECT lecture_name,no FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
-                            lecture_name = cur.fetchall()
-                            ReplyAlarmText += lecture_name[0][0] + "#&$@" + str(comment_array_reply[i])+ "#&$@" + str(replyAlarm[i][0])+ "#&$@" + str(data_time_array_reply[i]) + "#&$@" + str(
-                                lecture_name[0][1]) + "#&$@" + str(lec_co[0][1]) + "#&$@" + str(
-                                lec_co[0][0]) + "*&^%"  # 강의 이름,댓글,강의ID,강의탭,강의코드
+                            if len(lec_co) != 0:
+                                cur.execute(
+                                    "SELECT lecture_name,no FROM lecture WHERE lecture_code ='" + str(lec_co[0][0]) + "'")
+                                lecture_name = cur.fetchall()
+                                ReplyAlarmText += lecture_name[0][0] + "#&$@" + str(comment_array_reply[i])+ "#&$@" + str(replyAlarm[i][0])+ "#&$@" + str(data_time_array_reply[i]) + "#&$@" + str(
+                                    lecture_name[0][1]) + "#&$@" + str(lec_co[0][1]) + "#&$@" + str(
+                                    lec_co[0][0]) + "*&^%"  # 강의 이름,댓글,강의ID,강의탭,강의코드
                         ReplyAlarmText = ReplyAlarmText.rstrip()
                     AlarmText = ChatAlarmText + chatAlId + "$#%^" + ReplyAlarmText + replyAlId
                     client.send(AlarmText.encode('utf-8'))
@@ -1122,6 +1124,23 @@ class ServerSocket:
                     self.databasent.commit()
                     #print('굿?')
                     self.lock.release()
+
+                elif commend == "category_delete":
+                    self.lock.acquire()
+
+                    # print(side)
+                    cur = self.databasent.cursor()
+                    cur.execute("SELECT lecture_code FROM lecture WHERE no ='" + str(side[0]) + "'")
+                    lecture_code = cur.fetchall()[0][0]
+                    # print(lecture_code)
+
+                    query = 'delete FROM category WHERE (lecture_code,lecture_id,chatroom_name) = (%s,%s,%s)'
+                    cur.execute(query, (lecture_code, side[0], side[1]))
+
+                    self.databasent.commit()
+                    # print('굿?')
+                    self.lock.release()
+
                 elif commend == 'HowManyChat':
                     self.lock.acquire()
 
@@ -1443,84 +1462,101 @@ class ServerSocket:
                     cur = self.databasent.cursor()
 
                     # 선택한 카테고리의 아이디 값을 가져옴
-                    cur.execute(
-                        "SELECT no FROM category WHERE chatroom_name = '" + str(side[0]) + "' AND lecture_id ='" + str(
-                            side[1]) + "'")
-                    category_id = cur.fetchall()
-                    category_id = str(category_id[0][0])
+                    cur.execute("SELECT no,chatroom_name FROM category WHERE lecture_id ='" + str(side[1]) + "'")
+                    category_info = cur.fetchall()
+                    writer = None
 
-                    # 질문 선택
-                    cur.execute(
-                        "SELECT comment,student_id,date_time,likes FROM chatting WHERE category_id = '" + category_id + "'AND date(date_time) >='" + str(
-                            side[3]) + "'AND date(date_time) <='" + str(side[4]) + "'")
-                    quest_list = cur.fetchall()
+                    for i in range(len(category_info)):
+                        tmp_id = str(category_info[i][0])
+                        tmp_name = str(category_info[i][1])
 
-                    if len(quest_list) == 0:
-                        client.send('no'.encode('utf-8'))
-                    else:
-                        res = ""
-                        for i in range(len(quest_list)):
-                            res += str(quest_list[i][1]) + ","
-                            res += str(quest_list[i][2].strftime('%Y-%m-%d %H:%M:%S')) + ","
-                            res += str(quest_list[i][0]) + ","
-                            res += str(quest_list[i][3]) + "/"
-                        #print(res)
+                        # 질문 선택
+                        cur.execute(
+                            "SELECT comment,student_id,date_time,likes FROM chatting WHERE category_id = '" + tmp_id + "'AND date(date_time) >='" + str(
+                                side[3]) + "'AND date(date_time) <='" + str(side[4]) + "'")
+                        quest_list = cur.fetchall()
 
-                        cur.execute("SELECT lecture_name FROM lecture WHERE no = '" + str(side[1]) + "'")
-                        lec_name = cur.fetchall()
-                        lec_name = str(lec_name[0][0])
-
-                        # 질문,학번,날짜,좋아요 순서로 들어있음
-                        quest_list = res.split('/')
-                        quest_list.pop()
-                        tmp = []
-
-                        for i in range(len(quest_list)):
-                            tmp.append(quest_list[i].split(','))
-
-                        data = pd.DataFrame(tmp)
-                        data.columns = ['학번', '날짜', '질문', '공감수']
-                        fileName = '[아주똑똑]' + lec_name + '.csv'
-                        data.to_csv(fileName, encoding='euc-kr')
-
-                        try:
-                            smtp = smtplib.SMTP('smtp.gmail.com', 587)
-                            smtp.ehlo()
-                            smtp.starttls()
-                            smtp.login('primayy@ajou.ac.kr', 'cssprcyzfogxtmbu')
-
-                            quest = ""
-                            for i in range(len(quest_list)):
-                                quest += quest_list[i]
-
-                            msg = MIMEMultipart()
-
-                            # 제목 및 받는 사람
-                            msg['Subject'] = "[아주똑똑] " + lec_name + " 과목 질문 목록입니다."
-                            msg['To'] = str(side[2])
-
-                            # 본문
-                            text = lec_name + " 강의에 <" + str(side[3]) + " ~ " + str(
-                                side[4]) + "> 에 등록된 질문 목록입니다.\n학번,날짜,질문,공감수로 정리되어 있습니다."
-                            contentPart = MIMEText(text)
-                            msg.attach(contentPart)
-
-                            # 파일첨부
-                            with open(fileName, 'rb') as etcFD:
-                                etcPart = MIMEApplication(etcFD.read())
-                                # 첨부파일의 정보를 헤더로 추가
-                                etcPart.add_header('Content-Disposition', 'attachment', filename=fileName)
-                                msg.attach(etcPart)
-
-                            # 전송
-                            smtp.sendmail('primayy@ajou.ac.kr', str(side[2]), msg.as_string())
-
-                            smtp.quit()
-                        except smtplib.SMTPException:
-                            print('error')
+                        if len(quest_list) == 0:
+                            client.send('no'.encode('utf-8'))
                         else:
-                            client.send('success'.encode('utf-8'))
+                            res = ""
+                            for i in range(len(quest_list)):
+                                res += str(quest_list[i][1]) + ","
+                                res += str(quest_list[i][2].strftime('%Y-%m-%d %H:%M:%S')) + ","
+                                res += str(quest_list[i][0]) + ","
+                                res += str(quest_list[i][3]) + "/"
+                            #print(res)
+
+                            cur.execute("SELECT lecture_name FROM lecture WHERE no = '" + str(side[1]) + "'")
+                            lec_name = cur.fetchall()
+                            lec_name = str(lec_name[0][0])
+
+                            if writer == None:
+                                print('생성')
+                                # 파일 생성
+                                fileName = '[아주똑똑]' + lec_name + '.xlsx'
+                                writer = pd.ExcelWriter(fileName, engine='xlsxwriter')
+
+                            # 질문,학번,날짜,좋아요 순서로 들어있음
+                            quest_list = res.split('/')
+                            quest_list.pop()
+                            tmp = []
+
+                            for i in range(len(quest_list)):
+                                tmp.append(quest_list[i].split(','))
+                            print(tmp)
+                            print(tmp_name)
+                            data = pd.DataFrame(tmp)
+                            data.columns = ['학번', '날짜', '질문', '공감수']
+                            data.to_excel(writer, sheet_name = tmp_name)
+
+                            # data.to_csv(fileName, encoding='euc-kr')
+
+                    writer.save()
+
+                    #저장된 파일 메일로 보내기
+                    try:
+                        smtp = smtplib.SMTP('smtp.gmail.com', 587)
+                        smtp.ehlo()
+                        smtp.starttls()
+                        smtp.login('ajoutoktok@gmail.com', 'hfzrxrxcohatevpi')
+
+                        quest = ""
+                        for i in range(len(quest_list)):
+                            quest += quest_list[i]
+
+                        msg = MIMEMultipart()
+
+                        # 제목 및 받는 사람
+                        msg['Subject'] = "[아주똑똑] " + lec_name + " 과목 질문 목록입니다."
+                        msg['To'] = str(side[2])
+
+                        # 본문
+                        text = lec_name + " 강의에 <" + str(side[3]) + " ~ " + str(
+                            side[4]) + "> 에 등록된 질문 목록입니다.\n학번,날짜,질문,공감수로 정리되어 있습니다."
+                        contentPart = MIMEText(text)
+                        msg.attach(contentPart)
+
+                        # 파일첨부
+                        with open(fileName, 'rb') as etcFD:
+                            etcPart = MIMEApplication(etcFD.read())
+                            # 첨부파일의 정보를 헤더로 추가
+                            etcPart.add_header('Content-Disposition', 'attachment', filename=fileName)
+                            msg.attach(etcPart)
+
+                        # 전송
+                        smtp.sendmail('ajoutoktok@gmail.com', str(side[2]), msg.as_string())
+
+                        smtp.quit()
+
+                    except smtplib.SMTPException:
+                        print('error')
                         self.lock.release()
+
+                    else:
+                        client.send('success'.encode('utf-8'))
+                        self.lock.release()
+
 
 
                 elif commend == 'exit':

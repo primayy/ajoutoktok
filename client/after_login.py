@@ -25,8 +25,6 @@ class App(QWidget):
 
         #필수 변수
         self.menu_lec = None
-        self.menu_alarm = None
-        self.menu_setting = None
 
         #클라이언트 소켓
         self.clientSocket = window.clientSock
@@ -215,13 +213,7 @@ class App(QWidget):
     def showSetting(self):
         self.rightSideInfo.close()
 
-        if self.menu_setting == None:
-            self.menu_setting = setting.setting(self)
-            self.rightSideInfo = self.menu_setting
-        else:
-            self.rightSideInfo = self.menu_setting
-            self.rightSideInfo.show()
-
+        self.rightSideInfo = setting.setting(self)
         self.rightSideInfo.setMinimumSize(300,500)
         self.rightSideLayout.addWidget(self.rightSideInfo)
 

@@ -30,7 +30,7 @@ class update_listener(QThread):
             update_commend = self.chatSocket.recv(30000)
             update_commend = update_commend.decode('utf-8')
             update_commend = update_commend.split(',')
-            print("update_commend: "+str(update_commend))
+            #print("update_commend: "+str(update_commend))
             if len(update_commend) != 1:
                 if update_commend[0] == 'update':
                     tmp = []
@@ -76,16 +76,17 @@ class chatRoom(QWidget):
         self.lecId = self.getLecId()
         self.sendType = True
         self.comment_info = 0
-        self.tab = QTabWidget()
-
+        self.oldPos=self.pos()
+        # self.tab = QTabWidget()
+        self.tab = tabWidget(self)
         self.getCategory()
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        # self.chatSocket.connect(('192.168.0.17', 3334))
+        self.chatSocket.connect(('192.168.0.14', 3334))
         # self.chatSocket.connect(('192.168.43.36', 3334))
         #self.chatSocket.connect(('192.168.0.8',3334))
-        self.chatSocket.connect(('192.168.25.22', 3334))
+        # self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('35.200.112.11', 3334))
         #self.chatSocket.connect(('172.30.1.21', 3334))
         # self.chatSocket.connect(('192.168.0.17', 3334))
@@ -252,7 +253,7 @@ class chatRoom(QWidget):
         self.tab.currentWidget().setStyleSheet('QListWidget:item:hover{background:#e8f3f4};')
         #새로 업데이트된 메시지만 위젯에 추가함
         item = QListWidgetItem(self.tab.currentWidget())
-        print("msg: "+str(msg))
+        # #print("msg: "+str(msg))
         custom_widget = chatWidget(self,msg,self.parent)
         item.setSizeHint(custom_widget.sizeHint())
         self.tab.currentWidget().setItemWidget(item, custom_widget)
@@ -275,6 +276,8 @@ class chatRoom(QWidget):
             self.mwidget = msget.Invisible(self.parent)
             self.mwidget.setMinimumSize(QSize(200, 200))
             self.mwidget.move(self.msgWidgetPos)
+
+
 
     def category_changed(self):
         self.tab.currentWidget().clear()
@@ -308,7 +311,7 @@ class chatRoom(QWidget):
 
         for i in range(len(self.history)):
             item = QListWidgetItem(self.tab.currentWidget())
-            print("Self.history["+str(i)+"]: "+str(i))
+            # #print("Self.history["+str(i)+"]: "+str(i))
             custom_widget = chatWidget(self,self.history[i],self.parent)
             item.setSizeHint(custom_widget.sizeHint())
             self.tab.currentWidget().setItemWidget(item, custom_widget)
@@ -317,7 +320,7 @@ class chatRoom(QWidget):
 
 
     def getLecId(self):
-        print("self.parent.course: "+ str(self.parent.course))
+        # #print("self.parent.course: "+ str(self.parent.course))
         commend = "get_lecture_id "+self.parent.course[-1]
 
         self.clientSocket.send(commend.encode('utf-8'))
@@ -342,7 +345,7 @@ class chatRoom(QWidget):
     def getChatHistory(self):
         
         commend = 'chat_history '+ self.lecId + " " + self.tab.tabText(self.tab.currentIndex()) +" " + self.parent.stuid
-        print("getChatHistory()'s commend: "+str(commend))
+        # #print("getChatHistory()'s commend: "+str(commend))
         self.clientSocket.send(commend.encode('utf-8'))
         result = self.clientSocket.recv(30000)
 
@@ -353,12 +356,12 @@ class chatRoom(QWidget):
         else:
             result = result.split('/')
             result = result[:-1]
-            print("result: "+str(result))
+            # #print("result: "+str(result))
             question = []
             for i in range(len(result)):
                 tmp = result[i].split(',')
                 tmp = [x for x in tmp if x]
-                print("tmp: "+str(tmp))
+                # #print("tmp: "+str(tmp))
                 if len(tmp) == 10:
                     question.append(tmp)
 
@@ -387,31 +390,60 @@ class chatRoom(QWidget):
 
     def sendMsg(self,msg):
         self.chat_input.setText('')
-        if self.sendType == False:
-            commend = 'sendReplyMsg ' + self.comment_info[6] + " " + self.parent.stuid + " " + msg
+        msg= msg.lstrip()
+        if msg != "":
+            if self.sendType == False:
+                commend = 'sendReplyMsg ' + self.comment_info[6] + " " + self.parent.stuid + " " + msg
 
 
-            # main server에 알림
-            self.clientSocket.send(commend.encode('utf-8'))
+                # main server에 알림
+                self.clientSocket.send(commend.encode('utf-8'))
 
-            tmp = self.clientSocket.recv(30000)
+                tmp = self.clientSocket.recv(30000)
 
-            self.chatWidget.refresh()
-            # chat server에 전송 -> 모두에게 뿌리기 위해
-            # self.chatSocket.send('chat_update'.encode('utf-8'))
-        else:
-            commend = 'sendMsg ' + self.tab.tabText(self.tab.currentIndex()) + " "+ self.lecId + " " + msg + " " + self.parent.stuid
+                self.chatWidget.refresh()
+                # chat server에 전송 -> 모두에게 뿌리기 위해
+                # self.chatSocket.send('chat_update'.encode('utf-8'))
+            else:
+                commend = 'sendMsg ' + self.tab.tabText(self.tab.currentIndex()) + " "+ self.lecId + " " + msg + " " + self.parent.stuid
 
-            #main server에 알림
-            self.clientSocket.send(commend.encode('utf-8'))
+                #main server에 알림
+                self.clientSocket.send(commend.encode('utf-8'))
 
-            tmp = self.clientSocket.recv(30000)
-            tmp = tmp.decode('utf-8')
+                tmp = self.clientSocket.recv(30000)
+                tmp = tmp.decode('utf-8')
 
-            chat_id = tmp.split(' ')
-            #chat server에 전송 -> 모두에게 뿌리기 위해
-            data = 'chat_update '+chat_id[1] +" "  + self.parent.stuid+" "+self.parent.course[1]+" "+self.tab.tabText(self.tab.currentIndex())
-            self.chatSocket.send(data.encode('utf-8'))
+                chat_id = tmp.split(' ')
+                #chat server에 전송 -> 모두에게 뿌리기 위해
+                data = 'chat_update '+chat_id[1] +" "  + self.parent.stuid+" "+self.parent.course[1]+" "+self.tab.tabText(self.tab.currentIndex())
+                self.chatSocket.send(data.encode('utf-8'))
+
+
+class tabWidget(QTabWidget):
+    def __init__(self,parent):
+        super().__init__()
+        self.parent = parent
+
+    def mousePressEvent(self, QMouseEvent):
+
+        if QMouseEvent.button() == Qt.RightButton:
+            msg = QMessageBox()
+            name = self.tabText(self.currentIndex())
+
+            msg.setText(name + ' 카테고리를 제거합니다.\n카테고리명이 맞으면 확인\n틀리면 취소를 눌러주세요.')
+            msg.setStyleSheet("font:10pt 나눔스퀘어라운드 Regular;")
+            msg.addButton(QPushButton('확인'), 0)
+            msg.addButton(QPushButton('취소'), 1)
+
+            msg.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+
+            result = msg.exec_()
+
+            if result == 0:
+                commend = 'category_delete ' + self.parent.lecId + " " + name
+                print(commend)
+                self.parent.clientSocket.send(commend.encode('utf-8'))
+                self.removeTab(self.currentIndex())
 
 class category_create(QDialog):
     def __init__(self,window,parent):
@@ -429,6 +461,7 @@ class category_create(QDialog):
     def initUi(self):
         category_input = QLineEdit()
         category_input.setPlaceholderText('카테고리명')
+        category_input.setStyleSheet("font:10pt 나눔스퀘어라운드 Regular;")
         create = QPushButton('생성')
         cancel = QPushButton('취소')
 
@@ -451,12 +484,35 @@ class category_create(QDialog):
 
     def create_category(self, name):
         #db로 보내서 등록하고 탭 늘려야됨
-        commend = 'category_create ' + self.parent.lecId + " " + name
-        self.clientSocket.send(commend.encode('utf-8'))
+        if name != '':
+            msg = QMessageBox()
 
-        new_tab = QListWidget(self)
-        self.parent.tab.addTab(new_tab, name)
-        self.close()
+            msg.setText(name+' 카테고리를 생성합니다.\n카테고리명이 맞으면 확인\n틀리면 취소를 눌러주세요.')
+            msg.setStyleSheet("font:10pt 나눔스퀘어라운드 Regular;")
+            msg.addButton(QPushButton('확인'), 0)
+            msg.addButton(QPushButton('취소'), 1)
+
+            msg.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+
+            result = msg.exec_()
+
+            if result == 0:
+                commend = 'category_create ' + self.parent.lecId + " " + name
+                self.clientSocket.send(commend.encode('utf-8'))
+
+                new_tab = QListWidget(self)
+                self.parent.tab.addTab(new_tab, name)
+                self.close()
+        else:
+            msg = QMessageBox()
+
+            msg.setText('등록할 카테고리 이름을 입력해주세요.')
+            msg.setStyleSheet("font:10pt 나눔스퀘어라운드 Regular;")
+            msg.addButton(QPushButton('확인'), 0)
+
+            msg.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+            result = msg.exec_()
+
 
 class chatWidget(QWidget):
     def __init__(self,parent,comments,grandparent):
@@ -481,7 +537,7 @@ class chatWidget(QWidget):
             # self.clientSocket.send(commend.encode('utf-8'))
             # result = self.clientSocket.recv(30000)
             # result = result.decode('utf-8')
-            print("self.comments: "+str(self.comments))
+            #print("self.comments: "+str(self.comments))
             #하트아이콘
             if self.comments[-2] == str(0):
                 self.BtnLike = QPushButton(self.comments[3])
@@ -588,7 +644,7 @@ class chatWidget(QWidget):
         self.mainLayout.addStretch(1)
 
     def likeClicked(self):
-        print("like_update's comments: "+str(self.comments))
+        #print("like_update's comments: "+str(self.comments))
         commend = 'like_update '+ self.comments[6] + " " + self.grandparent.stuid#학번 + msg
         self.clientSocket.send(commend.encode('utf-8'))
 

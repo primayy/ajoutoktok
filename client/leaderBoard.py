@@ -81,10 +81,12 @@ class LeaderBoard(QWidget):
         self.clientSocket.send(commend.encode('utf-8'))
         result = self.clientSocket.recv(1024).decode('utf-8')
 
-        UnivRank = str(result).split(" ")
-        myRank = UnivRank.pop()
-        myRank = str(myRank[0]) + " 등!"
+        UnivRank = str(result).split("!#!#")
 
+
+        myRank = UnivRank.pop()
+
+        myRank = str(myRank) + " 등!"
 
         self.myRank.setText(myRank)
         for i in range(len(UnivRank)):
@@ -162,9 +164,11 @@ class LeaderBoard(QWidget):
             result = self.clientSocket.recv(1024).decode('utf-8')
 
             #등수 추가
-            UnivRank = str(result).split(" ")
+            UnivRank = str(result).split("!#!#")
+
             myRank = UnivRank.pop()
-            myRank = str(myRank[0]) +" 등!"
+            myRank = str(myRank) +" 등!"
+
             self.myRank.setText(myRank)
 
             
@@ -199,9 +203,9 @@ class LeaderBoard(QWidget):
             result = self.clientSocket.recv(1024).decode('utf-8')
 
             #등수 추가
-            inDeptRank = result.split(" ")
+            inDeptRank = result.split("!#!#")
             myRank = inDeptRank.pop()
-            myRank = str(myRank[0]) +" 등!"
+            myRank = str(myRank) +" 등!"
             self.myRank.setText(myRank)
 
             for i in range(len(inDeptRank)):
@@ -262,7 +266,6 @@ class LeaderBoard(QWidget):
 class medalWidget(QWidget):
     def __init__(self, info,idx):
         super().__init__()
-
         medal_layout = QHBoxLayout()
         medal_id_point_layout = QHBoxLayout()
         medal_info_layout = QVBoxLayout()
@@ -289,12 +292,14 @@ class medalWidget(QWidget):
         medal_id.setMaximumWidth(180)
         medal_id.setAlignment(QtCore.Qt.AlignBottom)
 
-        medal_aboutMe = QTextBrowser()
-        medal_aboutMe.setText('위젯과 달리 여러 줄의 텍스트를 수정할 수 있는')
-        medal_aboutMe.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;border:0px; background-color:#eef5f6;color:#737373')
-        medal_aboutMe.setMaximumWidth(233)
-        medal_aboutMe.setMaximumHeight(47)
-        medal_aboutMe.setAlignment(QtCore.Qt.AlignBottom)
+        self.medal_aboutMe = QTextBrowser()
+        if len(info) >2:
+            self.medal_aboutMe.setText(info[2])
+
+        self.medal_aboutMe.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;border:0px; background-color:#eef5f6;color:#737373')
+        self.medal_aboutMe.setMaximumWidth(233)
+        self.medal_aboutMe.setMaximumHeight(47)
+        self.medal_aboutMe.setAlignment(QtCore.Qt.AlignBottom)
 
         medal_point = QLabel(info[0]+'Pt')
         medal_point.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
@@ -305,7 +310,7 @@ class medalWidget(QWidget):
         medal_id_point_layout.setStretchFactor(medal_point,1)
         #medal_info_layout.addWidget(medal_id)
         medal_info_layout.addLayout(medal_id_point_layout)
-        medal_info_layout.addWidget(medal_aboutMe)
+        medal_info_layout.addWidget(self.medal_aboutMe)
         #medal_info_layout.addWidget(medal_point)
         medal_info_layout.setSpacing(0)
 
@@ -335,12 +340,12 @@ class elseWidget(QWidget):
         else_point = QLabel(info[0]+'Pt')
         else_point.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
 
-        else_aboutMe = QTextBrowser()
-        else_aboutMe.setText('위젯과 달리 여러 줄의 텍스트를 수정할 수')
-        else_aboutMe.setStyleSheet('font:7pt 나눔스퀘어라운드 Regular;border:0px; background-color:#eef5f6;color:#737373')
-        else_aboutMe.setMaximumWidth(285)
-        else_aboutMe.setMaximumHeight(25)
-        else_aboutMe.setAlignment(QtCore.Qt.AlignBottom)
+        self.else_aboutMe = QTextBrowser()
+        self.else_aboutMe.setText(info[2])
+        self.else_aboutMe.setStyleSheet('font:7pt 나눔스퀘어라운드 Regular;border:0px; background-color:#eef5f6;color:#737373')
+        self.else_aboutMe.setMaximumWidth(285)
+        self.else_aboutMe.setMaximumHeight(25)
+        self.else_aboutMe.setAlignment(QtCore.Qt.AlignBottom)
 
         
         else_info_layout.addWidget(else_rank)
@@ -352,7 +357,7 @@ class elseWidget(QWidget):
         else_info_layout.setSpacing(0)
 
         else_layout.addLayout(else_info_layout)
-        else_layout.addWidget(else_aboutMe)
+        else_layout.addWidget(self.else_aboutMe)
         else_layout.setSpacing(0)
         else_layout.setContentsMargins(5,5,5,5)
         self.setLayout(else_layout)

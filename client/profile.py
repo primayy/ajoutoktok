@@ -20,6 +20,8 @@ class profile(QWidget):
         self.bodypart11 = QHBoxLayout()
         self.bodypart2 = QWidget(self)
         self.bodypart22 = QHBoxLayout()
+        self.bodypart3 = QWidget(self)
+        self.bodypart33 = QHBoxLayout()
         self.tail = QVBoxLayout()
 
         self.mainLayout.setContentsMargins(0,0,0,0)
@@ -31,7 +33,7 @@ class profile(QWidget):
         profile_groupbox.setStyleSheet('font:10pt 나눔스퀘어라운드 Regular;')
         profile_groupbox.setLayout(self.body)
         profile_groupbox.setMinimumWidth(300)
-        profile_groupbox.setMaximumHeight(180)
+        profile_groupbox.setMaximumHeight(250)
 
 
         self.nickname = QLabel()
@@ -50,6 +52,12 @@ class profile(QWidget):
         self.Respond.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
         self.Points = QLabel()
         self.Points.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
+        self.introduceLabel = QLabel("자기소개")
+        self.introduceLabel.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
+        self.changeIntro = QPushButton("변경")
+        self.changeIntro.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
+        self.introduceText = QTextBrowser()
+        self.changeIntro.clicked.connect(self.changeIntroPop)
 
         self.getProfile()
 
@@ -57,14 +65,21 @@ class profile(QWidget):
         self.bodypart11.addWidget(changeNick)
         self.bodypart22.addWidget(self.Query)
         self.bodypart22.addWidget(self.Respond)
+        self.bodypart33.addWidget(self.introduceLabel)
+        self.bodypart33.addWidget(self.changeIntro)
 
         self.bodypart1.setLayout(self.bodypart11)
         self.bodypart2.setLayout(self.bodypart22)
+        self.bodypart3.setLayout(self.bodypart33)
 
         self.body.addWidget(self.bodypart1, alignment=QtCore.Qt.AlignCenter)
         self.body.addWidget(self.Dept, alignment=QtCore.Qt.AlignCenter)
         self.body.addWidget(self.bodypart2, alignment=QtCore.Qt.AlignCenter)
         self.body.addWidget(self.Points, alignment=QtCore.Qt.AlignCenter)
+        self.body.addWidget(self.bodypart3, alignment=QtCore.Qt.AlignCenter)
+        self.body.addWidget(self.introduceText, alignment=QtCore.Qt.AlignCenter)
+
+
         self.body.addStretch(1)
         self.body.setSpacing(0)
 
@@ -80,16 +95,64 @@ class profile(QWidget):
         res = self.clientSocket.recv(1024)
         res = res.decode('utf-8')
         res = res.split(',')
+        print(res)
 
         self.nickname.setText("닉네임: " + res[0])
         self.Dept.setText("소속: " + res[1])
         self.Query.setText("질문: " + res[2])
         self.Respond.setText("답변: " + res[3])
         self.Points.setText("포인트: " + res[4])
+        self.introduceText.setText(res[6])
+
+
+    def changeIntroPop(self):
+        dlg = changeIntroPop(self)
+        dlg.exec_()
 
     def changeNicknamePop(self):
         dlg = changeNickPop(self)
         dlg.exec_()
+
+
+class changeIntroPop(QDialog):
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+        self.clientSocket = self.parent.clientSocket
+
+        self.mainLayout = QVBoxLayout()
+        self.btnLayout = QHBoxLayout()
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.setMinimumSize(150, 150)
+        self.setStyleSheet('background:')
+        self.initUi()
+
+    def initUi(self):
+        intro_input = QLineEdit()
+        intro_input.setPlaceholderText('자기소개 입력')
+        change = QPushButton('확인')
+        change.setFocusPolicy(Qt.NoFocus)
+        cancel = QPushButton('취소')
+
+        cancel.clicked.connect(self.close)
+        change.clicked.connect(lambda: self.changeIntro(intro_input.text()))
+
+        self.btnLayout.addWidget(change)
+        self.btnLayout.addWidget(cancel)
+
+        self.mainLayout.addWidget(intro_input)
+        self.mainLayout.addLayout(self.btnLayout)
+        self.setLayout(self.mainLayout)
+
+    def changeIntro(self,intro):
+        commend = "change_intro "+self.parent.studid + "!#!#" + intro
+        self.clientSocket.send(commend.encode('utf-8'))
+        res = self.clientSocket.recv(1024).decode('utf-8')
+
+        if str(res) == 'changed':
+            self.parent.introduceText.setText(intro)
+            self.close()
+
 
 class changeNickPop(QDialog):
     def __init__(self,parent):

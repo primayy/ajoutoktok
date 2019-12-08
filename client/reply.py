@@ -417,8 +417,8 @@ class sendQuestion(QDialog):
         self.initUi()
 
     def initUi(self):
-        head = QLabel('\t현 댓글을 채택하시겠습니까?\n(주의! 한 번 채택하시면 현 게시글의 댓글에 더 이상 \n 채택을 하시지 못하시며 취소도 하실수 없습니다.)')
-        head.setStyleSheet('font-weight:bold; font-size:13pt;')
+        head = QLabel('\t현 댓글을 채택하시겠습니까?\n(주의! 한 번 채택하시면 현 게시글의 댓글에 더 이상 \n 채택을 하지 못하며 취소도 할 수 없습니다.)')
+        head.setStyleSheet('font:13pt 나눔스퀘어라운드 Regular;')
         send = QPushButton('확인')
         send.clicked.connect(self.sendToEmail)
         cancel = QPushButton('취소')
@@ -428,7 +428,7 @@ class sendQuestion(QDialog):
         self.btnLayout.addWidget(cancel)
 
         self.mainLayout.addStretch(1)
-        self.mainLayout.addWidget(head)
+        self.mainLayout.addWidget(head,alignment=QtCore.Qt.AlignCenter)
         self.mainLayout.addLayout(self.btnLayout)
         self.mainLayout.addStretch(1)
 

@@ -869,26 +869,21 @@ class ServerSocket:
                 elif commend == 'replyHistory':
                     self.lock.acquire()
 
-                    #print(side)
                     cur = self.databasent.cursor()
                     cur.execute("SELECT * FROM reply WHERE chat_id ='" + str(side[0]) + "'")
                     reply = cur.fetchall()
-                    # #print(reply[0][4].strftime('%Y,%m,%d,%H,%M'))
                     if len(reply) != 0:
                         result = ""
                         for i in range(len(reply)):
-                            #print(reply[i][2])
                             result += str(reply[i][2]) + ","  # msg
                             result += str(reply[i][3]) + ","  # stuId
-                            result += str(reply[i][4].strftime('%Y.%m.%d.%H.%M')) + ","  # time
+                            result += str(reply[i][4].strftime('%Y.%m.%d %H:%M:%S')) + ","  # time
                             result += str(reply[i][0]) + ","  # replyId
                             result += str(reply[i][5]) + "/"  # replySelected
 
                         client.sendall(result.encode('utf-8'))
-                        #print('reply 끝')
                     else:
                         client.send('x'.encode('utf-8'))
-                        #print('답글 없음')
                     self.lock.release()
 
                 elif commend == 'get_lecture_id':

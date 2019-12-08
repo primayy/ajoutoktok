@@ -45,30 +45,48 @@ class setting(QWidget):
         horizon_line.setAlignment(Qt.AlignTop)
 
         #사용 설명
-        #use_explanation = QGridLayout()
+        self.use_explanation = QGridLayout()
         #useicon_list = QListWidget()
-        
+        # lecture = QLabel()
+        # lecture_img = QPixmap('./ui/afterlogin_ui/list.png')
+        # lecture_img = lecture_img.scaled(100,100 , QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
+        # lecture.setPixmap(lecture_img)
+        lecture = QPushButton()
+        lecture.setStyleSheet('''
+                QPushButton{image:url(./ui/afterlogin_ui/list.png); border:0px; width:40px; height:40px}
+                QPushButton:hover{background:#cce5e8; border:0px}   
+                ''')
+        lecture.setFocusPolicy(Qt.NoFocus)
+        lecture.clicked.connect(lambda: self.use_explain(0))
+    
+        alarm = QPushButton()
+        alarm.setStyleSheet('''
+                QPushButton{image:url(./ui/afterlogin_ui/alarm.png); border:0px; width:40px; height:40px}
+                QPushButton:hover{background:#cce5e8; border:0px}   
+                ''')
+        alarm.setFocusPolicy(Qt.NoFocus)
+        alarm.clicked.connect(lambda:self.use_explain(1))
 
-        lecture = QLabel()
-        lecture_img = QPixmap('./ui/afterlogin_ui/list.png')
-        lecture_img = lecture_img.scaled(100,100 , QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
-        lecture.setPixmap(lecture_img)
-        
+        rank = QPushButton()
+        rank.setStyleSheet('''
+                QPushButton{image:url(./ui/afterlogin_ui/trophy.png); border:0px; width:40px; height:40px}
+                QPushButton:hover{background:#cce5e8; border:0px}   
+                ''')
+        rank.setFocusPolicy(Qt.NoFocus)
+        rank.clicked.connect(lambda:self.use_explain(2))
 
-        alarm = QLabel()
-        alarm_img = QPixmap('./ui/afterlogin_ui/alarm.png')
-        alarm_img = alarm_img.scaled(100, 100, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
-        alarm.setPixmap(alarm_img)
+        setting = QPushButton()
+        setting.setStyleSheet('''
+                QPushButton{image:url(./ui/afterlogin_ui/setting.png); border:0px; width:40px; height:40px}
+                QPushButton:hover{background:#cce5e8; border:0px}   
+                ''')
+        setting.setFocusPolicy(Qt.NoFocus)
+        setting.clicked.connect(lambda:self.use_explain(3))
 
-        rank = QLabel()
-        rank_img = QPixmap('./ui/afterlogin_ui/trophy.png')
-        rank_img = rank_img.scaled(100, 100, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
-        rank.setPixmap(rank_img)
-
-        setting = QLabel()
-        setting_img = QPixmap('./ui/afterlogin_ui/setting.png')
-        setting_img = setting_img.scaled(100, 100, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
-        setting.setPixmap(setting_img)
+        self.use_explanation.addWidget(lecture,0,0)
+        self.use_explanation.addWidget(alarm,0,1)
+        self.use_explanation.addWidget(rank,1,0)
+        self.use_explanation.addWidget(setting,1,1)
 
 
 
@@ -106,20 +124,43 @@ class setting(QWidget):
         self.title.addWidget(setting_label)
         #self.title.addWidget(logoutbtn)
 
-        self.line.addWidget(alarm_widget_label)
-        self.line.addWidget(self.widget_on_off_button,alignment=(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop))
-        self.line.addWidget(alarm_sound_label)
-        self.line.addWidget(self.sound_on_off_button,alignment=(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop))
-        #self.line.addWidget(useicon_list)
-        self.line.addStretch(1)
+        # self.line.addWidget(alarm_widget_label)
+        # self.line.addWidget(self.widget_on_off_button,alignment=(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop))
+        # self.line.addWidget(alarm_sound_label)
+        # self.line.addWidget(self.sound_on_off_button,alignment=(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop))
+        # #self.line.addWidget(useicon_list)
+        # self.line.addStretch(1)
 
-        alarm_groupbox.setLayout(self.line)
-
+        #alarm_groupbox.setLayout(self.line)
+        alarm_groupbox.setLayout(self.use_explanation)
         self.mainLayout.addLayout(self.title)
         self.mainLayout.addWidget(horizon_line)
         self.mainLayout.addWidget(pf, alignment=QtCore.Qt.AlignCenter)
         self.mainLayout.addWidget(alarm_groupbox)
         self.mainLayout.addStretch(1)
+
+    def use_explain(self,icon_num):
+        msg = QMessageBox()
+        msg.setStyleSheet("font:9pt 나눔스퀘어라운드 Regular;")
+        if icon_num ==0:
+            msg.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+            msg.setText('*강의코드를 통해 강의를 추가할 수 있습니다\n*강의채팅방에 접속할 수 있습니다\n*말풍선 아이콘을 통해 질문 위젯을 띄울 수 있습니다')
+            msg.exec_()
+
+        elif icon_num ==1:
+            msg.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+            msg.setText('*내 게시물에 달린 댓글 알림을 볼 수 있습니다\n*채택된 내 댓글 알림을 볼 수 있습니다')
+            msg.exec_()
+            
+        elif icon_num ==2:
+            msg.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+            msg.setText('*교내, 학과내, 학과별 자신의 포인트와 랭크를 확인할 수 있습니다')
+            msg.exec_()
+        
+        elif icon_num ==3:
+            msg.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+            msg.setText('*개인정보를 확인하고 닉네임을 변경할 수 있습니다')
+            msg.exec_()
 
     def widget_button_toggle(self):
         if (self.widget_on_off_button_status == True):

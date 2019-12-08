@@ -51,7 +51,7 @@ class Invisible(QWidget):
 
         self.l = QLabel()
         self.chatcount = 0
-        self.l.setStyleSheet('QLabel{image:url(./icon/msgWid.png)}')
+        self.l.setStyleSheet('QLabel{image:url(./icon/chat_Widget.png)}')
         self.l.setText(str(self.chatcount))
         self.l.setFont(QFont("Times", 50, QFont.Bold))
 

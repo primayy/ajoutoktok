@@ -103,7 +103,7 @@ class App(QWidget):
         btnAlram.setMaximumHeight(200)
         btnAlram.setMaximumWidth(200)
         btnAlram.setStyleSheet('''
-                        QPushButton{image:url(./ui/afterlogin_ui/alarm.png); border:0px; width:36px; height:36px}        
+                        QPushButton{image:url(./ui/afterlogin_ui/bell (4).png); border:0px; width:36px; height:36px}        
                         QPushButton:hover{background:#cce5e8; border:0px}
                         ''')
         btnAlram.setFocusPolicy(Qt.NoFocus)

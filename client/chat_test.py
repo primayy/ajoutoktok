@@ -83,7 +83,7 @@ class chatRoom(QWidget):
 
         #chat server와 연결
         self.chatSocket= socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.14', 3334))
+        self.chatSocket.connect(('192.168.0.31', 3334))
         # self.chatSocket.connect(('192.168.43.36', 3334))
         #self.chatSocket.connect(('192.168.0.8',3334))
         # self.chatSocket.connect(('192.168.25.22', 3334))
@@ -555,7 +555,7 @@ class chatWidget(QWidget):
             #댓글 아이콘
             self.BtnReply = QPushButton()
 
-            self.BtnReply.setIcon(QIcon('./ui/chatting_ui/reply.png'))
+            self.BtnReply.setIcon(QIcon('./ui/chatting_ui/bubble.png'))
             self.BtnReply.setStyleSheet('''
             QPushButton{border:0px; background-color:#e8f3f4; width:50px;height:40px;padding:20px}''')
             self.BtnReply.setIconSize(QSize(30,30))

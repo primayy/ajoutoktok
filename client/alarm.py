@@ -176,16 +176,16 @@ class lecture(QWidget):
 
         #텍스트브라우저형식
         alarm_message = QTextBrowser()
-        alarm_message.setMaximumHeight(90)
+        alarm_message.setMaximumHeight(75)
         alarm_message.setMaximumWidth(230)
-        alarm_message.setStyleSheet('border:0px')
+        alarm_message.setStyleSheet('background-color:white;border:0px;')
         #alarm_message.setMinimumSize(100,90)
         
 
         #이동 버튼
         reply_move_button = QPushButton()
         reply_move_button.setStyleSheet('''
-                    QPushButton{image:url(./ui/afterlogin_ui/이동3.png); border:0px; width:35px;height:105px}        
+                    QPushButton{image:url(./ui/afterlogin_ui/이동3.png); border:0px; width:35px;height:93px}        
                     ''')
         reply_move_button.setFocusPolicy(Qt.NoFocus)
         reply_move_button.clicked.connect(self.open_reply)
@@ -213,7 +213,7 @@ class lecture(QWidget):
                 time = time_tmp
 
                 Qlabel2 = QLabel(str(date)+" "+str(time))
-                Qlabel2.setStyleSheet('background:#eef5f6')
+                Qlabel2.setStyleSheet('background:white')
                 
                 layoutout.addWidget(Qlabel2,alignment=(QtCore.Qt.AlignTop))
                 layoutout.setSpacing(0)

@@ -18,6 +18,7 @@ class LeaderBoard(QWidget):
         self.rankWidget = QWidget()
         self.title = QHBoxLayout()
         self.myRankLayout = QVBoxLayout()
+        self.myRankLayout.setContentsMargins(0,0,0,0)
 
         #랭크 탭 설정
         self.tab = QTabWidget()
@@ -26,8 +27,20 @@ class LeaderBoard(QWidget):
 
         #랭크 리스트 설정
         self.show_all = QListWidget(self)
+        self.show_all.setStyleSheet('''
+                QListWidget:item:hover{background:#95c3cb};
+                ''')
+        self.show_all.setContentsMargins(0,0,0,0)
+
         self.show_inDepart = QListWidget(self)
+        self.show_inDepart.setStyleSheet('''
+                QListWidget:item:hover{background:#95c3cb};
+                ''')
+
         self.show_compDepart = QListWidget(self)
+        self.show_compDepart.setStyleSheet('''
+                QListWidget:item:hover{background:#95c3cb};
+                ''')
         self.initUi()
 
     def initUi(self):
@@ -88,16 +101,25 @@ class LeaderBoard(QWidget):
                         self.show_all.update()
 
                     else:
-                        self.show_all.addItem(str(str(i+1)+"등- "+allRank[1]+" / " +allRank[0]+"Pt"))
-                    #self.show_all.addItem(medal1_info_id)
+                        #self.show_all.addItem(str(str(i+1)+"등- "+allRank[1]+" / " +allRank[0]+"Pt"))
+                        item2 =QListWidgetItem(self.show_all)
+                        custom_widget2 = elseWidget(allRank,i)
+                        item2.setSizeHint(custom_widget2.sizeHint())
+                        self.show_all.setItemWidget(item2, custom_widget2)
+                        self.show_all.addItem(item2)
+                        self.show_all.update()
+
+
             #########여기까지가 그 코드
 
 
-
-        self.tab.addTab(self.show_all, "전체")
+        
+        self.tab.addTab(self.show_all, "   전체   ")
+        self.tab.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
         self.tab.addTab(self.show_inDepart, "학과내")
         self.tab.addTab(self.show_compDepart, "학과별")
-
+        self.tab.setContentsMargins(0,0,0,0)
+        
         self.tab.currentChanged.connect(self.tab.tabText)
         self.tab.currentChanged.connect(self.getRank)
         self.title.addWidget(group)
@@ -117,8 +139,8 @@ class LeaderBoard(QWidget):
         self.mainLayout.addWidget(empty)
         self.mainLayout.addWidget(empty)
         self.mainLayout.addWidget(empty)
-        self.tab.setMinimumSize(300,300)
-        self.tab.setMaximumSize(300,400)
+        self.tab.setMinimumSize(330,320)
+        self.tab.setMaximumSize(330,320)
 
         self.setLayout(self.mainLayout)
 
@@ -145,6 +167,8 @@ class LeaderBoard(QWidget):
             myRank = str(myRank[0]) +" 등!"
             self.myRank.setText(myRank)
 
+            
+
             for i in range(len(UnivRank)):
                 if len(UnivRank[i])>0:
                     allRank = UnivRank[i].split(",")
@@ -159,7 +183,12 @@ class LeaderBoard(QWidget):
                             self.show_all.update()
 
                         else:
-                            self.show_all.addItem(" "+str(str(i+1)+"등  "+allRank[1]+"      " +allRank[0]+"Pt"))
+                            item2 =QListWidgetItem(self.show_all)
+                            custom_widget2 = elseWidget(allRank,i)
+                            item2.setSizeHint(custom_widget2.sizeHint())
+                            self.show_all.setItemWidget(item2, custom_widget2)
+                            self.show_all.addItem(item2)
+                            self.show_all.update()
 
 
         elif self.tab.tabText(self.tab.currentIndex()) == '학과내':
@@ -188,8 +217,14 @@ class LeaderBoard(QWidget):
                             self.show_inDepart.addItem(item)
                             self.show_inDepart.update()
 
-                    else:
-                        self.show_inDepart.addItem("    "+str(str(i+1)+"등  "+inDepartRank[1]+"     " +inDepartRank[0]+"Pt"))
+                        else:
+                            item2 =QListWidgetItem(self.show_inDepart)
+                            custom_widget2 = elseWidget(inDepartRank,i)
+                            item2.setSizeHint(custom_widget2.sizeHint())
+                            self.show_inDepart.setItemWidget(item2, custom_widget2)
+                            self.show_inDepart.addItem(item2)
+                            self.show_inDepart.update()
+                        
 
 
         elif self.tab.tabText(self.tab.currentIndex()) == '학과별':
@@ -217,47 +252,110 @@ class LeaderBoard(QWidget):
                             self.show_compDepart.update()
 
                         else:
-                            self.show_compDepart.addItem("  "+str(str(i+1)+"등  "+compDepartRank[1]+"       " +compDepartRank[0]+"Pt"))                       
+                            item2 =QListWidgetItem(self.show_compDepart)
+                            custom_widget2 = elseWidget(compDepartRank,i)
+                            item2.setSizeHint(custom_widget2.sizeHint())
+                            self.show_compDepart.setItemWidget(item2, custom_widget2)
+                            self.show_compDepart.addItem(item2)
+                            self.show_compDepart.update()
 
 class medalWidget(QWidget):
     def __init__(self, info,idx):
         super().__init__()
 
         medal_layout = QHBoxLayout()
+        medal_id_point_layout = QHBoxLayout()
         medal_info_layout = QVBoxLayout()
+        medal_info_layout.setContentsMargins(0,0,0,0)
         medal_img = QLabel()
 
         if idx==0:
             medal_img_file = QPixmap('./ui/board_ui/first.png')
-            medal_img_file= medal_img_file.scaled(50,50,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+            medal_img_file= medal_img_file.scaled(45,45,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
             medal_img.setPixmap(medal_img_file)
 
         elif idx==1:
             medal_img_file = QPixmap('./ui/board_ui/second.png')
-            medal_img_file= medal_img_file.scaled(50,50,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+            medal_img_file= medal_img_file.scaled(45,45,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
             medal_img.setPixmap(medal_img_file)
 
         elif idx==2:
             medal_img_file = QPixmap('./ui/board_ui/third.png')
-            medal_img_file= medal_img_file.scaled(50,50,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
+            medal_img_file= medal_img_file.scaled(45,45,QtCore.Qt.KeepAspectRatio,QtCore.Qt.FastTransformation)
             medal_img.setPixmap(medal_img_file)
 
-        medal_id = QLabel(info[1])
-        medal_id.setStyleSheet('font:11pt 나눔스퀘어라운드 Regular;')
+        medal_id = QLabel(" " +info[1])
+        medal_id.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
+        medal_id.setMaximumWidth(180)
         medal_id.setAlignment(QtCore.Qt.AlignBottom)
-        medal_point = QLabel(info[0]+'Pt')
-        medal_point.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
 
-        medal_info_layout.addWidget(medal_id)
-        medal_info_layout.addWidget(medal_point)
+        medal_aboutMe = QTextBrowser()
+        medal_aboutMe.setText('위젯과 달리 여러 줄의 텍스트를 수정할 수 있는')
+        medal_aboutMe.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;border:0px; background-color:#eef5f6;color:#737373')
+        medal_aboutMe.setMaximumWidth(233)
+        medal_aboutMe.setMaximumHeight(47)
+        medal_aboutMe.setAlignment(QtCore.Qt.AlignBottom)
+
+        medal_point = QLabel(info[0]+'Pt')
+        medal_point.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
+
+        medal_id_point_layout.addWidget(medal_id)
+        medal_id_point_layout.setStretchFactor(medal_id,5)
+        medal_id_point_layout.addWidget(medal_point)
+        medal_id_point_layout.setStretchFactor(medal_point,1)
+        #medal_info_layout.addWidget(medal_id)
+        medal_info_layout.addLayout(medal_id_point_layout)
+        medal_info_layout.addWidget(medal_aboutMe)
+        #medal_info_layout.addWidget(medal_point)
         medal_info_layout.setSpacing(0)
 
         medal_layout.addWidget(medal_img)
         medal_layout.setStretchFactor(medal_img,1)
         medal_layout.addLayout(medal_info_layout)
-        medal_layout.setStretchFactor(medal_info_layout,4)
+        medal_layout.setStretchFactor(medal_info_layout,5)
         medal_layout.setSpacing(5)
+        medal_layout.setContentsMargins(5,5,5,5)
         self.setLayout(medal_layout)
+        #self.setContentsMargins(0,0,0,0)
+
+class elseWidget(QWidget):
+    def __init__(self, info,idx):
+        super().__init__()
+
+        else_layout = QVBoxLayout()
+        else_info_layout = QHBoxLayout()
+        
+        else_rank = QLabel(str(idx+1) + "등")
+        else_rank.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
+
+        else_id = QLabel(info[1])
+        else_id.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
+        else_id.setAlignment(QtCore.Qt.AlignBottom)
+
+        else_point = QLabel(info[0]+'Pt')
+        else_point.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
+
+        else_aboutMe = QTextBrowser()
+        else_aboutMe.setText('위젯과 달리 여러 줄의 텍스트를 수정할 수')
+        else_aboutMe.setStyleSheet('font:7pt 나눔스퀘어라운드 Regular;border:0px; background-color:#eef5f6;color:#737373')
+        else_aboutMe.setMaximumWidth(285)
+        else_aboutMe.setMaximumHeight(25)
+        else_aboutMe.setAlignment(QtCore.Qt.AlignBottom)
+
+        
+        else_info_layout.addWidget(else_rank)
+        else_info_layout.setStretchFactor(else_rank,1)
+        else_info_layout.addWidget(else_id)
+        else_info_layout.setStretchFactor(else_id,5)
+        else_info_layout.addWidget(else_point)
+        else_info_layout.setStretchFactor(else_point,1)
+        else_info_layout.setSpacing(0)
+
+        else_layout.addLayout(else_info_layout)
+        else_layout.addWidget(else_aboutMe)
+        else_layout.setSpacing(0)
+        else_layout.setContentsMargins(5,5,5,5)
+        self.setLayout(else_layout)
 
 
 if __name__ == "__main__":

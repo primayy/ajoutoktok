@@ -256,8 +256,12 @@ class lecture(QWidget):
             self.msg_widget.setMaximumHeight(23)
             self.msg_widget.setMaximumWidth(23)
             self.msg_widget.resize(23, 23)
-            self.msg_widget.setStyleSheet('''border:0px''')
-            self.msg_widget.setIcon(QIcon('./ui/afterlogin_ui/bubble.png'))
+            #self.msg_widget.setStyleSheet('''QPushButton:{image:url(./ui/afterlogin_ui/chat (1).png); border:0px}''')
+            #self.msg_widget.setIcon(QIcon('./ui/afterlogin_ui/chat (1).png'))
+            self.msg_widget.setStyleSheet('''
+            QPushButton{image:url(./ui/afterlogin_ui/chat (1).png); border:0px}
+            QPushButton:hover{image:url(./ui/afterlogin_ui/chat (2).png); border:0px}''')
+            #self.msg_widget.setIconSize(QSize(20,20))
             self.msg_widget.setFocusPolicy(Qt.NoFocus)
             self.prof = QLabel(course[1])
             self.prof.setStyleSheet('font: 8pt 나눔스퀘어라운드 Regular;background:#eef5f6;color:#42808a')

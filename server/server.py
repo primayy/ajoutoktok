@@ -16,7 +16,7 @@ class ServerSocket:
     def __init__(self):
         self.numnum = 0
         try:
-            self.databasent = mdb.connect('localhost', 'root', '0428', 'db_testin')
+            self.databasent = mdb.connect('localhost', 'root', '789521', 'db_testin')
             #print("Successfully Connected To DB")
         except mdb.Error as e:
             print('Not Connected Succefully To DB')
@@ -1004,11 +1004,11 @@ class ServerSocket:
                         # 전체 랭킹 서치
                         if len(allSQLRows) > 0:
                             for i in range(len(allSQLRows)):
-                                cur.execute("SELECT nickname FROM user WHERE student_id ='" + str(
+                                cur.execute("SELECT nickname,introduce FROM user WHERE student_id ='" + str(
                                     allSQLRows[i][1]) + "'")  # 해당 학번의 닉네임 호출
                                 allSQLRows2 = cur.fetchall()
                                 #print(">>>>>ID: " + str(allSQLRows2))
-                                UnivRank += str(allSQLRows[i][0]) + "," + str(allSQLRows2[0][0]) + " "  # "포인트,닉네임"
+                                UnivRank += str(allSQLRows[i][0]) + "," + str(allSQLRows2[0][0]) + ","+str(allSQLRows2[0][1]) + "!#!#"  # "포인트,닉네임"
                         UnivRank.rstrip()
                         #print(UnivRank)
 
@@ -1032,11 +1032,11 @@ class ServerSocket:
                         # 과내 랭킹 서치
                         if len(allSQLRows) > 0:
                             for i in range(len(allSQLRows)):
-                                cur.execute("SELECT nickname FROM user WHERE student_id ='" + str(
+                                cur.execute("SELECT nickname,introduce FROM user WHERE student_id ='" + str(
                                     allSQLRows[i][1]) + "'")  # 해당 학번의 닉네임 호출
                                 allSQLRows2 = cur.fetchall()
                                 #print(">>>>>ID: " + str(allSQLRows2))
-                                inDeptRank += str(allSQLRows[i][0]) + "," + str(allSQLRows2[0][0]) + " "  # "포인트,닉네임"
+                                inDeptRank += str(allSQLRows[i][0]) + "," + str(allSQLRows2[0][0]) + ","+str(allSQLRows2[0][1]) + "!#!#"  # "포인트,닉네임"
                         inDeptRank.rstrip()
                         #print(inDeptRank)
                         cur.execute(
@@ -1065,7 +1065,7 @@ class ServerSocket:
                             "SELECT count(*)+1 from (SELECT sum(points) as p FROM points GROUP BY Depart ORDER BY sum(points) DESC) as tt where p > (select sum(points) from points where Depart='" + Department + "')")
                         myRank = str(cur.fetchall()[0][0])
                         DeptRank += " " + myRank
-                        #print(DeptRank)
+                        print(DeptRank)
                         client.send(str(DeptRank).encode('utf-8'))
 
                     self.lock.release()
@@ -1436,9 +1436,25 @@ class ServerSocket:
                     res += str(user_info[0][5]) + ","  # 질문수
                     res += str(user_info[0][6]) + ","  # 답변수
                     res += str(user_info[0][7]) + ","  # 포인트
-                    res += str(user_info[0][2])  # 이름
-
+                    res += str(user_info[0][2]) + "," # 이름
+                    res += str(user_info[0][11]) #자기 소개
                     client.send(res.encode('utf-8'))
+
+                    print(res)
+                    self.lock.release()
+                elif commend == 'change_intro':
+                    self.lock.acquire()
+                    if len(side) >1:
+                        side = ' '.join(side[0:])
+                    else:
+                        side = side[0]
+
+                    side = side.split('!#!#')
+                    cur = self.databasent.cursor()
+                    cur.execute(
+                        "UPDATE user set introduce ='" + str(side[1]) + "' where student_id ='" + str(side[0]) + "'")
+                    self.databasent.commit()
+                    client.send('changed'.encode('utf-8'))
 
                     self.lock.release()
 

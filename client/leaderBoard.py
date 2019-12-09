@@ -27,17 +27,20 @@ class LeaderBoard(QWidget):
 
         #랭크 리스트 설정
         self.show_all = QListWidget(self)
+        self.show_all.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.show_all.setStyleSheet('''
                 QListWidget:item:hover{background:#95c3cb};
                 ''')
         self.show_all.setContentsMargins(0,0,0,0)
 
         self.show_inDepart = QListWidget(self)
+        self.show_inDepart.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.show_inDepart.setStyleSheet('''
                 QListWidget:item:hover{background:#95c3cb};
                 ''')
 
         self.show_compDepart = QListWidget(self)
+        self.show_compDepart.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.show_compDepart.setStyleSheet('''
                 QListWidget:item:hover{background:#95c3cb};
                 ''')
@@ -117,7 +120,7 @@ class LeaderBoard(QWidget):
 
         
         self.tab.addTab(self.show_all, "   전체   ")
-        self.tab.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
+        self.tab.setStyleSheet('font:10pt 나눔스퀘어라운드 Regular;')
         self.tab.addTab(self.show_inDepart, "학과내")
         self.tab.addTab(self.show_compDepart, "학과별")
         self.tab.setContentsMargins(0,0,0,0)
@@ -141,8 +144,8 @@ class LeaderBoard(QWidget):
         self.mainLayout.addWidget(empty)
         self.mainLayout.addWidget(empty)
         self.mainLayout.addWidget(empty)
-        self.tab.setMinimumSize(330,320)
-        self.tab.setMaximumSize(330,320)
+        self.tab.setMinimumSize(310,320)
+        self.tab.setMaximumSize(310,320)
 
         self.setLayout(self.mainLayout)
 
@@ -289,7 +292,7 @@ class medalWidget(QWidget):
 
         medal_id = QLabel(" " +info[1])
         medal_id.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
-        medal_id.setMaximumWidth(180)
+        medal_id.setMaximumWidth(160)
         medal_id.setAlignment(QtCore.Qt.AlignBottom)
 
         self.medal_aboutMe = QTextBrowser()
@@ -297,7 +300,7 @@ class medalWidget(QWidget):
             self.medal_aboutMe.setText(info[2])
 
         self.medal_aboutMe.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;border:0px; background-color:#eef5f6;color:#737373')
-        self.medal_aboutMe.setMaximumWidth(233)
+        self.medal_aboutMe.setMaximumWidth(215)
         self.medal_aboutMe.setMaximumHeight(47)
         self.medal_aboutMe.setAlignment(QtCore.Qt.AlignBottom)
 
@@ -345,17 +348,17 @@ class elseWidget(QWidget):
         if len(info)>2:
             self.else_aboutMe.setText(info[2])
         self.else_aboutMe.setStyleSheet('font:7pt 나눔스퀘어라운드 Regular;border:0px; background-color:#eef5f6;color:#737373')
-        self.else_aboutMe.setMaximumWidth(285)
+        self.else_aboutMe.setMaximumWidth(265)
         self.else_aboutMe.setMaximumHeight(25)
         self.else_aboutMe.setAlignment(QtCore.Qt.AlignBottom)
 
         
         else_info_layout.addWidget(else_rank)
-        else_info_layout.setStretchFactor(else_rank,1)
+        else_info_layout.setStretchFactor(else_rank,2)
         else_info_layout.addWidget(else_id)
-        else_info_layout.setStretchFactor(else_id,5)
+        else_info_layout.setStretchFactor(else_id,7)
         else_info_layout.addWidget(else_point)
-        else_info_layout.setStretchFactor(else_point,1)
+        else_info_layout.setStretchFactor(else_point,2)
         else_info_layout.setSpacing(0)
 
         else_layout.addLayout(else_info_layout)

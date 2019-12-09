@@ -185,7 +185,8 @@ class lecture(QWidget):
         #이동 버튼
         reply_move_button = QPushButton()
         reply_move_button.setStyleSheet('''
-                    QPushButton{image:url(./ui/afterlogin_ui/이동3.png); border:0px; width:35px;height:93px}        
+                    QPushButton{image:url(./ui/afterlogin_ui/보내기3.png); border:0px; width:35px;height:93px}
+                    QPushButton:hover{image:url(./ui/afterlogin_ui/보내기4.png); border:0px; width:35px;height:93px}          
                     ''')
         reply_move_button.setFocusPolicy(Qt.NoFocus)
         reply_move_button.clicked.connect(self.open_reply)

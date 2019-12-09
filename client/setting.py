@@ -30,8 +30,9 @@ class setting(QWidget):
 
         alarm_groupbox = QGroupBox('안내설명')
         alarm_groupbox.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
-        alarm_groupbox.setMinimumSize(300,300)
+        alarm_groupbox.setMinimumSize(300,170)
 
+        empty = QLabel("   ")
 
         #강의 목록 그리기
         setting_label = QLabel('개인 설정')
@@ -137,6 +138,8 @@ class setting(QWidget):
         self.mainLayout.addWidget(horizon_line)
         self.mainLayout.addWidget(pf, alignment=QtCore.Qt.AlignCenter)
         self.mainLayout.addWidget(alarm_groupbox)
+        self.mainLayout.addWidget(empty)
+        self.mainLayout.addWidget(empty)
         self.mainLayout.addStretch(1)
 
     def use_explain(self,icon_num):

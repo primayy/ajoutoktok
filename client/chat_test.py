@@ -84,13 +84,14 @@ class chatRoom(QWidget):
 
         # chat server와 연결
         self.chatSocket = socket(AF_INET, SOCK_STREAM)
-        self.chatSocket.connect(('192.168.0.14', 3334))
+        #self.chatSocket.connect(('192.168.0.31', 3334))
         # self.chatSocket.connect(('192.168.43.36', 3334))
         # self.chatSocket.connect(('192.168.0.8',3334))
         # self.chatSocket.connect(('192.168.25.22', 3334))
         # self.chatSocket.connect(('35.200.112.11', 3334))
         # self.chatSocket.connect(('172.30.1.21', 3334))
         # self.chatSocket.connect(('192.168.0.17', 3334))
+        self.chatSocket.connect(('34.84.112.149', 3334))
 
         self.history = self.getChatHistory()
         self.tab.currentChanged.connect(self.category_changed)
@@ -693,19 +694,24 @@ class studentInfo(QDialog):
         self.mainLayout = QVBoxLayout()
         self.btnLayout = QHBoxLayout()
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        
         self.initUi()
 
     def initUi(self):
         head = QLabel('정보')
-        head.setStyleSheet('font-weight:bold; font-size:13pt')
+        head.setStyleSheet('font-weight:bold; font:12pt 나눔스퀘어라운드 Regular;')
 
         # 학생 정보
         self.name = QLabel('이름')
+        self.name.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
         self.depart = QLabel('소속')
+        self.depart.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
         self.student_id = QLabel('학번')
+        self.student_id.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
 
         # 버튼
         check = QPushButton('확인')
+        check.setStyleSheet('font:9pt 나눔스퀘어라운드 Regular;')
         check.clicked.connect(self.close)
 
         self.btnLayout.addWidget(check)
@@ -720,7 +726,7 @@ class studentInfo(QDialog):
 
         self.student_info()
 
-        self.setFixedSize(200, 150)
+        self.setFixedSize(200, 200)
         self.setLayout(self.mainLayout)
 
     def student_info(self):

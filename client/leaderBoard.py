@@ -341,7 +341,9 @@ class elseWidget(QWidget):
         else_point.setStyleSheet('font:8pt 나눔스퀘어라운드 Regular;')
 
         self.else_aboutMe = QTextBrowser()
-        self.else_aboutMe.setText(info[2])
+        print(info)
+        if len(info)>2:
+            self.else_aboutMe.setText(info[2])
         self.else_aboutMe.setStyleSheet('font:7pt 나눔스퀘어라운드 Regular;border:0px; background-color:#eef5f6;color:#737373')
         self.else_aboutMe.setMaximumWidth(285)
         self.else_aboutMe.setMaximumHeight(25)

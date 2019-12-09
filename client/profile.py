@@ -33,7 +33,7 @@ class profile(QWidget):
         profile_groupbox.setStyleSheet('font:10pt 나눔스퀘어라운드 Regular;')
         profile_groupbox.setLayout(self.body)
         profile_groupbox.setMinimumWidth(300)
-        profile_groupbox.setMaximumHeight(250)
+        profile_groupbox.setMaximumHeight(300)
 
 
         self.nickname = QLabel()
